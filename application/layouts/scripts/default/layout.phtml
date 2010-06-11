@@ -1,0 +1,6 @@
+<h1>This is Layout</h1>
+<?php echo $this->layout()->content; ?>
+<h4>Request Object:</h4>
+<pre>
+<?php echo var_export(Zend_Controller_Front::getInstance()->getRequest()/*->getParams()*/, true);?>
+</pre>

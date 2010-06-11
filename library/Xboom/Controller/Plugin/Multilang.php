@@ -1,0 +1,208 @@
+<?php
+
+/**
+ * Front Controller Plugin.
+ * Hooks routeStartup, routeShutdown and dispatchLoopShutdown.
+ * Multilanguage support, which adds language detection by URL prefix.
+ *
+ * @category   Multilang
+ * @package    Multilang_Controller
+ * @subpackage Plugins
+ *
+ * Description of Multilang
+ *
+ * @author     yugeon
+ * @version    SVN: $Id$
+ */
+
+class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
+{
+    /**
+     * Default language.
+     *
+     * @var string
+     */
+    protected $_defaultLang = 'en';
+
+    /**
+     * Map of supported locales.
+     *
+     * @var array
+     */
+    protected $_locales = array('en' => 'en_GB');
+
+    /**
+     * URL delimetr symbol.
+     * @var string
+     */
+    protected $_urlDelimiter = '/';
+
+    /**
+     * HTTP status code for redirects
+     * @var int
+     */
+    protected $_redirectCode = 302;
+
+    /**
+     * Contructor
+     * Verify options
+     *
+     * @param array $options
+     */
+    public function __construct($defaultLang = '', Array $localesMap = array())
+    {
+        $this->_locales = array_merge($this->_locales, $localesMap);
+        if (array_key_exists($defaultLang, $this->_locales))
+        {
+            $this->_defaultLang = $defaultLang;
+        }
+    }
+
+    /**
+     * routeStartup() plugin hook
+     * Parse URL and extract language if present in URL. Prepare base url for routing.
+     *
+     * @param Zend_Controller_Request_Abstract $request
+     */
+    public function routeStartup(Zend_Controller_Request_Abstract $request)
+    {
+        // Work only with http request
+        if (! ($request instanceof Zend_Controller_Request_Http))
+            return;
+
+        $front = Zend_Controller_Front::getInstance();
+
+        // if language present in URL after baseUrl. (http://host/base_url/en/..., /ru, /rus...)
+        $lang = '';
+        if (preg_match("#^/([a-zA-Z]{2,3})($|/)#", $request->getPathInfo(), $matches))
+        {
+            $lang = $matches[1];
+        }
+
+        // Check if lang in list of available language
+        if (array_key_exists($lang, $this->_locales))
+        {
+            // change base URL
+            $front->setBaseUrl($front->getBaseUrl() . $this->_urlDelimiter . $lang);
+            // init path info with new baseUrl.
+            $request->setPathInfo();
+            // save present language
+            Zend_Registry::set('url_lang', $lang);
+        }
+    }
+
+    /**
+     * routeShutdown() plugin hook
+     * Last chance to define language.
+     * If language not present in URL and is a GET request then redirect immediately.
+     *
+     * @param Zend_Controller_Request_Abstract $request
+     */
+    public function dispatchLoopStartup(Zend_Controller_Request_Abstract $request)
+    {
+        // Work only with http request
+        if (! ($request instanceof Zend_Controller_Request_Http))
+            return;
+
+        $lang = '';
+        if (!Zend_Registry::isRegistered('url_lang'))
+        {
+            // language not present in URL
+            // check if language set in user options.
+            $lang = '';
+            if (Zend_Registry::isRegistered('user_lang'))
+            {
+                $lang = Zend_Registry::get('user_lang');
+            }
+            else
+            {
+                // language not present in user options
+                // take from browser.
+                try
+                {
+                    $locale = new Zend_Locale(Zend_Locale::BROWSER);
+                    $lang = $locale->getLanguage();
+                    unset($locale);
+                }
+                catch (Exception $e)
+                {
+                    $lang = $this->_defaultLang;
+                }
+            }
+            if (!array_key_exists($lang, $this->_locales))
+            {
+                $lang =  $this->_defaultLang;
+            }
+
+            if ($request->isGet())
+            {
+                // set evaluating language in URL, and redirect request
+                $uri = Zend_Uri::factory($request->getScheme());
+                $uri->setHost($request->getHttpHost());
+                $uri->setPath($request->getBaseUrl() . $this->_urlDelimiter
+                        . $lang . $request->getPathInfo());
+                $query = '';
+                $requestUri = $request->getRequestUri();
+                if (false !== ($pos = strpos($requestUri, '?')))
+                {
+                    $query = substr($requestUri, $pos + 1);
+                    $uri->setQuery($query);
+                }
+                $response = Zend_Controller_Front::getInstance()->getResponse();
+                $response->setRedirect($uri, $this->_redirectCode);
+                $response->sendHeaders();
+                exit();
+            }
+        }
+        else
+        {
+            // language present in URL
+            $lang = Zend_Registry::get('url_lang');
+        }
+
+        // Set up Locale object.
+//        if (Zend_Registry::isRegistered('user_locale'))
+//        {
+//            $localeString = Zend_Registry::get('user_locale');
+//        }
+//        else
+//        {
+            $localeString = $this->_locales[$lang];
+//        }
+        $locale = new Zend_Locale($localeString);
+
+        // TODO: location dir for language
+        // Set up Translate Object.
+        $translationStrings = array();
+        $file = APPLICATION_PATH . '/modules/' . $request->getModuleName()
+                . '/lang/' . $localeString . '.php';
+        if (file_exists($file))
+        {
+            $translationStrings = include $file;
+        }
+        if(empty($translationStrings) || !is_array($translationStrings))
+        {
+            $translationStrings = array('test' => '1');
+        }
+        $translate = new Zend_Translate('array', $translationStrings, $locale);
+
+        // Save language settings.
+        Zend_Registry::set('lang', $lang);
+        Zend_Registry::set('Zend_Locale', $locale);
+        Zend_Registry::set('Zend_Translate', $translate);
+    }
+
+     /**
+     * routeShutdown
+     *
+     * @param Zend_Controller_Request_Abstract $request
+     */
+    public function preDispatch(Zend_Controller_Request_Abstract $request)
+    {
+        // add translation for current module
+//        $translate = Zend_Registry::get('Zend_Translate');
+//        $translate->addTranslation(APPLICATION_PATH . '/modules/'.$request->getModuleName().'/lang/',
+//                                   Zend_Registry::get('Zend_Locale'));
+    }
+
+}

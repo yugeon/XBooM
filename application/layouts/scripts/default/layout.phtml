@@ -1,6 +1,27 @@
+<?php echo $this->doctype(); ?>
+
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    
+    <?php echo $this->headMeta(); ?>
+
+    <?php echo $this->headTitle(); ?>
+
+    <?php echo $this->headLink(); ?>
+
+	<?php echo $this->headStyle(); ?>
+    
+	<?php echo $this->headScript(); ?>
+
+</head>
+<body>
+
 <h1>This is Layout</h1>
 <?php echo $this->layout()->content; ?>
 <h4>Request Object:</h4>
 <pre>
 <?php echo var_export(Zend_Controller_Front::getInstance()->getRequest()/*->getParams()*/, true);?>
 </pre>
+
+</body>
+</html>

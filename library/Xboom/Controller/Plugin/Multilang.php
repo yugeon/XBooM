@@ -175,7 +175,7 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
         // Set up Translate Object.
         $translationStrings = array();
         $file = APPLICATION_PATH . '/modules/' . $request->getModuleName()
-                . '/lang/' . $localeString . '.php';
+                . '/lang/' . $lang . '.php';
         if (file_exists($file))
         {
             $translationStrings = include $file;
@@ -184,7 +184,7 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
         {
             $translationStrings = array('test' => '1');
         }
-        $translate = new Zend_Translate('array', $translationStrings, $locale);
+        $translate = new Zend_Translate('array', $translationStrings, $lang);
 
         // Save language settings.
         Zend_Registry::set('lang', $lang);

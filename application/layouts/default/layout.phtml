@@ -1,28 +1,38 @@
 <?php echo $this->doctype(); ?>
 
-<!--html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en"-->
-<html lang="en">
+<html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
-    
-    <?php echo $this->headMeta(); ?>
 
-    <?php echo $this->headTitle(); ?>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-    <?php echo $this->headLink(); ?>
+<?php echo $this->headMeta(); ?>
 
-	<?php echo $this->headStyle(); ?>
-    
-	<?php echo $this->headScript(); ?>
+<?php echo $this->headTitle(); ?>
+
+<base href="<?php echo $this->escape($this->baseUrl()); ?>" />
+
+<?php
+    $this->headLink()->appendStylesheet('css/blueprint/screen.css', 'screen, projection');
+    $this->headLink()->appendStylesheet('css/blueprint/print.css', 'print');
+    $this->headLink()->appendStylesheet('css/blueprint/ie.css', 'screen, projection', 'lt IE 8');
+    $this->headLink()->appendStylesheet('css/main.css', 'screen, projection');
+
+    echo $this->headLink(); ?>
+
+
+<?php echo $this->headStyle(); ?>
+
+<?php echo $this->headScript(); ?>
 
 </head>
 <body>
 
-<h1>This is Layout</h1>
-<?php echo $this->layout()->content; ?>
-<h4>Request Object:</h4>
-<pre>
-<?php echo var_export(Zend_Controller_Front::getInstance()->getRequest()/*->getParams()*/, true);?>
-</pre>
+    <div class="container showgrid">
+
+        <h1>This is Layout</h1>
+        <?php echo $this->layout()->content; ?>
+
+    </div>
 
 </body>
 </html>

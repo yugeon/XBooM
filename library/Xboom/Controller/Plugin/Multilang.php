@@ -72,6 +72,10 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
 
         $front = Zend_Controller_Front::getInstance();
 
+        // for multilanguage
+        // TODO: set base URL for view http://__HOST__/__BASE_URL__ without language in URL.
+        //$view->getHelper('BaseUrl')->setBaseUrl('http://xboom.local');
+
         // if language present in URL after baseUrl. (http://host/base_url/en/..., /ru, /rus...)
         $lang = '';
         if (preg_match("#^/([a-zA-Z]{2,3})($|/)#", $request->getPathInfo(), $matches))
@@ -94,7 +98,8 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
     /**
      * routeShutdown() plugin hook
      * Last chance to define language.
-     * If language not present in URL and is a GET request then redirect immediately.
+     * If language not present in URL and is a GET request then paste language in
+     * URL and redirect immediately.
      *
      * @param Zend_Controller_Request_Abstract $request
      */
@@ -161,14 +166,15 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
         }
 
         // Set up Locale object.
-//        if (Zend_Registry::isRegistered('user_locale'))
-//        {
-//            $localeString = Zend_Registry::get('user_locale');
-//        }
-//        else
-//        {
+        if (Zend_Registry::isRegistered('user_locale'))
+        {
+            // from user options
+            $localeString = Zend_Registry::get('user_locale');
+        }
+        else
+        {
             $localeString = $this->_locales[$lang];
-//        }
+        }
         $locale = new Zend_Locale($localeString);
 
         // TODO: location dir for language

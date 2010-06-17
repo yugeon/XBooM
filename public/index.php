@@ -1,7 +1,5 @@
 <?php
 
-list($bms,$bs) = explode(' ', microtime());
-
 // Define path to application directory
 defined('APPLICATION_PATH')
     || define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../application'));
@@ -29,9 +27,6 @@ try
 
     $application->bootstrap()
                 ->run();
-    list($ems, $es) = explode(' ', microtime());
-    echo ($es + $ems) - ($bs + $bms);
-
 }
 catch (Exception $exception)
 {

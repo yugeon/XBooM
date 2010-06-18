@@ -2,7 +2,7 @@
 
 /**
  * Front Controller Plugin.
- * Hooks routeStartup, routeShutdown and dispatchLoopShutdown.
+ * Hooks routeStartup, dispatchLoopStartup.
  * Multilanguage support, which adds language detection by URL prefix.
  *
  * @category   Multilang
@@ -86,8 +86,11 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
         // Check if lang in list of available language
         if (array_key_exists($lang, $this->_locales))
         {
+            // save original base URL
+            $baseUrl = $front->getBaseUrl();
+            Zend_Registry::set('orig_baseUrl', $baseUrl);
             // change base URL
-            $front->setBaseUrl($front->getBaseUrl() . $this->_urlDelimiter . $lang);
+            $front->setBaseUrl($baseUrl . $this->_urlDelimiter . $lang);
             // init path info with new baseUrl.
             $request->setPathInfo();
             // save present language
@@ -96,7 +99,7 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
     }
 
     /**
-     * routeShutdown() plugin hook
+     * dispatchLoopStartup() plugin hook
      * Last chance to define language.
      * If language not present in URL and is a GET request then paste language in
      * URL and redirect immediately.
@@ -141,22 +144,7 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
 
             if ($request->isGet())
             {
-                // set evaluating language in URL, and redirect request
-                $uri = Zend_Uri::factory($request->getScheme());
-                $uri->setHost($request->getHttpHost());
-                $uri->setPath($request->getBaseUrl() . $this->_urlDelimiter
-                        . $lang . $request->getPathInfo());
-                $query = '';
-                $requestUri = $request->getRequestUri();
-                if (false !== ($pos = strpos($requestUri, '?')))
-                {
-                    $query = substr($requestUri, $pos + 1);
-                    $uri->setQuery($query);
-                }
-                $response = Zend_Controller_Front::getInstance()->getResponse();
-                $response->setRedirect($uri, $this->_redirectCode);
-                $response->sendHeaders();
-                exit();
+                $this->_doRedirectAndExit($request, $lang);
             }
         }
         else
@@ -198,14 +186,33 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
         Zend_Registry::set('Zend_Translate', $translate);
     }
 
-     /**
-     * routeShutdown
+    protected function _doRedirectAndExit(Zend_Controller_Request_Abstract $request, $lang)
+    {
+        // set evaluating language in URL, and redirect request
+        $uri = Zend_Uri::factory($request->getScheme());
+        $uri->setHost($request->getHttpHost());
+        $uri->setPath($request->getBaseUrl() . $this->_urlDelimiter
+                . $lang . $request->getPathInfo());
+        $query = '';
+        $requestUri = $request->getRequestUri();
+        if (false !== ($pos = strpos($requestUri, '?')))
+        {
+            $query = substr($requestUri, $pos + 1);
+            $uri->setQuery($query);
+        }
+        $response = Zend_Controller_Front::getInstance()->getResponse();
+        $response->setRedirect($uri, $this->_redirectCode);
+        $response->sendHeaders();
+        exit();
+    }
+    /**
+     * preDispatch
      *
      * @param Zend_Controller_Request_Abstract $request
      */
     public function preDispatch(Zend_Controller_Request_Abstract $request)
     {
-        // add translation for current module
+        // TODO: add translation for current module
 //        $translate = Zend_Registry::get('Zend_Translate');
 //        $translate->addTranslation(APPLICATION_PATH . '/modules/'.$request->getModuleName().'/lang/',
 //                                   Zend_Registry::get('Zend_Locale'));

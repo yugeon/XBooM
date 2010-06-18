@@ -27,6 +27,7 @@ class ControllerTestCase extends Zend_Test_PHPUnit_ControllerTestCase
         $this->application = new Zend_Application(
                 APPLICATION_ENV,
                 APPLICATION_PATH . '/configs/application.ini');
+        $this->application->bootstrap();
     }
 }
 ?>

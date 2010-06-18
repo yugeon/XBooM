@@ -7,9 +7,13 @@
     <filter>
         <whitelist>
             <directory suffix=".php">../application/</directory>
+            <directory suffix=".php">../library/Xboom/</directory>
             <exclude>
-		<directory suffix=".php">../library/Zend</directory>
                 <directory suffix=".phtml">../application/</directory>
+                <directory suffix="ErrorController.php">../application/</directory>
+                <directory suffix="Exception.php">../application</directory>
+                <directory suffix="Exception.php">../library/Xboom</directory>
+                <file>../application/Bootstrap.php</file>
             </exclude>
         </whitelist>
     </filter>

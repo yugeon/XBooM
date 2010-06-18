@@ -44,6 +44,12 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
     protected $_redirectCode = 302;
 
     /**
+     * Language presented in URL.
+     * @var string
+     */
+    protected $_urlLang = '';
+
+    /**
      * Contructor
      * Verify options
      *
@@ -71,11 +77,19 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
             return;
 
         $front = Zend_Controller_Front::getInstance();
+        $baseUrl = $front->getBaseUrl();
 
-        // for multilanguage
-        // TODO: set base URL for view http://__HOST__/__BASE_URL__ without language in URL.
-        //$view->getHelper('BaseUrl')->setBaseUrl('http://xboom.local');
-
+        // set baseUrl for view helper BaseUrl
+        $view = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->view;
+        if (null !== $view)
+        {
+            $uri = Zend_Uri::factory($request->getScheme());
+            $uri->setHost($request->getHttpHost());
+            $uri->setPath($baseUrl);
+            $view->getHelper('BaseUrl')->setBaseUrl($uri);
+            unset($uri);
+        }
+        
         // if language present in URL after baseUrl. (http://host/base_url/en/..., /ru, /rus...)
         $lang = '';
         if (preg_match("#^/([a-zA-Z]{2,3})($|/)#", $request->getPathInfo(), $matches))
@@ -87,14 +101,13 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
         if (array_key_exists($lang, $this->_locales))
         {
             // save original base URL
-            $baseUrl = $front->getBaseUrl();
             Zend_Registry::set('orig_baseUrl', $baseUrl);
             // change base URL
             $front->setBaseUrl($baseUrl . $this->_urlDelimiter . $lang);
             // init path info with new baseUrl.
             $request->setPathInfo();
             // save present language
-            Zend_Registry::set('url_lang', $lang);
+            $this->_urlLang = $lang;
         }
     }
 
@@ -113,7 +126,7 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
             return;
 
         $lang = '';
-        if (!Zend_Registry::isRegistered('url_lang'))
+        if (empty ($this->_urlLang))
         {
             // language not present in URL
             // check if language set in user options.
@@ -150,7 +163,7 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
         else
         {
             // language present in URL
-            $lang = Zend_Registry::get('url_lang');
+            $lang = $this->_urlLang;
         }
 
         // Set up Locale object.

@@ -23,18 +23,14 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     {
         $front = $this->bootstrap('frontcontroller')->getResource('frontcontroller');
 
-        $this->bootstrap('layout');
-
         $options = $this->getOption('view');
 
         // Initialize view
         $view = new Zend_View();
+        $view->setEncoding($options['encoding']);
         $view->headTitle($options['title']);
         $view->doctype($options['doctype']);
 
-        // for multilanguage
-        // TODO: set base URL http://__HOST__/__BASE_URL__ without language in URL.
-        $view->getHelper('BaseUrl')->setBaseUrl('http://xboom.local');
         // FIXME: add content language in output
 //        $view->headMeta()
 //             ->appendHttpEquiv('Content-Language', $locale);
@@ -42,9 +38,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $view->assign('env', APPLICATION_ENV);
 
         // Add it to the ViewRenderer
-        $viewRenderer = new Zend_Controller_Action_Helper_ViewRenderer();
+        $viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer');
         $viewRenderer->setView($view);
-        Zend_Controller_Action_HelperBroker::addHelper($viewRenderer);
 
         // Return it, so that it can be stored by the bootstrap
         return $view;

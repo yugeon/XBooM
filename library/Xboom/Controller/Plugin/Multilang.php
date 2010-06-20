@@ -141,7 +141,7 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
                 // take from browser.
                 try
                 {
-                    $locale = new Zend_Locale(Zend_Locale::BROWSER);
+                    $locale = new Zend_Locale();
                     $lang = $locale->getLanguage();
                     unset($locale);
                 }
@@ -155,7 +155,7 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
                 $lang =  $this->_defaultLang;
             }
 
-            if ($request->isGet())
+            if ($request->isGet() && !$request->isXmlHttpRequest())
             {
                 $this->_doRedirectAndExit($request, $lang);
             }

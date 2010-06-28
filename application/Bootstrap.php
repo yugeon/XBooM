@@ -2,6 +2,13 @@
 
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
+
+//    public static function autoload($class)
+//    {
+//        include str_replace('_', '/', $class) . '.php';
+//        return $class;
+//    }
+
     protected function _initPluginLoaderCache()
     {
         $classFileIncCache = APPLICATION_PATH . '/../data/cache/pluginLoaderCache.php';
@@ -21,7 +28,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
      */
     protected function _initView()
     {
-        $front = $this->bootstrap('frontcontroller')->getResource('frontcontroller');
+        //$front = $this->bootstrap('frontcontroller')->getResource('frontcontroller');
 
         $options = $this->getOption('view');
 
@@ -29,6 +36,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $view = new Zend_View();
         $view->setEncoding($options['encoding']);
         $view->headTitle($options['title']);
+        $view->headTitle()->setSeparator($options['titleSeparator']);
         $view->doctype($options['doctype']);
 
         // FIXME: add content language in output
@@ -45,6 +53,16 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         return $view;
     }
 
+    protected function _initResponse()
+    {
+        $this->bootstrap('FrontController');
+        $front = $this->getResource('FrontController');
+        $response = new Zend_Controller_Response_Http;
+        // FIXME if set header then can't do unit testing exception becouse output is began.
+        //$response->setHeader('Content-Type', 'text/html; charset=UTF-8', true);
+        $front->setResponse($response);
+    }
+
     protected function _initZFDebug()
     {
         if (APPLICATION_ENV != 'development')
@@ -57,23 +75,25 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
         $options = array(
             'plugins' => array('Variables',
-                               'File' => array('base_path' => APPLICATION_PATH),
-                               'Memory',
-                               'Time',
-                               'Registry',
-                               'Exception')
+                'File' => array('base_path' => APPLICATION_PATH),
+                'Memory',
+                'Time',
+                'Registry',
+                'Exception')
         );
 
         # Instantiate the database adapter and setup the plugin.
         # Alternatively just add the plugin like above and rely on the autodiscovery feature.
-        if ($this->hasPluginResource('db')) {
+        if ($this->hasPluginResource('db'))
+        {
             $this->bootstrap('db');
             $db = $this->getPluginResource('db')->getDbAdapter();
             $options['plugins']['Database']['adapter'] = $db;
         }
 
         # Setup the cache plugin
-        if ($this->hasPluginResource('cache')) {
+        if ($this->hasPluginResource('cache'))
+        {
             $this->bootstrap('cache');
             $cache = $this->getPluginResource('cache')->getDbAdapter();
             $options['plugins']['Cache']['backend'] = $cache->getBackend();

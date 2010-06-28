@@ -12,6 +12,7 @@ defined('APPLICATION_ENV')
 set_include_path(implode(PATH_SEPARATOR, array(
     realpath(APPLICATION_PATH . '/../library'),
     '.'
+    // no current include_path for minimize autoloading
 )));
 
 /** Zend_Application */

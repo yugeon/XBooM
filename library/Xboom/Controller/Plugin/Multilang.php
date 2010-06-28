@@ -213,7 +213,7 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
             $query = substr($requestUri, $pos + 1);
             $uri->setQuery($query);
         }
-        $response = Zend_Controller_Front::getInstance()->getResponse();
+        $response = $this->getResponse();
         $response->setRedirect($uri, $this->_redirectCode);
         $response->sendHeaders();
         exit();

@@ -39,9 +39,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $view->headTitle()->setSeparator($options['titleSeparator']);
         $view->doctype($options['doctype']);
 
+        $view->headMeta()
+             ->appendHttpEquiv('Content-Type', 
+                     'text/html;charset=' . strtolower($options['encoding']))
         // FIXME: add content language in output
-//        $view->headMeta()
-//             ->appendHttpEquiv('Content-Language', $locale);
+             /*->appendHttpEquiv('Content-Language', $locale)*/;
 
         $view->assign('env', APPLICATION_ENV);
 
@@ -59,7 +61,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $front = $this->getResource('FrontController');
         $response = new Zend_Controller_Response_Http;
         // FIXME if set header then can't do unit testing exception becouse output is began.
-        //$response->setHeader('Content-Type', 'text/html; charset=UTF-8', true);
+        $response->setHeader('Content-Type', 'text/html; charset=UTF-8', true);
         $front->setResponse($response);
     }
 

@@ -50,14 +50,21 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
     protected $_urlLang = '';
 
     /**
+     * Do redirect if langueage not present in url?
+     * @var boolean
+     */
+    protected $_doRedirect = false;
+
+    /**
      * Contructor
      * Verify options
      *
      * @param array $options
      */
-    public function __construct($defaultLang = '', Array $localesMap = array())
+    public function __construct($defaultLang = '', Array $localesMap = array(), $doRedirect = false)
     {
         $this->_locales = array_merge($this->_locales, $localesMap);
+        $this->_doRedirect = $doRedirect;
         if (array_key_exists($defaultLang, $this->_locales))
         {
             $this->_defaultLang = $defaultLang;
@@ -79,15 +86,14 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
         $front = Zend_Controller_Front::getInstance();
         $baseUrl = $front->getBaseUrl();
 
-        // set baseUrl for view helper BaseUrl
-        $view = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->view;
-        if (null !== $view)
+        // set original baseUrl for view helper BaseUrl
+        if (Zend_Controller_Action_HelperBroker::hasHelper('viewRender'))
         {
-            $uri = Zend_Uri::factory($request->getScheme());
-            $uri->setHost($request->getHttpHost());
-            $uri->setPath($baseUrl);
-            $view->getHelper('BaseUrl')->setBaseUrl($uri);
-            unset($uri);
+            $view = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->view;
+            if (null !== $view)
+            {
+                $view->getHelper('BaseUrl')->setBaseUrl($baseUrl);
+            }
         }
         
         // if language present in URL after baseUrl. (http://host/base_url/en/..., /ru, /rus...)
@@ -155,7 +161,7 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
                 $lang =  $this->_defaultLang;
             }
 
-            if ($request->isGet() && !$request->isXmlHttpRequest())
+            if ($this->_doRedirect && $request->isGet() && !$request->isXmlHttpRequest())
             {
                 $this->_doRedirectAndExit($request, $lang);
             }

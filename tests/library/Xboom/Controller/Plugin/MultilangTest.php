@@ -24,6 +24,32 @@ class Xboom_Controller_Plugin_MultilangTest extends ControllerTestCase
         $this->assertResponseCode(200);
     }
 
+    public function _testNoLanguageInUrlGet()
+    {
+        $this->markTestSkipped(
+            "Testing would break the test suite"
+        );
+        $_SERVER['HTTP_HOST'] = 'xboom.local';
+        // this test break dispatch loop if GET-request
+        $this->getRequest()->setMethod('GET');
+        $this->dispatch('');
+        $this->assertRedirectTo('http://xboom.local/'
+                . $this->_options['multilang']['default']);
+    }
+
+    public function _testNoLanguageInUrlGetQuery()
+    {
+                $this->markTestSkipped(
+            "Testing would break the test suite"
+        );
+        $_SERVER['HTTP_HOST'] = 'xboom.local';
+        // this test break dispatch loop if GET-request
+        $this->getRequest()->setMethod('GET');
+        $this->dispatch('/?a=1');
+        $this->assertRedirectTo('http://xboom.local/'
+                . $this->_options['multilang']['default'] . '/?a=1');
+    }
+
     public function testNoLanguageInUrl()
     {
         $_SERVER['HTTP_HOST'] = 'xboom.local';

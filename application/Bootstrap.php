@@ -3,11 +3,54 @@
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
 
-//    public static function autoload($class)
-//    {
-//        include str_replace('_', '/', $class) . '.php';
-//        return $class;
-//    }
+    /**
+     * Factory for init container.
+     */
+    protected $_containerFactory = null;
+
+    /**
+     * Set factory for resource container.
+     *
+     * @param array $options
+     */
+    protected function setDIContainer(array $options)
+    {
+        if (isset($options['factoryClass']))
+        {
+            $factory = $options['factoryClass'];
+            $this->_containerFactory = new $factory($options['params']);
+        }
+    }
+
+    /**
+     * 
+     * @return Object Container Factory 
+     */
+    public function getContainerFactory()
+    {
+        return $this->_containerFactory;
+    }
+
+    /**
+     * Retrieve resource container
+     * 
+     * @return object
+     */
+    public function getContainer()
+    {
+        if (null === $this->_container)
+        {
+            if (null === $this->getContainerFactory())
+            {
+                $this->_container = parent::getContainer();
+            }
+            else
+            {
+                $this->_container = $this->getContainerFactory()->makeContainer();
+            }
+        }
+        return $this->_container;
+    }
 
     protected function _initPluginLoaderCache()
     {
@@ -28,7 +71,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
      */
     protected function _initView()
     {
-        //$front = $this->bootstrap('frontcontroller')->getResource('frontcontroller');
+        $front = $this->bootstrap('frontcontroller');
 
         $options = $this->getOption('view');
 
@@ -40,10 +83,10 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $view->doctype($options['doctype']);
 
         $view->headMeta()
-             ->appendHttpEquiv('Content-Type', 
-                     'text/html;charset=' . strtolower($options['encoding']))
+                ->appendHttpEquiv('Content-Type',
+                        'text/html;charset=' . strtolower($options['encoding']))
         // FIXME: add content language in output
-             /*->appendHttpEquiv('Content-Language', $locale)*/;
+        /* ->appendHttpEquiv('Content-Language', $locale) */;
 
         $view->assign('env', APPLICATION_ENV);
 
@@ -60,7 +103,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $this->bootstrap('FrontController');
         $front = $this->getResource('FrontController');
         $response = new Zend_Controller_Response_Http;
-        // FIXME if set header then can't do unit testing exception becouse output is began.
         $response->setHeader('Content-Type', 'text/html; charset=UTF-8', true);
         $front->setResponse($response);
     }

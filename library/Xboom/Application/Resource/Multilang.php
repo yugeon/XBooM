@@ -17,7 +17,8 @@ class Xboom_Application_Resource_Multilang extends Zend_Application_Resource_Res
         $front = $this->getBootstrap()->bootstrap('frontcontroller')->getResource('frontcontroller');
         $plugin = new Xboom_Controller_Plugin_Multilang(
                 isset($options['default'])? $options['default'] : '',
-                isset($options['locales'])? $options['locales'] : array()
+                isset($options['locales'])? $options['locales'] : array(),
+                isset($options['redirectIfLangNotPresent'])? $options['redirectIfLangNotPresent'] : false
                 );
         // TODO stackIndex value from config?
         $stackIndex = null;

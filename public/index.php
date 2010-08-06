@@ -32,9 +32,11 @@ try
 catch (Exception $exception)
 {
     echo '<html><title>Critical Error</title><body><center>'
-       . 'An exception occured while bootstrapping the application.';
-    if (APPLICATION_ENV == 'development') {
-        echo '<br /><br />' . $exception->getMessage() . '<br />'
+       . 'Technical work. Please try again later.';
+    if (APPLICATION_ENV == 'development')
+    {
+        echo '<br /><br />An exception occured while bootstrapping the application.'
+           . '<br />' . $exception->getMessage() . '<br />'
            . '<div align="left">Stack Trace:'
            . '<pre>' . $exception->getTraceAsString() . '</pre></div>';
     }

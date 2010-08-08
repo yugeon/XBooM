@@ -61,14 +61,14 @@ class Xboom_Application_Resource_DIContainerFactory
                     $loader = new sfServiceContainerLoaderFileXml($sc);
                     break;
 
-                case 'yml':
+/**                case 'yml':
                     $loader = new sfServiceContainerLoaderFileYaml($sc);
                     break;
 
                 case 'ini':
                     $loader = new sfServiceContainerLoaderFileIni($sc);
                     break;
-
+*/
                 default:
                     throw new Zend_Exception("Invalid configuration file provided; unknown config type '$suffix'");
             }

@@ -52,6 +52,18 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         return $this->_container;
     }
 
+    protected function _initEntityManager()
+    {
+        $sc = $this->getContainer();
+        $options = $this->getOption('doctrine');
+        $sc->addParameters(array(
+            'doctrine.connection.options'   => $options['connection'],
+            'doctrine.orm.path_to_mappings' => $options['pathToMappings'],
+            'doctrine.orm.path_to_proxies'  => $options['pathToProxies'],
+            'doctrine.orm.proxy_namespace'  => $options['proxiesNamespace']
+        ));
+    }
+
     protected function _initPluginLoaderCache()
     {
         $classFileIncCache = APPLICATION_PATH . '/../data/cache/pluginLoaderCache.php';

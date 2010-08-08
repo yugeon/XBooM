@@ -1,28 +1,35 @@
-<container xmlns="http://symfony-project.org/2.0/container">
-  <parameters>
-    <parameter key="mailer.username">foo</parameter>
+<?xml version="1.0" ?>
 
-    <parameter key="mailer.password">bar</parameter>
-    <parameter key="mailer.class">Zend_Mail</parameter>
-  </parameters>
+<container xmlns="http://symfony-project.org/2.0/container">
+
+  <imports>
+    <import resource="entitymanager.xml" />
+  </imports>
+  
+<!--  <parameters>
+      <parameter key="doctrine.connection.options" type="collection">
+          <parameter key="driver">pdo_sqlite</parameter>
+          <parameter key="path">/dev/null</parameter>
+      </parameter>
+      <parameter key="doctrine.orm.path_to_mappings">/configs/mappings</parameter>
+      <parameter key="doctrine.orm.path_to_proxies">/dev/null</parameter>
+      <parameter key="doctrine.orm.proxy_namespace">/dev/null</parameter>
+  </parameters>-->
 
   <services>
     <service id="mail.transport" class="Zend_Mail_Transport_Smtp" shared="false">
       <argument>smtp.gmail.com</argument>
-
       <argument type="collection">
         <argument key="auth">login</argument>
         <argument key="username">%mailer.username%</argument>
-
         <argument key="password">%mailer.password%</argument>
         <argument key="ssl">ssl</argument>
         <argument key="port">true</argument>
-
       </argument>
     </service>
+
     <service id="mailer" class="%mailer.class%">
       <call method="setDefaultTransport">
-
         <argument type="service" id="mail.transport" />
       </call>
     </service>

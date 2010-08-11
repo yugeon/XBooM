@@ -18,6 +18,8 @@ class Core_IndexController extends Zend_Controller_Action
     {
         $results = $this->em->createQuery('SELECT u FROM Application_Model_Domain_User u')
                             ->getResult();
+        $date = new Zend_Date();
+        var_dump($date->get(Zend_Date::YEAR));
         $this->view->users = $results;
     }
 

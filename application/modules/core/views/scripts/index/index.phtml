@@ -13,3 +13,9 @@
             </div>
 
         </div>
+
+<p><a href="/index/add">Добавить пользователя</a></p>
+<?php foreach ($this->users as $user): ?>
+        <?php echo $user->getName() ?> |
+        <a href="/index/delete/id/<?php echo $user->getId() ?>">Удалить</a><br />
+<?php endforeach;?>

@@ -59,8 +59,12 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $sc->addParameters(array(
             'doctrine.connection.options'   => $options['connection'],
             'doctrine.orm.path_to_mappings' => $options['pathToMappings'],
+            'doctrine.orm.path_to_entities' => $options['pathToEntities'],
             'doctrine.orm.path_to_proxies'  => $options['pathToProxies'],
-            'doctrine.orm.proxy_namespace'  => $options['proxiesNamespace']
+            'doctrine.orm.proxy_namespace'  => $options['proxiesNamespace'],
+            'doctrine.orm.autogenerate_proxy_classes'
+                                            => $options['autogenerateProxyClasses'],
+            'doctrine.common.cache_class'   => $options['cacheClass']
         ));
     }
 

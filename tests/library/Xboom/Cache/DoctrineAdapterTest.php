@@ -18,13 +18,13 @@ class DoctrineAdapterTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
-        $frontendName = 'Core';
-        $backendName  = 'File';
-        $frontendOptions = array('lifetime' => null);
-        $backendOptions  = array('cache_dir' => APPLICATION_PATH . '/../data/cache/',
-                                'file_name_prefix' => 'doctrine2'
-            );
-        $zendCache = Zend_Cache::factory($frontendName, $backendName, $frontendOptions, $backendOptions);
+        $config = new Zend_Config_Ini(
+                        APPLICATION_PATH . '/configs/application.ini',
+                        APPLICATION_ENV);
+        $options = $config->toArray();
+        $options = $options['doctrine']['cacheOptions'];
+        $zendCache = Zend_Cache::factory('Core', 'File',
+                $options['frontendOptions'], $options['backendOptions']);
         $this->object = new Xboom_Cache_DoctrineAdapter($zendCache);
     }
 

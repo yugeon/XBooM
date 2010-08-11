@@ -64,7 +64,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             'doctrine.orm.proxy_namespace'  => $options['proxiesNamespace'],
             'doctrine.orm.autogenerate_proxy_classes'
                                             => $options['autogenerateProxyClasses'],
-            'doctrine.common.cache_class'   => $options['cacheClass']
+            'doctrine.common.cache_class'   => $options['cacheClass'],
+            'doctrine.common.cache_options' => $options['cacheOptions']
         ));
     }
 

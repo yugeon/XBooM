@@ -34,6 +34,29 @@ class Xboom_Cache_DoctrineAdapter extends Doctrine\Common\Cache\AbstractCache
         $this->_cache = $cache;
         $this->_prefix = $prefix;
     }
+
+    /**
+     * Convert hexidecimal string to normal string
+     * @param string $hexstr Hexidecimal string
+     * @return string
+     */
+    protected function hex2str($hexstr)
+    {
+        $retstr = pack('H*', $hexstr);
+        return $retstr;
+    }
+
+    /**
+     * Convert string to hexidecimal presenter
+     * @param string $string
+     * @return string
+     */
+    protected function str2hex($string)
+    {
+        $hexstr = unpack('H*', $string);
+        return array_shift($hexstr);
+    }
+
     /**
      * Fetches an entry from the cache.
      *
@@ -42,7 +65,8 @@ class Xboom_Cache_DoctrineAdapter extends Doctrine\Common\Cache\AbstractCache
      */
     protected function _doFetch($id)
     {
-         return $this->_cache->load($this->_prefix . $id);
+        $hId = $this->str2hex($id);
+        return $this->_cache->load($this->_prefix . $hId);
     }
 
     /**
@@ -53,7 +77,8 @@ class Xboom_Cache_DoctrineAdapter extends Doctrine\Common\Cache\AbstractCache
      */
     protected function _doContains($id)
     {
-        return (bool) $this->_cache->test($this->_prefix . $id);
+        $hId = $this->str2hex($id);
+        return (bool) $this->_cache->test($this->_prefix . $hId);
     }
 
     /**
@@ -66,9 +91,10 @@ class Xboom_Cache_DoctrineAdapter extends Doctrine\Common\Cache\AbstractCache
      */
     protected function _doSave($id, $data, $lifeTime = false)
     {
+        $hId = $this->str2hex($id);
         try
         {
-            return $this->_cache->save($data, $this->_prefix . $id, array(), $lifeTime);
+            return $this->_cache->save($data, $this->_prefix . $hId, array(), $lifeTime);
         }
         catch (Zend_Cache_Exception $e)
         {
@@ -84,7 +110,8 @@ class Xboom_Cache_DoctrineAdapter extends Doctrine\Common\Cache\AbstractCache
      */
     protected function _doDelete($id)
     {
-        return $this->_cache->remove($this->_prefix . $id);
+        $hId = $this->str2hex($id);
+        return $this->_cache->remove($this->_prefix . $hId);
     }
 
     /**
@@ -94,6 +121,7 @@ class Xboom_Cache_DoctrineAdapter extends Doctrine\Common\Cache\AbstractCache
      */
     public function getIds()
     {
-        return $this->_cache->getIds();
+        return array_map(array($this, 'hex2str'), $this->_cache->getIds());
     }
+
 }

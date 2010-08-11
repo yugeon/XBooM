@@ -38,8 +38,10 @@
         </service>
 
         <!-- C A C H E  S E T T I N G -->
-        <service id="doctrine.common.cache" class="%doctrine.common.cache_class%">
-<!--            <argument>%doctrine.common.cache_arg1%</argument>-->
+        <service id="doctrine.common.cache" class="Xboom_Cache_DoctrineFactory"
+                constructor="getCache">
+            <argument>%doctrine.common.cache_class%</argument>
+            <argument>%doctrine.common.cache_options%</argument>
         </service>
 
         <!-- C O N F I G U R A T I O N -->

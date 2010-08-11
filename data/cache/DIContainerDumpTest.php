@@ -39,8 +39,7 @@ class DIContainer extends sfServiceContainer
   {
     if (isset($this->shared['doctrine.common.cache'])) return $this->shared['doctrine.common.cache'];
 
-    $class = $this->getParameter('doctrine.common.cache_class');
-    $instance = new $class();
+    $instance = call_user_func(array('Xboom_Cache_DoctrineFactory', 'getCache'), $this->getParameter('doctrine.common.cache_class'), $this->getParameter('doctrine.common.cache_options'));
 
     return $this->shared['doctrine.common.cache'] = $instance;
   }

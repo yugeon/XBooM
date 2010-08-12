@@ -15,15 +15,18 @@ class DoctrineFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testGetArrayCache()
     {
-        //$this->markTestSkipped();
         $arrayCache = Xboom_Cache_DoctrineFactory::getCache('Doctrine\Common\Cache\ArrayCache');
         $this->assertType('Doctrine\\Common\Cache\\ArrayCache', $arrayCache);
     }
     public function testGetApcCache()
     {
-        //$this->markTestSkipped();
         $apcCache = Xboom_Cache_DoctrineFactory::getCache('Doctrine\Common\Cache\ApcCache');
         $this->assertType('Doctrine\\Common\Cache\\ApcCache', $apcCache);
+    }
+    public function testGetXCache()
+    {
+        $xCache = Xboom_Cache_DoctrineFactory::getCache('Doctrine\Common\Cache\XcacheCache');
+        $this->assertType('Doctrine\\Common\Cache\\XcacheCache', $xCache);
     }
     public function testGetZendCache()
     {
@@ -32,5 +35,18 @@ class DoctrineFactoryTest extends PHPUnit_Framework_TestCase
             );
         $zendCache = Xboom_Cache_DoctrineFactory::getCache('Xboom_Cache_DoctrineAdapter', $options);
         $this->assertType('Xboom_Cache_DoctrineAdapter', $zendCache);
+    }
+    public function testGetMemcache()
+    {
+        if (!extension_loaded('memcache'))
+        {
+            $this->assertTrue(TRUE, 'Memcache extenstion is not available.');
+            return;
+        }
+        $options = array(
+            'memcache' => array('host' => 'localhost', 'port' => 11211)
+            );
+        $memCache = Xboom_Cache_DoctrineFactory::getCache('Doctrine\\Common\\Cache\\MemcacheCache', $options);
+        $this->assertType('Doctrine\\Common\\Cache\\MemcacheCache', $memCache);
     }
 }

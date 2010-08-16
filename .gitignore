@@ -1,5 +1,5 @@
-library/Zend/*
-library/ZFDebug/*
-data/*
-tests/log/*
+/library/Zend/*
+/library/ZFDebug/*
+/data/*
+/tests/log/*
 

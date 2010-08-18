@@ -7,7 +7,7 @@ require_once 'PHPUnit/Framework.php';
  *
  * @author yugeon
  */
-class DoctrineAdapterTest extends PHPUnit_Framework_TestCase
+class Xboom_Cache_DoctrineAdapterTest extends PHPUnit_Framework_TestCase
 {
     /**
      *

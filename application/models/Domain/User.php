@@ -1,30 +1,18 @@
 <?php
-
+// FIXME: решить вопрос с подгрузкой для PHPUnit
+require_once APPLICATION_PATH . '/../library/Xboom/Model/Domain/AbstractObject.php';
 /**
  * @Entity
  * @Table(name="users")
  */
-class Application_Model_Domain_User
+class Application_Model_Domain_User extends Xboom_Model_Domain_AbstractObject
 {
     /**
      * @Id @Column(type="integer")
      * @GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
     /** @Column(type="string", length=50) */
-    private $name;
-
-    public function getId()
-    {
-        return $this->id;
-    }
-    public function setName($string) {
-        $this->name = $string;
-        return true;
-    }
-    public function getName()
-    {
-        return $this->name;
-    }
+    protected $name;
 }

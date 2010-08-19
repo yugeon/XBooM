@@ -20,3 +20,7 @@ set_include_path(implode(PATH_SEPARATOR, array(
 require_once 'Zend/Application.php';
 
 require_once 'ControllerTestCase.php';
+
+require_once 'Mockery/Loader.php';
+$loader = new \Mockery\Loader;
+$loader->register();

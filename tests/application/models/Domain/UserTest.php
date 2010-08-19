@@ -3,7 +3,6 @@
 require_once 'PHPUnit/Framework.php';
 
 require_once APPLICATION_PATH . '/models/Domain/User.php';
-
 class Application_Model_Domain_UserTest extends PHPUnit_Framework_TestCase
 {
 

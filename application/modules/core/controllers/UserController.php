@@ -1,5 +1,5 @@
 <?php
-
+use \App_Model_Domain_User as User;
 class Core_UserController extends Zend_Controller_Action
 {
     /**
@@ -16,15 +16,16 @@ class Core_UserController extends Zend_Controller_Action
 
     public function indexAction()
     {
-        $results = $this->em->createQuery('SELECT u FROM Application_Model_Domain_User u')
+        $results = $this->em->createQuery('SELECT u FROM App_Model_Domain_User u')
                             ->getResult();
         $this->view->users = $results;
     }
 
     public function addAction()
     {
-        $user = new Application_Model_Domain_User();
+        $user = new User();
         $user->setName('TestName' . rand(1, 100));
+        $user->setPassword(md5($user->name));
 
         $this->em->persist($user);
         $this->em->flush();
@@ -35,7 +36,7 @@ class Core_UserController extends Zend_Controller_Action
 
     public function deleteAction()
     {
-        $user = $this->em->find('Application_Model_Domain_User', (int) $this->_getParam('id'));
+        $user = $this->em->find('App_Model_Domain_User', (int) $this->_getParam('id'));
 
         $this->em->remove($user);
         $this->em->flush();

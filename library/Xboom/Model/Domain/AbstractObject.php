@@ -24,12 +24,12 @@ abstract class Xboom_Model_Domain_AbstractObject
             $accessorMethod = 'get' . ucfirst($name);
             if (method_exists($this, $accessorMethod))
             {
-                return $this->$accessorMethod();
+                return $this->{$accessorMethod}();
             }
 
             if (property_exists($this, $name))
             {
-                return $this->$name;
+                return $this->{$name};
             }
         }
 
@@ -55,12 +55,12 @@ abstract class Xboom_Model_Domain_AbstractObject
             $mutatorMethod = 'set' . ucfirst($name);
             if (method_exists($this, $mutatorMethod))
             {
-                return $this->$mutatorMethod($value);
+                return $this->{$mutatorMethod}($value);
             }
 
             if (property_exists($this, $name))
             {
-                $this->$name = $value;
+                $this->{$name} = $value;
                 return $this;
             }
         }
@@ -89,16 +89,35 @@ abstract class Xboom_Model_Domain_AbstractObject
             {
                 if ('set' == $action)
                 {
-                    $this->$property = array_shift($arguments);
+                    $this->{$property} = array_shift($arguments);
                     return $this;
                 }
                 if ('get' == $action)
                 {
-                    return $this->$property;
+                    return $this->{$property};
                 }
             }
         }
         throw new BadMethodCallException('No method named ' . $name . ' exists');
     }
 
+    /**
+     * Return all properties as array.
+     * Ignore any properties that begin with an underscore.
+     * 
+     * @return array
+     */
+    public function toArray()
+    {
+        $data = get_object_vars($this);
+        $resultAsArray = array();
+        foreach ($data as $property => $value)
+        {
+            if ('_' !== $property[0])
+            {
+                $resultAsArray[$property] = $value;
+            }
+        }
+        return $resultAsArray;
+    }
 }

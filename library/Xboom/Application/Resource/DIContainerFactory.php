@@ -93,7 +93,13 @@ class Xboom_Application_Resource_DIContainerFactory
     protected function dumpToFile($sc)
     {
         $dumper = new sfServiceContainerDumperPhp($sc);
-        file_put_contents($this->_options['dumpFilePath'],
+        $filename = $this->_options['dumpFilePath'];
+        if (file_exists($filename))
+        {
+            // try delete file for rewrite
+            unlink($filename);
+        }
+        file_put_contents($filename,
                 $dumper->dump(array('class' => $this->_options['dumpFileClass']))
         );
     }

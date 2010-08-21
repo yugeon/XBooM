@@ -5,7 +5,7 @@
  *
  * @author yugeon
  */
-abstract class Xboom_Service_Abstract
+abstract class Xboom_Service_AbstractService
 {
     //put your code here
 }

@@ -145,4 +145,14 @@ class Xboom_Model_Domain_AbstractObjectTest extends PHPUnit_Framework_TestCase
         }
         $this->fail('An expected exception has not been raised.');
     }
+    public function testGetAllPropertiesAsArray()
+    {
+        $expected = array(
+            "testPropertyTrue" => true,
+            "testPropertyFalse" => true,
+            "testProperty" => null,
+            "testProtectedProperty"=> null
+        );
+        $this->assertEquals($expected, $this->object->toArray());
+    }
 }

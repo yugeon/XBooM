@@ -21,9 +21,19 @@ set_include_path(implode(PATH_SEPARATOR, array(
 require_once 'Zend/Loader/Autoloader.php';
 $autoloader = Zend_Loader_Autoloader::getInstance();
 $autoloader->registerNamespace('Xboom');
-new Zend_Application_Module_Autoloader(array(
-    'namespace' => '',
-    'basePath' => APPLICATION_PATH
+new Zend_Loader_Autoloader_Resource(array(
+    'namespace' => 'Core',
+    'basePath' => APPLICATION_PATH . '/modules/core',
+    'resourceTypes' => array(
+        'model' => array(
+            'namespace' => 'Model',
+            'path' => 'models'
+        ),
+        'service' => array(
+            'namespace' => 'Service',
+            'path' => 'models/services'
+        ),
+    )
 ));
 
 require_once 'ControllerTestCase.php';

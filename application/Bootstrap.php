@@ -52,19 +52,37 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         return $this->_container;
     }
 
+    protected function _initAutoload()
+    {
+        new Zend_Loader_Autoloader_Resource(array(
+                    'namespace' => 'Core',
+                    'basePath' => APPLICATION_PATH . '/modules/core',
+                    'resourceTypes' => array(
+                        'model' => array(
+                            'namespace' => 'Model',
+                            'path' => 'models'
+                        ),
+                        'service' => array(
+                            'namespace' => 'Service',
+                            'path' => 'models/services'
+                        ),
+                    )
+                ));
+    }
+
     protected function _initEntityManager()
     {
         $sc = $this->getContainer();
         $options = $this->getOption('doctrine');
         $sc->addParameters(array(
-            'doctrine.connection.options'   => $options['connection'],
+            'doctrine.connection.options' => $options['connection'],
             'doctrine.orm.path_to_mappings' => $options['pathToMappings'],
             'doctrine.orm.path_to_entities' => $options['pathToEntities'],
-            'doctrine.orm.path_to_proxies'  => $options['pathToProxies'],
-            'doctrine.orm.proxy_namespace'  => $options['proxiesNamespace'],
+            'doctrine.orm.path_to_proxies' => $options['pathToProxies'],
+            'doctrine.orm.proxy_namespace' => $options['proxiesNamespace'],
             'doctrine.orm.autogenerate_proxy_classes'
-                                            => $options['autogenerateProxyClasses'],
-            'doctrine.common.cache_class'   => $options['cacheClass'],
+            => $options['autogenerateProxyClasses'],
+            'doctrine.common.cache_class' => $options['cacheClass'],
             'doctrine.common.cache_options' => $options['cacheOptions']
         ));
     }
@@ -93,8 +111,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $options = $this->getOption('view');
 
         // Initialize view
-        $view = new Zend_View();
-        $view->setEncoding($options['encoding']);
+        $view = new Zend_View($options);
         $view->headTitle($options['title']);
         $view->headTitle()->setSeparator($options['titleSeparator']);
         $view->doctype($options['doctype']);

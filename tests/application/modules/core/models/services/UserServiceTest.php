@@ -4,8 +4,6 @@ use \Mockery as m;
 require_once 'PHPUnit/Framework.php';
 require_once 'Mockery.php';
 
-require_once APPLICATION_PATH . '/services/User.php';
-
 /**
  * Description of User
  *
@@ -29,7 +27,7 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $this->em = m::mock('\\Doctrine\\ORM\\EntityManager');
-        $this->object = new App_Service_User($this->em);
+        $this->object = new Core_Service_UserService($this->em);
     }
 
     public function teardown()
@@ -40,8 +38,8 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
     public function  testGetUsersList()
     {
         $result = array(
-            new App_Model_Domain_User(),
-            new App_Model_Domain_User()
+            new Core_Model_Domain_User(),
+            new Core_Model_Domain_User()
         );
         
         $this->em->shouldReceive('createQuery')->once()->andReturn($this->em);
@@ -54,10 +52,9 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
     public function testGetUserById()
     {
         $testUserName = 'TestUserName';
-        $result = new App_Model_Domain_User(array('name' => $testUserName));
+        $result = new Core_Model_Domain_User(array('login' => $testUserName));
         
         $this->em->shouldReceive('find')->once()->andReturn($result);
-        $this->object = new App_Service_User($this->em);
         
         $user = $this->object->getUserById(1);
         $this->assertEquals($result, $user);

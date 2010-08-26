@@ -2,7 +2,6 @@
 
 require_once 'PHPUnit/Framework.php';
 
-require_once APPLICATION_PATH . '/models/Domain/User.php';
 class App_Model_Domain_UserTest extends PHPUnit_Framework_TestCase
 {
 
@@ -13,7 +12,7 @@ class App_Model_Domain_UserTest extends PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->object = new App_Model_Domain_User;
+        $this->object = new Core_Model_Domain_User;
     }
 
     public function testGetSetUserName()
@@ -29,9 +28,10 @@ class App_Model_Domain_UserTest extends PHPUnit_Framework_TestCase
         $userData = array(
             'name' => $testUserName,
             'login' => $testUserName,
-            'password' => $testUserPassword
+            'password' => $testUserPassword,
+            'role' => null
         );
-        $this->object = new App_Model_Domain_User($userData);
+        $this->object = new Core_Model_Domain_User($userData);
         $expected = $userData;
         $expected['id'] = null;
         $this->assertEquals($expected, $this->object->toArray());

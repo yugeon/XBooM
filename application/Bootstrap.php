@@ -56,26 +56,18 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     {
         $autoloader = Xboom\Loader\Autoloader::getInstance();
         $autoloader->registerNamespace($this->getOption('autoloaderNamespaces'));
+        $nsSuffix = $this->getOption('appnamespace');
+        $nsSuffix = !empty($nsSuffix) ? $nsSuffix . '\\' : $nsSuffix;
+        if (!empty($nsSuffix))
+        {
+            $nsSuffix .= '\\';
+        }
         $autoloader->registerNamespace(array(
-            'Core' => APPLICATION_PATH . '/modules/core',
-            'Core\\Model' => APPLICATION_PATH . '/modules/core/models',
-            'Core\\Service' => APPLICATION_PATH . '/modules/core/models/services',
-                )
+            $nsSuffix . 'Core' => APPLICATION_PATH . '/modules/core',
+            $nsSuffix . 'Core\\Model' => APPLICATION_PATH . '/modules/core/models',
+            $nsSuffix . 'Core\\Service' => APPLICATION_PATH . '/modules/core/models/services',
+            )
         );
-//        new Zend_Loader_Autoloader_Resource(array(
-//                    'namespace' => 'Core',
-//                    'basePath' => APPLICATION_PATH . '/modules/core',
-//                    'resourceTypes' => array(
-//                        'model' => array(
-//                            'namespace' => 'Model',
-//                            'path' => 'models'
-//                        ),
-//                        'service' => array(
-//                            'namespace' => 'Service',
-//                            'path' => 'models/services'
-//                        ),
-//                    )
-//                ));
     }
 
     protected function _initEntityManager()

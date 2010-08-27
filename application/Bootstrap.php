@@ -57,7 +57,6 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $autoloader = Xboom\Loader\Autoloader::getInstance();
         $autoloader->registerNamespace($this->getOption('autoloaderNamespaces'));
         $nsSuffix = $this->getOption('appnamespace');
-        $nsSuffix = !empty($nsSuffix) ? $nsSuffix . '\\' : $nsSuffix;
         if (!empty($nsSuffix))
         {
             $nsSuffix .= '\\';

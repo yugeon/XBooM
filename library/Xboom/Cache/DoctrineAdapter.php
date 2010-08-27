@@ -1,5 +1,7 @@
 <?php
 
+namespace Xboom\Cache;
+
 /**
  * An Adapter for using a Zend_Cache_Core-Instance as Query or Result-Cache
  * for Doctrine
@@ -16,7 +18,7 @@
  * @todo       Add support for Tags to automatically tag all Entry made with a
  *             set of Tags provided by the constructor
  */
-class Xboom_Cache_DoctrineAdapter extends Doctrine\Common\Cache\AbstractCache
+class DoctrineAdapter extends \Doctrine\Common\Cache\AbstractCache
 {
 
     /**
@@ -29,7 +31,7 @@ class Xboom_Cache_DoctrineAdapter extends Doctrine\Common\Cache\AbstractCache
      */
     protected $_prefix = '';
 
-    public function __construct(Zend_Cache_Core $cache, $prefix = '')
+    public function __construct(\Zend_Cache_Core $cache, $prefix = '')
     {
         $this->_cache = $cache;
         $this->_prefix = $prefix;

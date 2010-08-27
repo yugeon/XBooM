@@ -12,7 +12,7 @@ class App_Model_Domain_UserTest extends PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->object = new Core_Model_Domain_User;
+        $this->object = new Core\Model\Domain\User;
     }
 
     public function testGetSetUserName()
@@ -31,7 +31,7 @@ class App_Model_Domain_UserTest extends PHPUnit_Framework_TestCase
             'password' => $testUserPassword,
             'role' => null
         );
-        $this->object = new Core_Model_Domain_User($userData);
+        $this->object = new Core\Model\Domain\User($userData);
         $expected = $userData;
         $expected['id'] = null;
         $this->assertEquals($expected, $this->object->toArray());

@@ -2,9 +2,7 @@
 
 require_once 'PHPUnit/Framework.php';
 
-require_once APPLICATION_PATH . '/../library/Xboom/Model/Domain/AbstractObject.php';
-
-class AbstractObject extends Xboom_Model_Domain_AbstractObject
+class AbstractObject extends Xboom\Model\Domain\AbstractObject
 {
     protected $testPropertyTrue = true;
     protected $testPropertyFalse = true;

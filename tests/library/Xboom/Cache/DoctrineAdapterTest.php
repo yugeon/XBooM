@@ -25,7 +25,7 @@ class Xboom_Cache_DoctrineAdapterTest extends PHPUnit_Framework_TestCase
         $options = $options['doctrine']['cacheOptions'];
         $zendCache = Zend_Cache::factory('Core', 'File',
                 $options['frontendOptions'], $options['backendOptions']);
-        $this->object = new Xboom_Cache_DoctrineAdapter($zendCache);
+        $this->object = new Xboom\Cache\DoctrineAdapter($zendCache);
     }
 
     public function testGetCache()

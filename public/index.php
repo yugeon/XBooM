@@ -26,6 +26,9 @@ try
         APPLICATION_PATH . '/configs/application.ini'
     );
 
+    require_once 'Xboom/Loader/Autoloader.php';
+    $autoloader = Xboom\Loader\Autoloader::getInstance();
+
     $application->bootstrap()
                 ->run();
 }

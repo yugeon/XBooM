@@ -25,24 +25,6 @@ class Autoloader
     );
 
     /**
-     * Transform the class name to a filename
-     *
-     * @param string $class
-     * @param string $directory
-     * @return string
-     */
-    protected function transformClassNameToFilename($class, $directory)
-    {
-        return $directory
-        . str_replace(
-                array(self::NS_SEPARATOR, self::PREFIX_SEPARATOR),
-                DIRECTORY_SEPARATOR,
-                $class
-        )
-        . '.php';
-    }
-
-    /**
      * Helper method to calculate the correct class path
      *
      * @param string $class
@@ -205,6 +187,7 @@ class Autoloader
 
         foreach ($namespace as $ns)
         {
+            $ns = rtrim($ns, self::PREFIX_SEPARATOR . self::NS_SEPARATOR);
             if (isset(self::$_namespaces[$ns]))
             {
                 unset(self::$_namespaces[$ns]);

@@ -1,12 +1,13 @@
 <?php
 
+namespace Core\Model\Domain;
 /**
  * @Entity
  * @Table(name="users")
  */
-class Core_Model_Domain_User
-    extends Xboom_Model_Domain_AbstractObject
-    implements Zend_Acl_Role_Interface
+class User
+    extends \Xboom\Model\Domain\AbstractObject
+    implements \Zend_Acl_Role_Interface
 {
 
     /**
@@ -35,7 +36,7 @@ class Core_Model_Domain_User
             // Login field must be set
             if (empty($data['login']))
             {
-                throw new InvalidArgumentException('Login must be set.');
+                throw new \InvalidArgumentException('Login must be set.');
             }
 
             // If name not set, then name equals login

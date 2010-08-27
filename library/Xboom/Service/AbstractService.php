@@ -1,11 +1,12 @@
 <?php
 
+namespace Xboom\Service;
 /**
  * Description of Abstract
  *
  * @author yugeon
  */
-abstract class Xboom_Service_AbstractService
+abstract class AbstractService
 {
     //put your code here
 }

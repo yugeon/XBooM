@@ -1,13 +1,14 @@
 <?php
+namespace Core\Service;
 
-use \Core_Model_Domain_User as User;
+use \Core\Model\Domain\User as User;
 
 /**
  * Description of User
  *
  * @author yugeon
  */
-class Core_Service_UserService extends Xboom_Service_AbstractService
+class UserService extends \Xboom\Service\AbstractService
 {
 
     /**
@@ -15,7 +16,7 @@ class Core_Service_UserService extends Xboom_Service_AbstractService
      */
     protected $_em;
 
-    public function __construct(Doctrine\ORM\EntityManager $em)
+    public function __construct(\Doctrine\ORM\EntityManager $em)
     {
         $this->_em = $em;
     }
@@ -27,7 +28,7 @@ class Core_Service_UserService extends Xboom_Service_AbstractService
      */
     public function getUsersList()
     {
-        return $this->_em->createQuery('SELECT u FROM Core_Model_Domain_User u')
+        return $this->_em->createQuery('SELECT u FROM Core\\Model\\Domain\\User u')
                 ->getResult();
     }
 
@@ -39,7 +40,7 @@ class Core_Service_UserService extends Xboom_Service_AbstractService
      */
     public function getUserById($userId)
     {
-        return $this->_em->find('Core_Model_Domain_User', (int) $userId);
+        return $this->_em->find('Core\\Model\\Domain\\User', (int) $userId);
     }
 
     /**

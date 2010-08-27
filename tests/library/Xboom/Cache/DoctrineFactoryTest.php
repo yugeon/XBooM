@@ -15,17 +15,17 @@ class Xboom_Cache_DoctrineFactoryTest extends PHPUnit_Framework_TestCase
 
     public function testGetArrayCache()
     {
-        $arrayCache = Xboom_Cache_DoctrineFactory::getCache('Doctrine\Common\Cache\ArrayCache');
+        $arrayCache = Xboom\Cache\DoctrineFactory::getCache('Doctrine\\Common\\Cache\\ArrayCache');
         $this->assertType('Doctrine\\Common\Cache\\ArrayCache', $arrayCache);
     }
     public function testGetApcCache()
     {
-        $apcCache = Xboom_Cache_DoctrineFactory::getCache('Doctrine\Common\Cache\ApcCache');
+        $apcCache = Xboom\Cache\DoctrineFactory::getCache('Doctrine\\Common\\Cache\\ApcCache');
         $this->assertType('Doctrine\\Common\Cache\\ApcCache', $apcCache);
     }
     public function testGetXCache()
     {
-        $xCache = Xboom_Cache_DoctrineFactory::getCache('Doctrine\Common\Cache\XcacheCache');
+        $xCache = Xboom\Cache\DoctrineFactory::getCache('Doctrine\\Common\\Cache\\XcacheCache');
         $this->assertType('Doctrine\\Common\Cache\\XcacheCache', $xCache);
     }
     public function testGetZendCache()
@@ -33,8 +33,8 @@ class Xboom_Cache_DoctrineFactoryTest extends PHPUnit_Framework_TestCase
         $options = array('frontendOptions' => array(),
                          'backendOptions'  => array()
             );
-        $zendCache = Xboom_Cache_DoctrineFactory::getCache('Xboom_Cache_DoctrineAdapter', $options);
-        $this->assertType('Xboom_Cache_DoctrineAdapter', $zendCache);
+        $zendCache = Xboom\Cache\DoctrineFactory::getCache('Xboom\\Cache\\DoctrineAdapter', $options);
+        $this->assertType('Xboom\Cache\DoctrineAdapter', $zendCache);
     }
     public function testGetMemcache()
     {
@@ -46,7 +46,7 @@ class Xboom_Cache_DoctrineFactoryTest extends PHPUnit_Framework_TestCase
         $options = array(
             'memcache' => array('host' => 'localhost', 'port' => 11211)
             );
-        $memCache = Xboom_Cache_DoctrineFactory::getCache('Doctrine\\Common\\Cache\\MemcacheCache', $options);
+        $memCache = Xboom\Cache\DoctrineFactory::getCache('Doctrine\\Common\\Cache\\MemcacheCache', $options);
         $this->assertType('Doctrine\\Common\\Cache\\MemcacheCache', $memCache);
     }
 }

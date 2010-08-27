@@ -1,9 +1,7 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-require_once APPLICATION_PATH . '/../library/Xboom/Service/AbstractService.php';
-
-class TestService extends Xboom_Service_AbstractService
+class TestService extends Xboom\Service\AbstractService
 {
 
 }

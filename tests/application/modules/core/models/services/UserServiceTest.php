@@ -27,7 +27,7 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $this->em = m::mock('\\Doctrine\\ORM\\EntityManager');
-        $this->object = new Core_Service_UserService($this->em);
+        $this->object = new Core\Service\UserService($this->em);
     }
 
     public function teardown()
@@ -38,8 +38,8 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
     public function  testGetUsersList()
     {
         $result = array(
-            new Core_Model_Domain_User(),
-            new Core_Model_Domain_User()
+            new Core\Model\Domain\User(),
+            new Core\Model\Domain\User()
         );
         
         $this->em->shouldReceive('createQuery')->once()->andReturn($this->em);
@@ -52,7 +52,7 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
     public function testGetUserById()
     {
         $testUserName = 'TestUserName';
-        $result = new Core_Model_Domain_User(array('login' => $testUserName));
+        $result = new Core\Model\Domain\User(array('login' => $testUserName));
         
         $this->em->shouldReceive('find')->once()->andReturn($result);
         

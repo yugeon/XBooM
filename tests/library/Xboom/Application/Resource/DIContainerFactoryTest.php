@@ -18,7 +18,7 @@ class Xboom_Application_Resource_DIContainerFactoryTest extends PHPUnit_Framewor
                         APPLICATION_PATH . '/configs/application.ini',
                         APPLICATION_ENV);
         $this->options = $config->toArray();
-        $this->object = new Xboom_Application_Resource_DIContainerFactory(
+        $this->object = new Xboom\Application\Resource\DIContainerFactory(
                         $this->options['DIContainer']['params']);
     }
 

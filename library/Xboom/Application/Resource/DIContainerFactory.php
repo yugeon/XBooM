@@ -1,5 +1,6 @@
 <?php
 
+namespace Xboom\Application\Resource;
 /**
  * Resource for initializing dependency injection container
  *
@@ -9,7 +10,7 @@
  * @author     yugeon
  * @version    SVN: $Id$
  */
-class Xboom_Application_Resource_DIContainerFactory
+class DIContainerFactory
 {
 
     /**
@@ -32,7 +33,7 @@ class Xboom_Application_Resource_DIContainerFactory
          * (yet) know how to find this.
          */
         require_once 'Symfony/Components/DependencyInjection/sfServiceContainerAutoloader.php';
-        sfServiceContainerAutoloader::register();
+        \sfServiceContainerAutoloader::register();
     }
 
     public function setOptions(array $options = array())
@@ -68,17 +69,17 @@ class Xboom_Application_Resource_DIContainerFactory
     protected function buildServiceContainer()
     {
         //
-        $sc = new sfServiceContainerBuilder();
+        $sc = new \sfServiceContainerBuilder();
         $file = $this->_options['configFile'];
         $suffix = strtolower(pathinfo($file, PATHINFO_EXTENSION));
         switch ($suffix)
         {
             case 'xml':
-                $loader = new sfServiceContainerLoaderFileXml($sc);
+                $loader = new \sfServiceContainerLoaderFileXml($sc);
                 break;
 
             default:
-                throw new Zend_Exception("Invalid configuration file provided; unknown config type '$suffix'");
+                throw new \Zend_Exception("Invalid configuration file provided; unknown config type '$suffix'");
         }
         $loader->load($file);
 
@@ -92,7 +93,7 @@ class Xboom_Application_Resource_DIContainerFactory
      */
     protected function dumpToFile($sc)
     {
-        $dumper = new sfServiceContainerDumperPhp($sc);
+        $dumper = new \sfServiceContainerDumperPhp($sc);
         $filename = $this->_options['dumpFilePath'];
         if (file_exists($filename))
         {

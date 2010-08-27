@@ -1,10 +1,11 @@
 <?php
 
+namespace Xboom\Model\Domain;
 /**
  *
  * @author yugeon
  */
-abstract class Xboom_Model_Domain_AbstractObject
+abstract class AbstractObject
 {
 
     /**
@@ -15,7 +16,7 @@ abstract class Xboom_Model_Domain_AbstractObject
      *
      * @param string $name Name of property
      * @return mixed
-     * @throws InvalidArgumenException If no accessor/property exists by that name
+     * @throws \InvalidArgumenException If no accessor/property exists by that name
      */
     public function __get($name)
     {
@@ -33,7 +34,7 @@ abstract class Xboom_Model_Domain_AbstractObject
             }
         }
 
-        throw new InvalidArgumentException('No property named ' . $name . ' exists.');
+        throw new \InvalidArgumentException('No property named ' . $name . ' exists.');
     }
 
     /**
@@ -46,7 +47,7 @@ abstract class Xboom_Model_Domain_AbstractObject
      * @param  string $name Name of property
      * @param  mixed  $value Value of property
      * @return mixed Default return this object
-     * @throws InvalidArgumentException If no mutator/property exists by that name
+     * @throws \InvalidArgumentException If no mutator/property exists by that name
      */
     public function __set($name, $value)
     {
@@ -65,7 +66,7 @@ abstract class Xboom_Model_Domain_AbstractObject
             }
         }
 
-        throw new InvalidArgumentException('No property named ' . $name . ' exists.');
+        throw new \InvalidArgumentException('No property named ' . $name . ' exists.');
     }
 
     /**
@@ -77,7 +78,7 @@ abstract class Xboom_Model_Domain_AbstractObject
      * @param  string $name
      * @param  array  $arguments
      * @return mixed
-     * @throws BadMethodCallException If no mutator/accessor can be found
+     * @throws \BadMethodCallException If no mutator/accessor can be found
      */
     public function __call($name, $arguments)
     {
@@ -98,7 +99,7 @@ abstract class Xboom_Model_Domain_AbstractObject
                 }
             }
         }
-        throw new BadMethodCallException('No method named ' . $name . ' exists');
+        throw new \BadMethodCallException('No method named ' . $name . ' exists');
     }
 
     /**

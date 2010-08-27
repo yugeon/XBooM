@@ -1,10 +1,12 @@
 <?php
+
+namespace Xboom\Cache;
 /**
  * Factory for Doctrine cache driver.
  *
  * @author yugeon
  */
-class Xboom_Cache_DoctrineFactory
+class DoctrineFactory
 {
     /**
      * Return configured cache driver.
@@ -17,23 +19,24 @@ class Xboom_Cache_DoctrineFactory
     {
         switch ($cacheDriver)
         {
-            case 'Xboom_Cache_DoctrineAdapter':
-                $zendCache = Zend_Cache::factory('Core', 'File',
+            case 'Xboom\\Cache\\DoctrineAdapter':
+                $zendCache = \Zend_Cache::factory('Core', 'File',
                         $options['frontendOptions'], $options['backendOptions']);
-                $_cacheDriver = new Xboom_Cache_DoctrineAdapter($zendCache);
+                $_cacheDriver = new DoctrineAdapter($zendCache);
                 break;
             case 'Doctrine\\Common\\Cache\\Memcache':
-                $memcache = new Memcache;
+                $memcache = new \Memcache;
                 $memcache->connect($options['memcache']['host'], $options['memcache']['port']);
-                $_cacheDriver = new Doctrine\Common\Cache\MemcacheCache;
+                $_cacheDriver = new \Doctrine\Common\Cache\MemcacheCache;
                 $_cacheDriver->setMemcache($memcache);
                 break;
             default :
                     $_cacheDriver = new $cacheDriver();
         }
-        if (! ($_cacheDriver instanceof Doctrine\Common\Cache\Cache))
+        if (! ($_cacheDriver instanceof \Doctrine\Common\Cache\Cache))
         {
-            throw new Xboom_Exception ('Cache driver must be an instance of Doctrine\\Common\\Cache\\Cache interface.');
+            echo $_cacheDriver;
+            throw new \Xboom_Exception ('Cache driver must be an instance of Doctrine\\Common\\Cache\\Cache interface.');
             return null;
         }
         return $_cacheDriver;

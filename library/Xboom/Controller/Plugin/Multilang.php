@@ -1,5 +1,7 @@
 <?php
 
+namespace Xboom\Controller\Plugin;
+
 /**
  * Front Controller Plugin.
  * Hooks routeStartup, dispatchLoopStartup.
@@ -15,7 +17,7 @@
  * @version    SVN: $Id$
  */
 
-class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
+class Multilang extends \Zend_Controller_Plugin_Abstract
 {
     /**
      * Default language.
@@ -77,19 +79,19 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
      *
      * @param Zend_Controller_Request_Abstract $request
      */
-    public function routeStartup(Zend_Controller_Request_Abstract $request)
+    public function routeStartup(\Zend_Controller_Request_Abstract $request)
     {
         // Work only with http request
-        if (! ($request instanceof Zend_Controller_Request_Http))
+        if (! ($request instanceof \Zend_Controller_Request_Http))
             return;
 
-        $front = Zend_Controller_Front::getInstance();
+        $front = \Zend_Controller_Front::getInstance();
         $baseUrl = $front->getBaseUrl();
 
         // set original baseUrl for view helper BaseUrl
-        if (Zend_Controller_Action_HelperBroker::hasHelper('viewRender'))
+        if (\Zend_Controller_Action_HelperBroker::hasHelper('viewRender'))
         {
-            $view = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->view;
+            $view = \Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->view;
             if (null !== $view)
             {
                 $view->getHelper('BaseUrl')->setBaseUrl($baseUrl);
@@ -107,7 +109,7 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
         if (array_key_exists($lang, $this->_locales))
         {
             // save original base URL
-            Zend_Registry::set('orig_baseUrl', $baseUrl);
+            \Zend_Registry::set('orig_baseUrl', $baseUrl);
             // change base URL
             $front->setBaseUrl($baseUrl . $this->_urlDelimiter . $lang);
             // init path info with new baseUrl.
@@ -125,10 +127,10 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
      *
      * @param Zend_Controller_Request_Abstract $request
      */
-    public function dispatchLoopStartup(Zend_Controller_Request_Abstract $request)
+    public function dispatchLoopStartup(\Zend_Controller_Request_Abstract $request)
     {
         // Work only with http request
-        if (! ($request instanceof Zend_Controller_Request_Http))
+        if (! ($request instanceof \Zend_Controller_Request_Http))
             return;
 
         $lang = '';
@@ -137,9 +139,9 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
             // language not present in URL
             // check if language set in user options.
             $lang = '';
-            if (Zend_Registry::isRegistered('user_lang'))
+            if (\Zend_Registry::isRegistered('user_lang'))
             {
-                $lang = Zend_Registry::get('user_lang');
+                $lang = \Zend_Registry::get('user_lang');
             }
             else
             {
@@ -147,7 +149,7 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
                 // take from browser.
                 try
                 {
-                    $locale = new Zend_Locale();
+                    $locale = new \Zend_Locale();
                     $lang = $locale->getLanguage();
                     unset($locale);
                 }
@@ -173,16 +175,16 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
         }
 
         // Set up Locale object.
-        if (Zend_Registry::isRegistered('user_locale'))
+        if (\Zend_Registry::isRegistered('user_locale'))
         {
             // from user options
-            $localeString = Zend_Registry::get('user_locale');
+            $localeString = \Zend_Registry::get('user_locale');
         }
         else
         {
             $localeString = $this->_locales[$lang];
         }
-        $locale = new Zend_Locale($localeString);
+        $locale = new \Zend_Locale($localeString);
 
         // TODO: location dir for language
         // Set up Translate Object.
@@ -197,18 +199,18 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
         {
             $translationStrings = array('test' => '1');
         }
-        $translate = new Zend_Translate('array', $translationStrings, $lang);
+        $translate = new \Zend_Translate('array', $translationStrings, $lang);
 
         // Save language settings.
-        Zend_Registry::set('lang', $lang);
-        Zend_Registry::set('Zend_Locale', $locale);
-        Zend_Registry::set('Zend_Translate', $translate);
+        \Zend_Registry::set('lang', $lang);
+        \Zend_Registry::set('Zend_Locale', $locale);
+        \Zend_Registry::set('Zend_Translate', $translate);
     }
 
-    protected function _doRedirectAndExit(Zend_Controller_Request_Abstract $request, $lang)
+    protected function _doRedirectAndExit(\Zend_Controller_Request_Abstract $request, $lang)
     {
         // set evaluating language in URL, and redirect request
-        $uri = Zend_Uri::factory($request->getScheme());
+        $uri = \Zend_Uri::factory($request->getScheme());
         $uri->setHost($request->getHttpHost());
         $uri->setPath($request->getBaseUrl() . $this->_urlDelimiter
                 . $lang . $request->getPathInfo());
@@ -229,7 +231,7 @@ class Xboom_Controller_Plugin_Multilang extends Zend_Controller_Plugin_Abstract
      *
      * @param Zend_Controller_Request_Abstract $request
      */
-    public function preDispatch(Zend_Controller_Request_Abstract $request)
+    public function preDispatch(\Zend_Controller_Request_Abstract $request)
     {
         // TODO: add translation for current module
 //        $translate = Zend_Registry::get('Zend_Translate');

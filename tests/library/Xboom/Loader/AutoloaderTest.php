@@ -121,15 +121,15 @@ class AutoloaderTest extends PHPUnit_Framework_TestCase
     {
         $this->autoloader->unregisterNamespace('Zend_');
         $namespaces = $this->autoloader->getRegisteredNamespaces();
-        $this->assertNotContains('Zend_', $namespaces);
+        $this->assertNotContains('Zend', $namespaces);
     }
 
     public function testAutoloaderShouldAllowUnregisteringMultipleNamespacesAtOnce()
     {
         $this->autoloader->unregisterNamespace(array('Zend_', 'ZendX_'));
         $namespaces = $this->autoloader->getRegisteredNamespaces();
-        $this->assertNotContains('Zend_', $namespaces);
-        $this->assertNotContains('ZendX_', $namespaces);
+        $this->assertNotContains('Zend', $namespaces);
+        $this->assertNotContains('ZendX', $namespaces);
     }
 
     /**

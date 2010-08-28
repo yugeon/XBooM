@@ -1,7 +1,7 @@
 <?php
 require_once 'PHPUnit/Framework.php';
 
-class Xboom_Model_Validate_TestModel implements Xboom_Model_Validate_Interface
+class Xboom_Model_Validate_TestModel implements Xboom\Model\Validate\ValidateInterface
 {
 
     public function  addElement($element, $name = null, $options = null)

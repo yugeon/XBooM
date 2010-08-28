@@ -5,7 +5,7 @@ namespace Core\Model\Form;
  *
  * @author yugeon
  */
-class RegisterNewUser extends \Zend_Form
+class RegisterNewUserForm extends \Zend_Form
 {
 
     public function init()

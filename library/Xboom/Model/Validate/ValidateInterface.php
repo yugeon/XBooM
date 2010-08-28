@@ -1,10 +1,10 @@
 <?php
-
+namespace Xboom\Model\Validate;
 /**
  *
  * @author yugeon
  */
-interface Xboom_Model_Validate_Interface extends Zend_Validate_Interface
+interface ValidateInterface extends \Zend_Validate_Interface
 {
 
      /**

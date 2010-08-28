@@ -36,7 +36,7 @@ class DoctrineFactory
         if (! ($_cacheDriver instanceof \Doctrine\Common\Cache\Cache))
         {
             echo $_cacheDriver;
-            throw new \Xboom_Exception ('Cache driver must be an instance of Doctrine\\Common\\Cache\\Cache interface.');
+            throw new \Xboom\Exception ('Cache driver must be an instance of Doctrine\\Common\\Cache\\Cache interface.');
             return null;
         }
         return $_cacheDriver;

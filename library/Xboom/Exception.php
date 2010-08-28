@@ -1,8 +1,6 @@
 <?php
-/**
- * Zend_Exception
- */
-require_once 'Zend/Exception.php';
+
+namespace Xboom;
 
 /**
  * @category   Xboom
@@ -12,7 +10,7 @@ require_once 'Zend/Exception.php';
  *
  * @version SVN: $Id$
  */
-class Xboom_Exception extends Zend_Exception
+class Exception extends \Zend_Exception
 {
 
 }

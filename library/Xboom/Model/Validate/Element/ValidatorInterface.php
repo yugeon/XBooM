@@ -20,19 +20,13 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
+namespace Xboom\Model\Validate\Element;
 /**
  *
  * @author yugeon
  */
-interface Xboom_Model_Validate_Element_Interface
-    extends Zend_Validate_Interface, Zend_Filter_Interface
+interface ValidatorInterface extends \Zend_Validate_Interface, \Zend_Filter_Interface
 {
-    /**
-     * Return validator chain
-     *
-     * @return array Array of Xboom_Model_Validate_Interface elements
-     */
-    public function getValidators();
 
     /**
      * Adds a validator to the end of the chain
@@ -40,9 +34,17 @@ interface Xboom_Model_Validate_Element_Interface
      * If $breakChainOnFailure is true, then if the validator fails, the next validator in the chain,
      * if one exists, will not be executed.
      *
-     * @param  Xboom_Model_Validate_Interface $validator
-     * @param  boolean                        $breakChainOnFailure
-     * @return Xboom_Model_Validate_Interface Provides a fluent interface
+     * @param  \Zend_Validate_Interface $validator
+     * @param  boolean                  $breakChainOnFailure
+     * @return \Zend_Validate Provides a fluent interface
+     * @throws \InvalidArgumentException
      */
-    public function addValidator(Xboom_Model_Validate_Interface $validator, $breakChainOnFailure = false);
+    public function addValidator($validator, $breakChainOnFailure = false);
+
+    /**
+     * Retrieve all validators
+     *
+     * @return array
+     */
+    public function getValidators();
 }

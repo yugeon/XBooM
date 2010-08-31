@@ -21,29 +21,37 @@
  */
 
 namespace Xboom\Model\Validate;
+use Xboom\Model\Validate\Element\ValidatorInterface as ElementValidator;
 /**
  *
  * @author yugeon
  */
-interface ValidateInterface extends \Zend_Validate_Interface
+interface ValidatorInterface extends \Zend_Validate_Interface
 {
 
-     /**
-     * Add a new element
+    /**
+     * Add validator for property.
+     * $element must be an object of type ElementValidator.
      *
-     * $element may be either a string element type, or an object of type
-     * Zend_Form_Element. If a string element type is provided, $name must be
-     * provided, and $options may be optionally provided for configuring the
-     * element.
-     *
-     * If a Xboom_Model_Element_Interface is provided, $name may be optionally provided,
-     * and any provided $options will be ignored.
-     *
-     * @param  string|Xboom_Model_Element_Interface $element
-     * @param  string $name
-     * @param  array $options
-     * @return Xboom_Model_Validate_Interface Provides a fluent interface
+     * @param  string $propertyName
+     * @param  ElementValidator $validator
+     * @return ValidatorInterface Provides a fluent interface
      */
-    public function addElement($element, $name = null, $options = null);
+    public function setPropertyValidator($propertyName, ElementValidator $validator);
+
+    /**
+     * Return validator for property $propertyName.
+     *
+     * @param string $propertyName
+     * @return object ElementValidator
+     */
+    public function getPropertyValidator($propertyName);
+
+    /**
+     * Get Array of properties affected to validation
+     *
+     * @return array Array of ElementValidator
+     */
+    public function getPropertiesForValidation();
 
 }

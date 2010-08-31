@@ -32,6 +32,7 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
 
     public function teardown()
     {
+        parent::tearDown();
         m::close();
     }
 

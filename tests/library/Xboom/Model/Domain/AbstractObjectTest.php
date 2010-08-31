@@ -1,6 +1,8 @@
 <?php
 
 require_once 'PHPUnit/Framework.php';
+use Xboom\Model\Validate\ValidatorInterface;
+use \Mockery as m;
 
 class AbstractObject extends Xboom\Model\Domain\AbstractObject
 {
@@ -10,6 +12,9 @@ class AbstractObject extends Xboom\Model\Domain\AbstractObject
     protected $_testPropertyTrue = true;
     protected $testProtectedProperty;
     protected $_testProtectedProperty;
+
+    protected $login;
+    protected $password;
 
     public function getTestPropertyFalse()
     {
@@ -32,6 +37,12 @@ class Xboom_Model_Domain_AbstractObjectTest extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->object = new AbstractObject;
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+        m::close();
     }
 
     public function testCanGetProtectedProperty()
@@ -149,8 +160,110 @@ class Xboom_Model_Domain_AbstractObjectTest extends PHPUnit_Framework_TestCase
             "testPropertyTrue" => true,
             "testPropertyFalse" => true,
             "testProperty" => null,
-            "testProtectedProperty"=> null
+            "testProtectedProperty"=> null,
+            'login' => null,
+            'password' => null,
         );
         $this->assertEquals($expected, $this->object->toArray());
+    }
+
+    // ------------------------------
+    //  Implements ValidatorInterface
+    // ------------------------------
+    public function testCanSetValidator()
+    {
+        $validator = m::mock('Xboom\\Model\\Validate\\ValidatorInterface');
+        $this->assertEquals($this->object, $this->object->setValidator($validator));
+    }
+    public function testMustReturnTrueIfDataIsValid()
+    {
+        $validData = array(
+            'login'     => 'validLogin',
+            'password'   => 'validPassword'
+        );
+        $validator = m::mock('Xboom\\Model\\Validate\\ValidatorInterface');
+        $validator->shouldReceive('isValid')->once()->andReturn(true);
+        $this->object = new AbstractObject($validData);
+        $this->object->setValidator($validator);
+        $this->assertTrue($this->object->isValid());
+
+    }
+    public function testMustReturnFalseIfDataIsInvalid()
+    {
+        $invalidData = array(
+            'login'     => 'invalidLogin',
+            'password'   => 'validPassword'
+        );
+        $validator = m::mock('Xboom\\Model\\Validate\\ValidatorInterface');
+        $validator->shouldReceive('isValid')->once()->andReturn(false);
+        $this->object = new AbstractObject($invalidData);
+        $this->object->setValidator($validator);
+        $this->assertFalse($this->object->isValid());
+
+    }
+    public function testCanValidateExternalArray()
+    {
+        $validData = array(
+            'login' => 'validLogin',
+            'password'   => 'validPassword'
+        );
+        $invalidData = array(
+            'login' => 'invalidLogin',
+            'password'   => 'validPassword'
+        );
+        $validator = m::mock('Xboom\\Model\\Validate\\ValidatorInterface');
+        $validator->shouldReceive('isValid')->with($validData)->once()->andReturn(true);
+        $validator->shouldReceive('isValid')->with($invalidData)->once()->andReturn(false);
+        $this->object->setValidator($validator);
+
+        $this->assertTrue($this->object->isValid($validData));
+        $this->assertFalse($this->object->isValid($invalidData));
+    }
+    public function testDomainObjectMustBeValidIfValidatorNotSet()
+    {
+        $this->object->setValidator(null);
+        $this->assertTrue($this->object->isValid());
+    }
+    public function testMethodGetMessagesShouldReturnEmptyArrayIfValidatorNotSet()
+    {
+        $this->object->setValidator(null);
+        $this->assertEquals(array(), $this->object->getMessages());
+    }
+    public function testMethodGetMessagesShouldReturnEmptyArrayIfObjectValid()
+    {
+        $validData = array(
+            'login'     => 'validLogin',
+            'password'   => 'validPassword'
+        );
+        $validator = m::mock('Xboom\\Model\\Validate\\ValidatorInterface');
+        $validator->shouldReceive('isValid')->once()->andReturn(true);
+        $validator->shouldReceive('getMessages')->once()->andReturn(array());
+        $this->object = new AbstractObject($validData);
+        $this->object->setValidator($validator);
+        $this->assertTrue($this->object->isValid());
+        $this->assertEquals(array(), $this->object->getMessages());
+    }
+    public function testMethodGetMessagesShouldReturnArrayOfMessagesIfObjectInvalid()
+    {
+        $invalidData = array(
+            'login'     => 'invalidLogin',
+            'password'   => 'validPassword'
+        );
+        $errorMsg = 'Login is invalid';
+        $validator = m::mock('Xboom\\Model\\Validate\\ValidatorInterface');
+        $validator->shouldReceive('isValid')->once()->andReturn(false);
+        $validator->shouldReceive('getMessages')->once()->andReturn(array($errorMsg));
+        $this->object = new AbstractObject($invalidData);
+        $this->object->setValidator($validator);
+        $this->assertFalse($this->object->isValid());
+        $this->assertContains($errorMsg, $this->object->getMessages());
+    }
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testRaiseExceptionIfTryValidateNotArrayData()
+    {
+        $data = new stdClass();
+        $this->object->isValid($data);
     }
 }

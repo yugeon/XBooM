@@ -20,15 +20,15 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
-namespace Core\Service;
-
-use \Core\Model\Domain\User as User;
-
 /**
  * Description of User
  *
  * @author yugeon
  */
+namespace Core\Service;
+
+use \Core\Model\Domain\User as User;
+
 class UserService extends \Xboom\Service\AbstractService
 {
 

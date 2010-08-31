@@ -122,7 +122,7 @@ class Autoloader
     /**
      * Retrieve singleton instance
      *
-     * @return Zend_Loader_Autoloader
+     * @return Xboom\Loader\Autoloader
      */
     public static function getInstance()
     {

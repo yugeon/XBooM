@@ -20,41 +20,13 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
-namespace Core\Model\Domain;
 /**
- * @Entity
- * @Table(name="users")
+ * Description of NoSuchPropertyException
+ *
+ * @author yugeon
  */
-class User
-    extends \Xboom\Model\Domain\AbstractObject
-    implements \Zend_Acl_Role_Interface
+namespace Xboom\Model\Validate;
+
+class NoSuchPropertyException extends \Xboom\Exception
 {
-
-    /**
-     * @Id @Column(type="integer")
-     * @GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
-
-    /** @Column(type="string", length=50) */
-    protected $name;
-
-    /** @Column(type="string", length=16) */
-    protected $login;
-
-    /** @Column(type="string", length=32) */
-    protected $password;
-
-    protected $role = 'guest';
-
-    /**
-     * Returns the string identifier of the Role
-     *
-     * @return string
-     */
-    public function getRoleId()
-    {
-        return $this->role;
-    }
-
 }

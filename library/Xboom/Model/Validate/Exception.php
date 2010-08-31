@@ -25,9 +25,9 @@
  *
  * @author yugeon
  */
-namespace Xboom\Validate;
+namespace Xboom\Model\Validate;
 
-class Exception extends Xboom\Exception
+class Exception extends \Xboom\Exception
 {
     //put your code here
 }

@@ -46,6 +46,12 @@ abstract class AbstractValidator implements ValidatorInterface
     protected $_messages = array();
 
     /**
+     * Element filters
+     * @var array
+     */
+    protected $_filters = array();
+
+    /**
      * Adds a validator to the end of the chain
      *
      * If $breakChainOnFailure is true, then if the validator fails, the next validator in the chain,
@@ -53,8 +59,8 @@ abstract class AbstractValidator implements ValidatorInterface
      *
      * @param  \Zend_Validate_Interface $validator
      * @param  boolean                  $breakChainOnFailure
-     * @return \Zend_Validate Provides a fluent interface
-     * @throws \InvalidArgumentException
+     * @return ValidatorInterface       Provides a fluent interface
+     * @throws \InvalidArgumentException If $validator is not instance of \Zend_Validate_Interface
      */
     public function addValidator($validator, $breakChainOnFailure = false)
     {
@@ -94,16 +100,22 @@ abstract class AbstractValidator implements ValidatorInterface
      * getMessages() will return an array of messages that explain why the
      * validation failed.
      *
-     * @param  mixed $value
+     * @param  mixed $value Array not supported!
      * @return boolean
-     * @throws Zend_Valid_Exception If validation of $value is impossible
+     * @throws \Zend_Valid_Exception If validation of $value is impossible
+     * @throws \InvalidArgumentException If try validate Array value
      */
     public function isValid($value)
     {
+        if (\is_array($value))
+        {
+            throw new \InvalidArgumentException('Validation of Array not support');
+        }
+        
         $isValid = true;
         $this->_messages = array();
 
-        // TODO пропустить через фильтры
+        $value = $this->filter($value);
 
         foreach ($this->_validators as $element)
         {
@@ -118,6 +130,7 @@ abstract class AbstractValidator implements ValidatorInterface
                 break;
             }
         }
+        
         return $isValid;
     }
 
@@ -137,6 +150,36 @@ abstract class AbstractValidator implements ValidatorInterface
     }
 
     /**
+     * Add a filter to the element
+     *
+     * @param  \Zend_Filter_Interface $filter
+     * @return ValidatorInterface Provides a fluent interface
+     * @throws \InvalidArgumentException If $filter is not instance of \Zend_Filter_Interface
+     */
+    public function addFilter($filter)
+    {
+        if ($filter instanceof \Zend_Filter_Interface)
+        {
+            $filterName = \get_class($filter);
+            $this->_filters[$filterName] = $filter;
+        }
+        else
+        {
+            throw new \InvalidArgumentException;
+        }
+        return $this;
+    }
+    /**
+     * Get all filters
+     *
+     * @return array
+     */
+    public function getFilters()
+    {
+        return $this->_filters;
+    }
+
+    /**
      * Returns the result of filtering $value
      *
      * @param  mixed $value
@@ -145,7 +188,11 @@ abstract class AbstractValidator implements ValidatorInterface
      */
     public function filter($value)
     {
-        
+        foreach ($this->getFilters() as $filter)
+        {
+            $value = $filter->filter($value);
+        }
+        return $value;
     }
 
 }

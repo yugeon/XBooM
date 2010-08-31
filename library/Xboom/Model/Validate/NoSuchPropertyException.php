@@ -27,6 +27,6 @@
  */
 namespace Xboom\Model\Validate;
 
-class NoSuchPropertyException extends \Xboom\Exception
+class NoSuchPropertyException extends Exception
 {
 }

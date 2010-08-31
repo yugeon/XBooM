@@ -170,13 +170,14 @@ abstract class AbstractObject implements ValidateInterface
     }
 
     // ------------------------------
-    //  Implements ValidatorInterface
+    //  Implements ValidateInterface
     // ------------------------------
 
     /**
      * Set validate object
      *
      * @param $validator Xboom\Model\Validate\ValidatorInterface
+     * @return ValidateInterface for fluent.
      */
     public function setValidator($validator)
     {

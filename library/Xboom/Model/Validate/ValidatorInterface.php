@@ -44,6 +44,7 @@ interface ValidatorInterface extends \Zend_Validate_Interface
      *
      * @param string $propertyName
      * @return object ElementValidator
+     * @throws Xboom\Model\Validate\NoSuchPropertyException
      */
     public function getPropertyValidator($propertyName);
 

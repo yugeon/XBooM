@@ -46,11 +46,11 @@ abstract class AbstractValidator implements ValidatorInterface
     protected $_messages = array();
 
     /**
-     * Add a new property for validation.
-     * $element may be an object of type ElementValidator.
+     * Add validator for property.
+     * $element must be an object of type ElementValidator.
      *
      * @param  string $propertyName
-     * @param  ElementValidator $element
+     * @param  ElementValidator $validator
      * @return ValidatorInterface Provides a fluent interface
      */
     public function setPropertyValidator($propertyName, ElementValidator $validator)

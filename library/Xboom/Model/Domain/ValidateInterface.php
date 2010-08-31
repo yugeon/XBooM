@@ -30,7 +30,7 @@ interface ValidateInterface
     /**
      * Set validate object
      *
-     * @param $validator ValidateInterface
+     * @param $validator Xboom\Model\Validate\ValidatorInterface
      * @return ValidateInterface for fluent.
      */
     public function setValidator($validator);

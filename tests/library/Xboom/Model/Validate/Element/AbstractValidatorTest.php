@@ -102,6 +102,18 @@ class AbstractValidatorTest extends PHPUnit_Framework_TestCase
         $this->object->isValid($value);
         $this->assertTrue(count($this->object->getMessages()) > 0);
     }
+    public function testCanValidateByChainValidators()
+    {
+        $value = 'validValue';
+        $validator1 = new Zend_Validate_Alnum();
+        $validator2 = new Zend_Validate_Alpha();
+        $this->object->addValidator($validator1, true)
+                     ->addValidator($validator2);
+        $this->assertTrue($validator1->isValid($value));
+        $this->assertTrue($validator2->isValid($value));
+        $this->assertTrue($this->object->isValid($value));
+        $this->assertEquals(0, count($this->object->getMessages()));
+    }
     public function testCanBreakValidationChainIfValueIsInvalid()
     {
         $value = '#@$! invalidValue %$$@^#';
@@ -113,5 +125,57 @@ class AbstractValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($validator2->isValid($value));
         $this->assertFalse($this->object->isValid($value));
         $this->assertEquals(1, count($this->object->getMessages()));
+    }
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testValidationOfArrayNotSupported()
+    {
+        $value = array(
+            'key1' => 'value1',
+            'key2' => 'value2',
+            'key3' => 'value3',
+        );
+        $validator = new Zend_Validate_Alnum();
+        $this->object->addValidator($validator);
+        $this->assertTrue($this->object->isValid($value));
+    }
+    
+    // -----------------------
+    // Filters
+    // -----------------------
+
+    public function testCanAddFilter()
+    {
+        $value = '  validValue   ';
+        $filter = new Zend_Filter_StringTrim();
+        $this->object->addFilter($filter);
+        $this->assertContains($filter, $this->object->getFilters());
+    }
+    public function testFilterIsWork()
+    {
+        $value = '  validValue   ';
+        $filter = new Zend_Filter_StringTrim();
+        $this->object->addFilter($filter);
+        $this->assertEquals('validValue', $this->object->filter($value));
+    }
+    public function testChainFilterIsWork()
+    {
+        $value = '  validValue   ';
+        $filter = new Zend_Filter_StringTrim();
+        $filter2 = new Zend_Filter_StringToUpper();
+        $this->object->addFilter($filter)
+                     ->addFilter($filter2);
+        $this->assertEquals('VALIDVALUE', $this->object->filter($value));
+    }
+    public function testFilterAppliedToValueForValidation()
+    {
+        $value = '  validValue   ';
+        $filter = new Zend_Filter_StringTrim();
+        $validator = new Zend_Validate_Alnum();
+        $this->object->addValidator($validator);
+        $this->object->addFilter($filter);
+        $this->assertFalse($validator->isValid($value));
+        $this->assertTrue($this->object->isValid($value));
     }
 }

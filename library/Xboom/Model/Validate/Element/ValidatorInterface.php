@@ -36,8 +36,8 @@ interface ValidatorInterface extends \Zend_Validate_Interface, \Zend_Filter_Inte
      *
      * @param  \Zend_Validate_Interface $validator
      * @param  boolean                  $breakChainOnFailure
-     * @return \Zend_Validate Provides a fluent interface
-     * @throws \InvalidArgumentException
+     * @return ValidatorInterface       Provides a fluent interface
+     * @throws \InvalidArgumentException If $validator is not instance of \Zend_Validate_Interface
      */
     public function addValidator($validator, $breakChainOnFailure = false);
 
@@ -47,4 +47,21 @@ interface ValidatorInterface extends \Zend_Validate_Interface, \Zend_Filter_Inte
      * @return array
      */
     public function getValidators();
+
+    /**
+     * Add a filter to the element
+     *
+     * @param  \Zend_Filter_Interface $filter
+     * @return ValidatorInterface Provides a fluent interface
+     * @throws \InvalidArgumentException If $filter is not instance of \Zend_Filter_Interface
+     */
+    public function addFilter($filter);
+
+    /**
+     * Get all filters
+     *
+     * @return array
+     */
+    public function getFilters();
+
 }

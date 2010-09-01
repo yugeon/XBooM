@@ -30,6 +30,13 @@ interface ValidatorInterface extends \Zend_Validate_Interface
 {
 
     /**
+     * Initialize this object custom elements.
+     *
+     * @return void
+     */
+    public function init();
+    
+    /**
      * Add validator for property.
      * $element must be an object of type ElementValidator.
      *
@@ -37,7 +44,7 @@ interface ValidatorInterface extends \Zend_Validate_Interface
      * @param  ElementValidator $validator
      * @return ValidatorInterface Provides a fluent interface
      */
-    public function setPropertyValidator($propertyName, ElementValidator $validator);
+    public function addPropertyValidator($propertyName, ElementValidator $validator);
 
     /**
      * Return validator for property $propertyName.

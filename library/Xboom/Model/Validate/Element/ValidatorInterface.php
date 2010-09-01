@@ -64,4 +64,12 @@ interface ValidatorInterface extends \Zend_Validate_Interface, \Zend_Filter_Inte
      */
     public function getFilters();
 
+    /**
+     * Set flag indicating whether or not value should be obfuscated in messages
+     *
+     * @param  bool $flag
+     * @return ValidatorInterface
+     */
+    public function setObscureValue($flag);
+
 }

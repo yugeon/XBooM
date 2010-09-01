@@ -27,6 +27,9 @@ $application = new Zend_Application(
     APPLICATION_PATH . '/configs/application.ini'
 );
 
+require_once 'Xboom/Loader/Autoloader.php';
+Xboom\Loader\Autoloader::getInstance();
+
 $application->bootstrap();
 $sc = $application->getBootstrap()->getContainer();
 $em = $sc->getService('doctrine.orm.entitymanager');

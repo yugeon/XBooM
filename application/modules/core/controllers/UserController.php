@@ -44,15 +44,34 @@ class Core_UserController extends Zend_Controller_Action
 
     public function addAction()
     {
-        $user = new User();
-        $user->setName('TestName' . rand(1, 100));
-        $user->setPassword(md5($user->name));
+        $userService = new Core\Service\UserService($this->em);
 
-        $this->em->persist($user);
-        $this->em->flush();
+        if ($this->getRequest()->isPost())
+        {
+            try
+            {
+                $result = $userService->registerNewUser($_POST);
+                echo 'Register ok!';
+            }
+            catch (\Xboom\Exception $e)
+            {
+                echo 'Register Failed, try again';
 
-        return $this->_helper->getHelper('Redirector')
-                             ->gotoUrl($this->getRequest()->getControllerName());
+            }
+        }
+
+        $form = $userService->getForm('RegisterNewUser');
+        echo $form;
+
+//        $user = new User();
+//        $user->setName('TestName' . rand(1, 100));
+//        $user->setPassword(md5($user->name));
+//
+//        $this->em->persist($user);
+//        $this->em->flush();
+
+//        return $this->_helper->getHelper('Redirector')
+//                             ->gotoUrl($this->getRequest()->getControllerName());
     }
 
     public function deleteAction()

@@ -230,10 +230,9 @@ abstract class AbstractObject implements ValidateInterface
      */
     public function getMessages()
     {
-        $messages = array();
         if (null === $this->_validator)
         {
-            return $messages;
+            return array();
         }
         else
         {

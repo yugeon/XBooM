@@ -178,4 +178,16 @@ class AbstractValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($validator->isValid($value));
         $this->assertTrue($this->object->isValid($value));
     }
+
+    public function testCanObscureValue()
+    {
+        $password = '@12';
+        $validator = new Zend_Validate_StringLength(array('min' => 4));
+        $this->object->addValidator($validator);
+        $this->object->setObscureValue(true);
+        $this->assertFalse($this->object->isValid($password));
+        $this->assertNotContains("'@12' is less than 4 characters long", $this->object->getMessages());
+        $this->assertContains("'***' is less than 4 characters long", $this->object->getMessages());
+
+    }
 }

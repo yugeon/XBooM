@@ -32,7 +32,7 @@ use Xboom\Model\Validate\Element\ValidatorInterface as ElementValidator;
 
 abstract class AbstractValidator implements ValidatorInterface
 {
-
+    
     /**
      * Protected property.
      * Array of properties which affected to validation.
@@ -45,6 +45,21 @@ abstract class AbstractValidator implements ValidatorInterface
 
     protected $_messages = array();
 
+    public function  __construct()
+    {
+        $this->init();
+    }
+
+    /**
+     * Initialize this object custom elements.
+     *
+     * @return void
+     */
+    public function init()
+    {
+
+    }
+
     /**
      * Add validator for property.
      * $element must be an object of type ElementValidator.
@@ -53,7 +68,7 @@ abstract class AbstractValidator implements ValidatorInterface
      * @param  ElementValidator $validator
      * @return ValidatorInterface Provides a fluent interface
      */
-    public function setPropertyValidator($propertyName, ElementValidator $validator)
+    public function addPropertyValidator($propertyName, ElementValidator $validator)
     {
         $this->_propertiesForValidation[$propertyName] = $validator;
         return $this;
@@ -110,7 +125,7 @@ abstract class AbstractValidator implements ValidatorInterface
         $properties = $this->getPropertiesForValidation();
         foreach ($properties as $key => $propertyValidator)
         {
-            if (isset($data[$key]))
+            if (\array_key_exists($key, $data))
             {
                 $isValid = $propertyValidator->isValid($data[$key]) && $isValid;
             }
@@ -135,8 +150,9 @@ abstract class AbstractValidator implements ValidatorInterface
         $properties = $this->getPropertiesForValidation();
         foreach ($properties as $key => $propertyValidator)
         {
-            $this->_messages = \array_merge($this->_messages,
-                    $propertyValidator->getMessages());
+            $messages = $propertyValidator->getMessages();
+            if (!empty($messages))
+                $this->_messages[$key] = $messages;
         }
         return $this->_messages;
     }

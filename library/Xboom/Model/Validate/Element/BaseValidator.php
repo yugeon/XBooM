@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  CMF for web applications based on Zend Framework 1 and Doctrine 2
  *  Copyright (C) 2010  Eugene Gruzdev aka yugeon
@@ -19,41 +20,20 @@
  * @copyright  Copyright (c) 2010 yugeon <yugeon.ru@gmail.com>
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
-
-namespace Core\Model\Form;
 /**
- * Description of RegisterNewUserForm
+ * Description of BaseValidator
  *
  * @author yugeon
  */
-class RegisterNewUserForm extends \Zend_Form
+
+namespace Xboom\Model\Validate\Element;
+
+class BaseValidator extends \Xboom\Model\Validate\Element\AbstractValidator
 {
-
-    public function init()
+    public function __construct()
     {
-        $this->setName('registerNewUser');
-
-        $this->addElement('text', 'name', array(
-            'label' => 'Username'
-        ));
-
-        $this->addElement('text', 'login', array(
-            'label' => 'Login'
-        ));
-
-        $this->addElement('password', 'password', array(
-            'label' => 'Password'
-        ));
-
-        $this->addElement('password', 'confirm_password', array(
-            'label' => 'Confirm password',
-            'required' => true,
-            'validators' => array( array('Identical', false, 'password'))
-        ));
-
-        $this->addElement('submit', 'register', array(
-            'label' => 'Register'
-        ));
+        $this->addValidator(new \Zend_Validate_NotEmpty(), true);
+        return $this;
     }
 
 }

@@ -26,6 +26,8 @@ $autoloader->registerNamespace(array(
     'Core\\Model'       => APPLICATION_PATH . '/modules/core/models',
     'Core\\Service'     => APPLICATION_PATH . '/modules/core/models/services',
     'Core\\Model\\Form' => APPLICATION_PATH . '/modules/core/models/forms',
+    'Core\\Model\\Domain\\Validator'
+                        => APPLICATION_PATH . '/modules/core/models/Domain/validators',
     )
 );
 

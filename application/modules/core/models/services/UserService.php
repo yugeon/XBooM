@@ -43,6 +43,31 @@ class UserService extends \Xboom\Service\AbstractService
     }
 
     /**
+     *
+     * @param string $formName
+     * @return object Form
+     */
+    public function getForm($formName)
+    {
+        if (isset($this->_forms[$formName]))
+        {
+            return $this->_forms[$formName];
+        }
+        else
+        {
+            // FIXME hardcode namespace
+            $formClass = "\\Core\\Model\\Form\\{$formName}Form";
+            if (\class_exists($formClass))
+            {
+                $form = new $formClass;
+                $this->_forms[$formName] = $form;
+                return $this->_forms[$formName];
+            }
+            throw new \InvalidArgumentException("Form '{$formName}' not found.");
+        }
+    }
+    
+    /**
      * Get all users as array of objects.
      *
      * @return array
@@ -69,22 +94,49 @@ class UserService extends \Xboom\Service\AbstractService
      *
      * @param array $data
      * @param boolean $flush If true then flush EntityManager
-     * @return User
+     * @return object User
+     * @throws \Xboom\Exception If can't create new user
      */
     public function registerNewUser(array $data, $flush = true)
     {
         // TODO: ACL        !!!
-        // TODO: Validation !!!
 
-        $user = new User($data);
-        $this->_em->persist($user);
+        // TODO: REFACTORING засунуть все это в медиатор
 
-        if ($flush)
+        $registerUserForm = $this->getForm('RegisterNewUser');
+        if ($registerUserForm->isValid($data))
         {
-            $this->_em->flush();
+            $userData = $registerUserForm->getValues();
+            unset($userData['confirm_password']);
+            $user = new User($userData);
+            $userValidator = new \Core\Model\Domain\Validator\RegisterNewUserValidator();
+            $user->setValidator($userValidator);
+
+            if ($user->isValid())
+            {
+                $this->_em->persist($user);
+
+                if ($flush)
+                {
+                    $this->_em->flush();
+                }
+                return $user;
+            }
+            else
+            {
+                $messages = $userValidator->getMessages();
+                $formElements = $registerUserForm->getElements();
+                foreach ($formElements as $key => $element)
+                {
+                    if (isset($messages[$key]))
+                    {
+                        $element->addErrors($messages[$key]);
+                    }
+                }
+            }
         }
 
-        return $user;
+        throw new \Xboom\Exception('Can\'t create new user.');
     }
 
 }

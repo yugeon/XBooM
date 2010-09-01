@@ -8,7 +8,18 @@ use \Mockery as m;
 
 class TestModelValidator extends AbstractValidator
 {
+    protected static $testValidator;
 
+    public static function setTestValidator($validator)
+    {
+        self::$testValidator = $validator;
+    }
+
+    public function init()
+    {
+        $propertyName = 'setInInitMethod';
+        $this->addPropertyValidator($propertyName, self::$testValidator);
+    }
 }
 
 /**
@@ -29,9 +40,11 @@ class Xboom_Model_Validate_AbstractTest extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
         
-        $this->object = new TestModelValidator();
         $this->loginValidator = m::mock('Xboom\\Model\\Validate\\Element\\ValidatorInterface');
         $this->loginValidator->shouldReceive('isValid')->andReturn(true);
+        $this->loginValidator->shouldReceive('getMessages')->andReturn(array());
+        TestModelValidator::setTestValidator($this->loginValidator);
+        $this->object = new TestModelValidator();
     }
 
     public function tearDown()
@@ -43,11 +56,18 @@ class Xboom_Model_Validate_AbstractTest extends PHPUnit_Framework_TestCase
     public function  testSetAndGetPropertyValidator()
     {
         $propertyName = 'login';
-        $this->object->setPropertyValidator($propertyName, $this->loginValidator);
+        $this->object->addPropertyValidator($propertyName, $this->loginValidator);
 
         $this->assertEquals(
                 $this->loginValidator,
                 $this->object->getPropertyValidator($propertyName)
+        );
+    }
+    public function testMethodInitMustCall()
+    {
+        $this->assertEquals(
+                $this->loginValidator,
+                $this->object->getPropertyValidator('setInInitMethod')
         );
     }
     /**
@@ -64,7 +84,7 @@ class Xboom_Model_Validate_AbstractTest extends PHPUnit_Framework_TestCase
             'password'  => 'validPassword',
             'email'     => 'valid@email.com'
         );
-        $this->object->setPropertyValidator('login', $this->loginValidator);
+        $this->object->addPropertyValidator('login', $this->loginValidator);
         
         $this->assertTrue($this->object->isValid($validData));
     }
@@ -79,7 +99,7 @@ class Xboom_Model_Validate_AbstractTest extends PHPUnit_Framework_TestCase
         $loginValidator = m::mock('Xboom\\Model\\Validate\\Element\\ValidatorInterface');
         $loginValidator->shouldReceive('isValid')
                              ->with($invalidData['login'])->andReturn(false);
-        $this->object->setPropertyValidator('login', $loginValidator);
+        $this->object->addPropertyValidator('login', $loginValidator);
         $this->assertFalse($this->object->isValid($invalidData));
     }
 
@@ -99,7 +119,7 @@ class Xboom_Model_Validate_AbstractTest extends PHPUnit_Framework_TestCase
             'email'     => 'valid@email.com'
         );
         $this->loginValidator->shouldReceive('getMessages')->andReturn(array());
-        $this->object->setPropertyValidator('login', $this->loginValidator);
+        $this->object->addPropertyValidator('login', $this->loginValidator);
 
         $this->assertEquals(0, count($this->object->getMessages()));
     }
@@ -116,8 +136,9 @@ class Xboom_Model_Validate_AbstractTest extends PHPUnit_Framework_TestCase
         $loginValidator->shouldReceive('isValid')
                              ->with($invalidData['login'])->andReturn(false);
         $loginValidator->shouldReceive('getMessages')->andReturn(array($errorMsg));
-        $this->object->setPropertyValidator('login', $loginValidator);
+        $this->object->addPropertyValidator('login', $loginValidator);
         $this->assertFalse($this->object->isValid($invalidData));
-        $this->assertContains($errorMsg, $this->object->getMessages());
+        $messages = $this->object->getMessages();
+        $this->assertContains($errorMsg, $messages['login']);
     }
 }

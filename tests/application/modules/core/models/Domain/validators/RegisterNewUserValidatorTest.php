@@ -20,40 +20,31 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
-namespace Core\Model\Form;
 /**
- * Description of RegisterNewUserForm
+ * Description of RegisterNewUser
  *
  * @author yugeon
  */
-class RegisterNewUserForm extends \Zend_Form
+use Core\Model\Domain\Validator\RegisterNewUserValidator;
+
+class RegisterNewUserValidatorTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     *
+     * @var RegisterNewUser
+     */
+    protected $object;
 
-    public function init()
+    public function setUp()
     {
-        $this->setName('registerNewUser');
-
-        $this->addElement('text', 'name', array(
-            'label' => 'Username'
-        ));
-
-        $this->addElement('text', 'login', array(
-            'label' => 'Login'
-        ));
-
-        $this->addElement('password', 'password', array(
-            'label' => 'Password'
-        ));
-
-        $this->addElement('password', 'confirm_password', array(
-            'label' => 'Confirm password',
-            'required' => true,
-            'validators' => array( array('Identical', false, 'password'))
-        ));
-
-        $this->addElement('submit', 'register', array(
-            'label' => 'Register'
-        ));
+        parent::setUp();
+        $this->object = new RegisterNewUserValidator();
     }
 
+    public function testInit()
+    {
+        $this->assertArrayHasKey('name', $this->object->getPropertiesForValidation());
+        $this->assertArrayHasKey('login', $this->object->getPropertiesForValidation());
+        $this->assertArrayHasKey('password', $this->object->getPropertiesForValidation());
+    }
 }

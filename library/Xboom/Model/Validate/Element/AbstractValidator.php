@@ -146,7 +146,7 @@ abstract class AbstractValidator implements ValidatorInterface
      */
     public function getMessages()
     {
-        return $this->_messages;
+        return array_unique($this->_messages);
     }
 
     /**
@@ -193,6 +193,20 @@ abstract class AbstractValidator implements ValidatorInterface
             $value = $filter->filter($value);
         }
         return $value;
+    }
+
+    /**
+     * Set flag indicating whether or not value should be obfuscated in messages
+     *
+     * @param  bool $flag
+     * @return Zend_Validate_Abstract
+     */
+    public function setObscureValue($flag)
+    {
+        foreach ($this->getValidators() as $validator)
+        {
+            $validator->setObscureValue($flag);
+        }
     }
 
 }

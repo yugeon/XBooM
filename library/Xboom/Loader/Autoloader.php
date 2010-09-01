@@ -114,7 +114,7 @@ class Autoloader
         $classPath = self::getClassPath($class);
         if (false !== $classPath)
         {
-            return include $classPath;
+            return @include $classPath;
         }
         return false;
     }

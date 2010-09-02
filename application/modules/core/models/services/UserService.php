@@ -66,6 +66,26 @@ class UserService extends \Xboom\Service\AbstractService
             throw new \InvalidArgumentException("Form '{$formName}' not found.");
         }
     }
+
+    public function getValidator($validatorName)
+    {
+        if (isset($this->_validators[$validatorName]))
+        {
+            return $this->_validators[$validatorName];
+        }
+        else
+        {
+            // FIXME hardcode namespace
+            $validatorClass = "\\Core\\Model\\Domain\\Validator\\{$validatorName}Validator";
+            if (\class_exists($validatorClass))
+            {
+                $validator = new $validatorClass;
+                $this->_validators[$validatorName] = $validator;
+                return $this->_validators[$validatorName];
+            }
+            throw new \InvalidArgumentException("Validator '{$validatorName}' not found.");
+        }
+    }
     
     /**
      * Get all users as array of objects.
@@ -97,13 +117,13 @@ class UserService extends \Xboom\Service\AbstractService
      * @return object User
      * @throws \Xboom\Exception If can't create new user
      */
-    public function registerNewUser(array $data, $flush = true)
+    public function registerUser(array $data, $flush = true)
     {
         // TODO: ACL        !!!
 
         // TODO: REFACTORING засунуть все это в медиатор
 
-        $registerUserForm = $this->getForm('RegisterNewUser');
+        $registerUserForm = $this->getForm('RegisterUser');
         if ($registerUserForm->isValid($data))
         {
             $userData = $registerUserForm->getValues();

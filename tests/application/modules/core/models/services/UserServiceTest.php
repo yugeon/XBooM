@@ -77,7 +77,7 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
         $this->em->shouldReceive('persist');
         $this->em->shouldReceive('flush');
 
-        $user = $this->object->registerNewUser($userData);
+        $user = $this->object->registerUser($userData);
 
         $this->assertNotNull($user);
         $this->assertEquals($userData['login'], $user->login);
@@ -98,7 +98,7 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
 
         try
         {
-            $user = $this->object->registerNewUser($userData);
+            $user = $this->object->registerUser($userData);
             $this->fail('Must raise exception');
         }
         catch (\Xboom\Exception $e)
@@ -106,7 +106,7 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
             $user = null;
         }
 
-        $form = $this->object->getForm('RegisterNewUser');
+        $form = $this->object->getForm('RegisterUser');
 
         $this->assertNull($user);
         $this->assertNotNull($form);
@@ -126,7 +126,7 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
 
         try
         {
-            $user = $this->object->registerNewUser($userData);
+            $user = $this->object->registerUser($userData);
             $this->fail('Must raise exception');
         }
         catch (\Xboom\Exception $e)
@@ -134,7 +134,7 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
             $user = null;
         }
 
-        $form = $this->object->getForm('RegisterNewUser');
+        $form = $this->object->getForm('RegisterUser');
 
         $this->assertNull($user);
         $this->assertNotNull($form);
@@ -143,7 +143,7 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
 
     public function testGetForm()
     {
-        $this->assertNotNull($this->object->getForm('RegisterNewUser'));
+        $this->assertNotNull($this->object->getForm('RegisterUser'));
     }
 
     /**
@@ -152,5 +152,18 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
     public function testShouldRaiseExceptionIfFormNotExist()
     {
         $this->assertNotNull($this->object->getForm('NotExistForm'));
+    }
+
+    public function testGetValidator()
+    {
+        $this->assertNotNull($this->object->getValidator('RegisterUser'));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testShouldRaiseExceptionIfValidatorNotExist()
+    {
+        $this->assertNotNull($this->object->getValidator('NotExistValidator'));
     }
 }

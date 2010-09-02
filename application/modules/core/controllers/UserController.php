@@ -50,7 +50,7 @@ class Core_UserController extends Zend_Controller_Action
         {
             try
             {
-                $result = $userService->registerNewUser($_POST);
+                $result = $userService->registerUser($_POST);
                 echo 'Register ok!';
             }
             catch (\Xboom\Exception $e)
@@ -60,7 +60,7 @@ class Core_UserController extends Zend_Controller_Action
             }
         }
 
-        $form = $userService->getForm('RegisterNewUser');
+        $form = $userService->getForm('RegisterUser');
         echo $form;
 
 //        $user = new User();

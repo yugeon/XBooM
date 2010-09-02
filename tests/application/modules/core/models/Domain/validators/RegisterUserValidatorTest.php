@@ -21,13 +21,13 @@
  */
 
 /**
- * Description of RegisterNewUser
+ * Description of RegisterUser
  *
  * @author yugeon
  */
-use Core\Model\Domain\Validator\RegisterNewUserValidator;
+use Core\Model\Domain\Validator\RegisterUserValidator;
 
-class RegisterNewUserValidatorTest extends PHPUnit_Framework_TestCase
+class RegisterUserValidatorTest extends PHPUnit_Framework_TestCase
 {
     /**
      *
@@ -38,7 +38,7 @@ class RegisterNewUserValidatorTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->object = new RegisterNewUserValidator();
+        $this->object = new RegisterUserValidator();
     }
 
     public function testInit()

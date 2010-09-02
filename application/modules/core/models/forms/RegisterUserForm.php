@@ -26,12 +26,12 @@ namespace Core\Model\Form;
  *
  * @author yugeon
  */
-class RegisterNewUserForm extends \Zend_Form
+class RegisterUserForm extends \Zend_Form
 {
 
     public function init()
     {
-        $this->setName('registerNewUser');
+        $this->setName('registerUser');
 
         $this->addElement('text', 'name', array(
             'label' => 'Username'

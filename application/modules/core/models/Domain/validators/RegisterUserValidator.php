@@ -29,7 +29,7 @@ namespace Core\Model\Domain\Validator;
 use Xboom\Model\Validate\AbstractValidator;
 use Xboom\Model\Validate\Element\BaseValidator;
 
-class RegisterNewUserValidator extends AbstractValidator
+class RegisterUserValidator extends AbstractValidator
 {
     public function init()
     {

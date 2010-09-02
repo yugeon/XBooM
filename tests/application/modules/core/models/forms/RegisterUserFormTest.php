@@ -1,19 +1,19 @@
 <?php
 
-use Core\Model\Form\RegisterNewUserForm;
+use Core\Model\Form\RegisterUserForm;
 require_once 'PHPUnit/Framework.php';
 
-class RegisterNewUserFormTest extends PHPUnit_Framework_TestCase
+class RegisterUserFormTest extends PHPUnit_Framework_TestCase
 {
 
     /**
-     * @var RegisterNewUserForm
+     * @var RegisterUserForm
      */
     protected $object;
 
     protected function setUp()
     {
-        $this->object = new RegisterNewUserForm;
+        $this->object = new RegisterUserForm;
     }
 
 
@@ -23,6 +23,7 @@ class RegisterNewUserFormTest extends PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('login', $this->object->getElements());
         $this->assertArrayHasKey('password', $this->object->getElements());
         $this->assertArrayHasKey('confirm_password', $this->object->getElements());
+        $this->assertArrayHasKey('captcha', $this->object->getElements());
         $this->assertArrayHasKey('register', $this->object->getElements());
     }
     public function  testMustBePost()
@@ -39,6 +40,8 @@ class RegisterNewUserFormTest extends PHPUnit_Framework_TestCase
             'confirm_password' => $confirmPassword,
         );
 
+        $this->object->removeElement('captcha');
+
         $this->assertTrue($this->object->isValid($data));
     }
     public function  testFormMustBeInvalidIfPasswordAndConfirmPasswordNotEquals()
@@ -50,6 +53,8 @@ class RegisterNewUserFormTest extends PHPUnit_Framework_TestCase
             'password' => $password,
             'confirm_password' => $confirmPassword,
         );
+
+        $this->object->removeElement('captcha');
 
         $this->assertFalse($this->object->isValid($data));
     }

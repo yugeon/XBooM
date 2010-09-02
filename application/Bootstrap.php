@@ -86,7 +86,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
             $nsSuffix . 'Core\\Model' => APPLICATION_PATH . '/modules/core/models',
             $nsSuffix . 'Core\\Service' => APPLICATION_PATH . '/modules/core/models/services',
             $nsSuffix . 'Core\\Model\\Form' => APPLICATION_PATH . '/modules/core/models/forms',
-            'Core\\Model\\Domain\\Validator'
+            $nsSuffix . 'Core\\Model\\Domain\\Validator'
                         => APPLICATION_PATH . '/modules/core/models/Domain/validators',
             )
         );

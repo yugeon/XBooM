@@ -107,8 +107,12 @@ class UserService extends \Xboom\Service\AbstractService
         if ($registerUserForm->isValid($data))
         {
             $userData = $registerUserForm->getValues();
-            unset($userData['confirm_password']);
-            $user = new User($userData);
+            $dataForReg = array(
+                'name'     =>   $userData['name'],
+                'login'    =>   $userData['login'],
+                'password' =>   $userData['password'],
+            );
+            $user = new User($dataForReg);
             $userValidator = new \Core\Model\Domain\Validator\RegisterNewUserValidator();
             $user->setValidator($userValidator);
 

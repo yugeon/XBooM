@@ -51,6 +51,16 @@ class RegisterNewUserForm extends \Zend_Form
             'validators' => array( array('Identical', false, 'password'))
         ));
 
+        $this->addElement('captcha', 'captcha', array(
+            'label' => 'Captcha',
+            'captcha' => array(
+                'captcha' => 'Image',
+                'wordLen' => 6,
+                'timeout' => 300,
+                'font' => \APPLICATION_PATH . '/configs/fonts/Glasten_Bold.ttf',
+            ),
+        ));
+
         $this->addElement('submit', 'register', array(
             'label' => 'Register'
         ));

@@ -46,7 +46,7 @@ class RegisterUserValidator extends AbstractValidator
                               array('min' => 4, 'max' => 32)))
                        ->addValidator(new \Zend_Validate_Alnum())
                        ->addFilter(new \Zend_Filter_StringTrim())
-                       ->addFilter(new \Zend_Filter_StringToLower());
+                       ->addFilter(new \Zend_Filter_StringToLower('UTF-8'));
         $this->addPropertyValidator('login', $loginValidator);
 
         // password

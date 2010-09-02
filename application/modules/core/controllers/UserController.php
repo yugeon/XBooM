@@ -63,13 +63,6 @@ class Core_UserController extends Zend_Controller_Action
         $form = $userService->getForm('RegisterUser');
         echo $form;
 
-//        $user = new User();
-//        $user->setName('TestName' . rand(1, 100));
-//        $user->setPassword(md5($user->name));
-//
-//        $this->em->persist($user);
-//        $this->em->flush();
-
 //        return $this->_helper->getHelper('Redirector')
 //                             ->gotoUrl($this->getRequest()->getControllerName());
     }

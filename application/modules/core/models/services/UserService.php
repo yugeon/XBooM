@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  CMF for web applications based on Zend Framework 1 and Doctrine 2
  *  Copyright (C) 2010  Eugene Gruzdev aka yugeon
@@ -19,15 +20,17 @@
  * @copyright  Copyright (c) 2010 yugeon <yugeon.ru@gmail.com>
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
-
 /**
  * Description of User
  *
  * @author yugeon
  */
+
 namespace Core\Service;
 
 use \Core\Model\Domain\User as User;
+use \Xboom\Service\Exception as ServiceException;
+use \Xboom\Model\Form\Mediator;
 
 class UserService extends \Xboom\Service\AbstractService
 {
@@ -37,56 +40,67 @@ class UserService extends \Xboom\Service\AbstractService
      */
     protected $_em;
 
+    /**
+     * Contain mediators beetwen forms and model.
+     *
+     * @var array
+     */
+    protected $_mediators;
+
     public function __construct(\Doctrine\ORM\EntityManager $em)
     {
         $this->_em = $em;
     }
 
     /**
+     * Return mediator by name if exist or try create it.
      *
-     * @param string $formName
-     * @return object Form
+     * @param string $mediatorName
+     * @return object Mediator
+     * @throws \InvalidArgumentException If form with $formName not exists.
      */
-    public function getForm($formName)
+    public function getFormMediator($mediatorName)
     {
-        if (isset($this->_forms[$formName]))
+        if (isset($this->_mediators[$mediatorName]))
         {
-            return $this->_forms[$formName];
+            return $this->_mediators[$mediatorName];
         }
-        else
-        {
-            // FIXME hardcode namespace
-            $formClass = "\\Core\\Model\\Form\\{$formName}Form";
-            if (\class_exists($formClass))
-            {
-                $form = new $formClass;
-                $this->_forms[$formName] = $form;
-                return $this->_forms[$formName];
-            }
-            throw new \InvalidArgumentException("Form '{$formName}' not found.");
-        }
+
+        $mediator = new Mediator($mediatorName);
+        $this->setFormMediator($mediatorName, $mediator);
+
+        return $this->_mediators[$mediatorName];
     }
 
-    public function getValidator($validatorName)
+    /**
+     * For inject mediator.
+     *
+     * @param string $mediatorName
+     * @param Zend_Form $mediator
+     * @return UserService
+     */
+    public function setFormMediator($mediatorName, $mediator)
     {
-        if (isset($this->_validators[$validatorName]))
+        if (!\is_string($mediatorName))
         {
-            return $this->_validators[$validatorName];
+            throw new \InvalidArgumentException('Mediator name must be a string');
         }
-        else
+
+        if (!($mediator instanceof \Xboom\Model\Form\MediatorInterface))
         {
-            // FIXME hardcode namespace
-            $validatorClass = "\\Core\\Model\\Domain\\Validator\\{$validatorName}Validator";
-            if (\class_exists($validatorClass))
-            {
-                $validator = new $validatorClass;
-                $this->_validators[$validatorName] = $validator;
-                return $this->_validators[$validatorName];
-            }
-            throw new \InvalidArgumentException("Validator '{$validatorName}' not found.");
+            throw new \InvalidArgumentException('Mediator object must be an instance of MediatorInterface');
         }
+
+        $this->_mediators[$mediatorName] = $mediator;
+
+        return $this;
     }
-    
+
+    public function getForm($formName)
+    {
+        return $this->getFormMediator($formName)->getForm();
+    }
+
     /**
      * Get all users as array of objects.
      *
@@ -102,7 +116,7 @@ class UserService extends \Xboom\Service\AbstractService
      * Return user by id. All relations not loaded!
      *
      * @param int $userId
-     * @return App_Model_Domain_User 
+     * @return oject User
      */
     public function getUserById($userId)
     {
@@ -115,52 +129,30 @@ class UserService extends \Xboom\Service\AbstractService
      * @param array $data
      * @param boolean $flush If true then flush EntityManager
      * @return object User
-     * @throws \Xboom\Exception If can't create new user
+     * @throws \Xboom\Service\Exception If can't create new user
      */
     public function registerUser(array $data, $flush = true)
     {
-        // TODO: ACL        !!!
+        // TODO: ACL !!!
 
-        // TODO: REFACTORING засунуть все это в медиатор
-
-        $registerUserForm = $this->getForm('RegisterUser');
-        if ($registerUserForm->isValid($data))
+        $formMediator = $this->getFormMediator('RegisterUser');
+        if ($formMediator->isValid($data, false))
         {
-            $userData = $registerUserForm->getValues();
-            $dataForReg = array(
-                'name'     =>   $userData['name'],
-                'login'    =>   $userData['login'],
-                'password' =>   $userData['password'],
-            );
-            $user = new User($dataForReg);
-            $userValidator = new \Core\Model\Domain\Validator\RegisterNewUserValidator();
-            $user->setValidator($userValidator);
+            $user = new User($formMediator->getValues());
 
-            if ($user->isValid())
-            {
-                $this->_em->persist($user);
+            //$user->register();
 
-                if ($flush)
-                {
-                    $this->_em->flush();
-                }
-                return $user;
-            }
-            else
+            $this->_em->persist($user);
+
+            if ($flush)
             {
-                $messages = $userValidator->getMessages();
-                $formElements = $registerUserForm->getElements();
-                foreach ($formElements as $key => $element)
-                {
-                    if (isset($messages[$key]))
-                    {
-                        $element->addErrors($messages[$key]);
-                    }
-                }
+                $this->_em->flush();
             }
+            
+            return $user;
         }
 
-        throw new \Xboom\Exception('Can\'t create new user.');
+        throw new ServiceException('Can\'t create new user.');
     }
 
 }

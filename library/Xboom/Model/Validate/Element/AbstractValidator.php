@@ -52,6 +52,13 @@ abstract class AbstractValidator implements ValidatorInterface
     protected $_filters = array();
 
     /**
+     * Filtered value
+     *
+     * @var mixed
+     */
+    protected $_value = null;
+
+    /**
      * Adds a validator to the end of the chain
      *
      * If $breakChainOnFailure is true, then if the validator fails, the next validator in the chain,
@@ -192,6 +199,7 @@ abstract class AbstractValidator implements ValidatorInterface
         {
             $value = $filter->filter($value);
         }
+        $this->_value = $value;
         return $value;
     }
 
@@ -207,6 +215,11 @@ abstract class AbstractValidator implements ValidatorInterface
         {
             $validator->setObscureValue($flag);
         }
+    }
+
+    public function getValue()
+    {
+        return $this->_value;
     }
 
 }

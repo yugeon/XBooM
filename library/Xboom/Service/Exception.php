@@ -20,10 +20,14 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
-namespace Xboom\Model\Form;
-interface MediatorInterface
-{
-    public function isValid($data, $break = true);
+/**
+ * Description of Exception
+ *
+ * @author yugeon
+ */
+namespace Xboom\Service;
 
-    public function getValues();
+class Exception extends \Xboom\Exception
+{
+    //put your code here
 }

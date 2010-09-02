@@ -81,7 +81,7 @@ abstract class AbstractObject implements ValidateInterface
             }
         }
 
-        throw new \InvalidArgumentException('No property named ' . $name . ' exists.');
+        throw new \InvalidArgumentException('Property named ' . $name . 'dos\'t exists.');
     }
 
     /**
@@ -113,7 +113,7 @@ abstract class AbstractObject implements ValidateInterface
             }
         }
 
-        throw new \InvalidArgumentException('No property named ' . $name . ' exists.');
+        throw new \InvalidArgumentException('Property named ' . $name . ' dosn\'t exists.');
     }
 
     /**

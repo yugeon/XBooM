@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  CMF for web applications based on Zend Framework 1 and Doctrine 2
  *  Copyright (C) 2010  Eugene Gruzdev aka yugeon
@@ -19,13 +20,13 @@
  * @copyright  Copyright (c) 2010 yugeon <yugeon.ru@gmail.com>
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
-
 /**
  * Description of AbstractValidatorTest
  *
  * @author yugeon
  */
 require_once 'PHPUnit/Framework.php';
+
 use Xboom\Model\Validate\Element\ValidatorInterface;
 use Xboom\Model\Validate\Element\AbstractValidator;
 
@@ -36,6 +37,7 @@ class TestElementValidator extends AbstractValidator
 
 class AbstractValidatorTest extends PHPUnit_Framework_TestCase
 {
+
     /**
      * 
      * @var TestElementValidator
@@ -54,15 +56,17 @@ class AbstractValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($this->object, $this->object->addValidator($validator));
         $this->assertContains($validator, $this->object->getValidators());
     }
+
     public function testCanAddValidatorsByChain()
     {
         $validator1 = new Zend_Validate_Alnum();
         $validator2 = new Zend_Validate_Alpha();
         $this->object->addValidator($validator1)
-                     ->addValidator($validator2);
+                ->addValidator($validator2);
         $this->assertContains($validator1, $this->object->getValidators());
         $this->assertContains($validator2, $this->object->getValidators());
     }
+
     /**
      * @expectedException \Exception
      */
@@ -71,6 +75,7 @@ class AbstractValidatorTest extends PHPUnit_Framework_TestCase
         $validator = new stdClass();
         $this->object->addValidator($validator);
     }
+
     public function testCanValidateValue()
     {
         $value = 'validValue';
@@ -79,6 +84,7 @@ class AbstractValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($validator->isValid($value));
         $this->assertTrue($this->object->isValid($value));
     }
+
     public function testMustReturnFalseIfValueIsInvalid()
     {
         $value = '#@$! invalidValue %$$@^#';
@@ -87,6 +93,7 @@ class AbstractValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($validator->isValid($value));
         $this->assertFalse($this->object->isValid($value));
     }
+
     public function testMethodGetMessageShouldReturnEmptyArrayIfDataValid()
     {
         $value = 'validValue';
@@ -94,6 +101,7 @@ class AbstractValidatorTest extends PHPUnit_Framework_TestCase
         $this->object->addValidator($validator);
         $this->assertEquals(0, count($this->object->getMessages()));
     }
+
     public function testMethodGetMessagesShouldReturnArrayOfErrorsIfDataInvalid()
     {
         $value = '#@$validValue #@@';
@@ -102,30 +110,33 @@ class AbstractValidatorTest extends PHPUnit_Framework_TestCase
         $this->object->isValid($value);
         $this->assertTrue(count($this->object->getMessages()) > 0);
     }
+
     public function testCanValidateByChainValidators()
     {
         $value = 'validValue';
         $validator1 = new Zend_Validate_Alnum();
         $validator2 = new Zend_Validate_Alpha();
         $this->object->addValidator($validator1, true)
-                     ->addValidator($validator2);
+                ->addValidator($validator2);
         $this->assertTrue($validator1->isValid($value));
         $this->assertTrue($validator2->isValid($value));
         $this->assertTrue($this->object->isValid($value));
         $this->assertEquals(0, count($this->object->getMessages()));
     }
+
     public function testCanBreakValidationChainIfValueIsInvalid()
     {
         $value = '#@$! invalidValue %$$@^#';
         $validator1 = new Zend_Validate_Alnum();
         $validator2 = new Zend_Validate_Digits();
         $this->object->addValidator($validator1, true)
-                     ->addValidator($validator2);
+                ->addValidator($validator2);
         $this->assertFalse($validator1->isValid($value));
         $this->assertFalse($validator2->isValid($value));
         $this->assertFalse($this->object->isValid($value));
         $this->assertEquals(1, count($this->object->getMessages()));
     }
+
     /**
      * @expectedException \InvalidArgumentException
      */
@@ -140,7 +151,7 @@ class AbstractValidatorTest extends PHPUnit_Framework_TestCase
         $this->object->addValidator($validator);
         $this->assertTrue($this->object->isValid($value));
     }
-    
+
     // -----------------------
     // Filters
     // -----------------------
@@ -152,6 +163,7 @@ class AbstractValidatorTest extends PHPUnit_Framework_TestCase
         $this->object->addFilter($filter);
         $this->assertContains($filter, $this->object->getFilters());
     }
+
     public function testFilterIsWork()
     {
         $value = '  validValue   ';
@@ -159,15 +171,17 @@ class AbstractValidatorTest extends PHPUnit_Framework_TestCase
         $this->object->addFilter($filter);
         $this->assertEquals('validValue', $this->object->filter($value));
     }
+
     public function testChainFilterIsWork()
     {
         $value = '  validValue   ';
         $filter = new Zend_Filter_StringTrim();
         $filter2 = new Zend_Filter_StringToUpper();
         $this->object->addFilter($filter)
-                     ->addFilter($filter2);
+                ->addFilter($filter2);
         $this->assertEquals('VALIDVALUE', $this->object->filter($value));
     }
+
     public function testFilterAppliedToValueForValidation()
     {
         $value = '  validValue   ';
@@ -188,6 +202,17 @@ class AbstractValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->object->isValid($password));
         $this->assertNotContains("'@12' is less than 4 characters long", $this->object->getMessages());
         $this->assertContains("'***' is less than 4 characters long", $this->object->getMessages());
-
     }
+
+    public function testGetValue()
+    {
+        $value = '  validValue   ';
+        $filter = new Zend_Filter_StringTrim();
+        $validator = new Zend_Validate_Alnum();
+        $this->object->addValidator($validator);
+        $this->object->addFilter($filter);
+        $this->object->isValid($value);
+        $this->assertEquals('validValue', $this->object->getValue());
+    }
+
 }

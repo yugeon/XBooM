@@ -72,4 +72,9 @@ interface ValidatorInterface extends \Zend_Validate_Interface, \Zend_Filter_Inte
      */
     public function setObscureValue($flag);
 
+    /**
+     * @return mixed Filtered value
+     */
+    public function getValue();
+
 }

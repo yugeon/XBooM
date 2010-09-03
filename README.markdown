@@ -24,8 +24,8 @@
 
 # Requirements
 
-PHP version >= 5.3
+ * PHP version >= 5.3
 
-Zend Framework 1.10.x
+ * Zend Framework 1.10.x
 
-Doctrine 2.x
+ * Doctrine 2.x

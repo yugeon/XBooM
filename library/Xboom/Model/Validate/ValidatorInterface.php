@@ -30,7 +30,7 @@ interface ValidatorInterface extends \Zend_Validate_Interface
 {
 
     /**
-     * Initialize this object custom elements.
+     * Initialize this object with custom elements.
      *
      * @return void
      */

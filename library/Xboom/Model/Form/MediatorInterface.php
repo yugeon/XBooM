@@ -26,4 +26,12 @@ interface MediatorInterface
     public function isValid($data, $break = true);
 
     public function getValues();
+
+    /**
+     * Return form for this mediator.
+     *
+     * @return object \Zend_Form
+     * @throws \InvalidArgumentException If form not exists.
+     */
+    public function getForm();
 }

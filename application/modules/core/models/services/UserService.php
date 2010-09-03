@@ -26,13 +26,13 @@
  * @author yugeon
  */
 
-namespace Core\Service;
+namespace Core\Model\Service;
 
 use \Core\Model\Domain\User as User;
-use \Xboom\Service\Exception as ServiceException;
+use \Xboom\Model\Service\Exception as ServiceException;
 use \Xboom\Model\Form\Mediator;
 
-class UserService extends \Xboom\Service\AbstractService
+class UserService extends \Xboom\Model\Service\AbstractService
 {
 
     /**

@@ -20,14 +20,13 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
+namespace Xboom\Model\Service;
 /**
- * Description of Exception
+ * Description of Abstract
  *
  * @author yugeon
  */
-namespace Xboom\Service;
-
-class Exception extends \Xboom\Exception
+abstract class AbstractService
 {
     //put your code here
 }

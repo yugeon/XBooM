@@ -1,6 +1,7 @@
 <?php
 
 use \Mockery as m;
+use Core\Model\Service\UserService;
 use Core\Model\Form\RegisterUserForm;
 use Core\Model\Domain\Validator\RegisterUserValidator;
 
@@ -53,7 +54,7 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
 
         $this->userMediator = m::mock('\\Xboom\Model\\Form\\Mediator');
         
-        $this->object = new Core\Service\UserService($this->em);
+        $this->object = new UserService($this->em);
 
         $testUserName = 'TestUserName' . rand(1, 100);
         $testUserPassword = md5($testUserName);
@@ -116,7 +117,7 @@ class App_Service_UserTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Xboom\Service\Exception
+     * @expectedException \Xboom\Model\Service\Exception
      */
     public function testShouldRaiseExceptionIfCannotRegisterUserBecouseUserDataInvalid()
     {

@@ -44,7 +44,7 @@ class Core_UserController extends Zend_Controller_Action
 
     public function addAction()
     {
-        $userService = new Core\Service\UserService($this->em);
+        $userService = new Core\Model\Service\UserService($this->em);
 
         if ($this->getRequest()->isPost())
         {

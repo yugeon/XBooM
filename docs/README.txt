@@ -14,13 +14,13 @@ Setting Up Your VHOST
 The following is a sample VHOST you might want to consider for your project.
 
 <VirtualHost *:80>
-   DocumentRoot "/home/yugeon/PHP/sites/xboom.local/public"
-   ServerName xboom.local.local
+   DocumentRoot "/your_path/xboom.local/public"
+   ServerName xboom.local
 
    # This should be omitted in the production environment
    SetEnv APPLICATION_ENV development
     
-   <Directory "/home/yugeon/PHP/sites/xboom.local/public">
+   <Directory "/your_path/xboom.local/public">
        Options Indexes MultiViews FollowSymLinks
        AllowOverride All
        Order allow,deny

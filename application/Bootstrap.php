@@ -158,7 +158,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     {
         $this->bootstrap('FrontController');
         $front = $this->getResource('FrontController');
-        $response = new Zend_Controller_Response_Http;
+        $response = $front->getResponse();
+        if (null === $response)
+        {
+            $response = new Zend_Controller_Response_Http;
+        }
         $response->setHeader('Content-Type', 'text/html; charset=UTF-8', true);
         $front->setResponse($response);
     }

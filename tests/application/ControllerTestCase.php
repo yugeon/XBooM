@@ -17,15 +17,15 @@ class ControllerTestCase extends Zend_Test_PHPUnit_ControllerTestCase
     {
         $this->bootstrap = array($this, 'appBootstrap');
         parent::setUp();
+        $this->application->bootstrap();
+        $bootsrap = $this->application->getBootstrap();
+        $front = $bootsrap->getResource('FrontController');
+        $front->setParam('bootstrap', $bootsrap);
     }
     public function appBootstrap()
     {
         $this->application = new Zend_Application(
                 APPLICATION_ENV,
                 APPLICATION_PATH . '/configs/application.ini');
-        $this->application->bootstrap();
-        $bootsrap = $this->application->getBootstrap();
-        $front = $bootsrap->getResource('FrontController');
-        $front->setParam('bootstrap', $bootsrap);
     }
 }

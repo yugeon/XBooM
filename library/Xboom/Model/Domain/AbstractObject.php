@@ -26,16 +26,30 @@
  */
 
 namespace Xboom\Model\Domain;
+use \Xboom\Model\Validate\Exception as ValidateException;
 
-abstract class AbstractObject implements ValidateInterface
+abstract class AbstractObject implements ObjectInterface, ValidateInterface
 {
 
+    /**
+     * Contain short name this object.
+     * 
+     * @var string
+     */
+    protected $_shortName = '';
     /**
      * Current validator for this domain object.
      * 
      * @var Xboom\Model\Validate\ValidatorInterface
      */
     protected $_validator;
+
+    /**
+     * Marker is dirty this domain object or not.
+     * 
+     * @var boolean
+     */
+    protected $_isDirty = true;
 
     /**
      * Default constructor.
@@ -53,6 +67,9 @@ abstract class AbstractObject implements ValidateInterface
                 $this->{$accessor}($value);
             }
         }
+
+        $this->_markDirty();
+
     }
 
     /**
@@ -81,7 +98,7 @@ abstract class AbstractObject implements ValidateInterface
             }
         }
 
-        throw new \InvalidArgumentException('Property named ' . $name . 'dos\'t exists.');
+        throw new \InvalidArgumentException('Property named ' . $name . ' dos\'t exists.');
     }
 
     /**
@@ -103,12 +120,17 @@ abstract class AbstractObject implements ValidateInterface
             $mutatorMethod = 'set' . ucfirst($name);
             if (method_exists($this, $mutatorMethod))
             {
+                $this->_markDirty();
+
                 return $this->{$mutatorMethod}($value);
             }
 
             if (property_exists($this, $name))
             {
                 $this->{$name} = $value;
+
+                $this->_markDirty();
+
                 return $this;
             }
         }
@@ -149,6 +171,47 @@ abstract class AbstractObject implements ValidateInterface
         throw new \BadMethodCallException('No method named ' . $name . ' exists');
     }
 
+    // ------------------------------
+    //  Implements ObjectInterface
+    // ------------------------------
+
+    /**
+     * Return short name this class without the namespace/
+     *
+     * @return string
+     */
+    public function  _getObjectName()
+    {
+        if (empty($this->_shortName))
+        {
+            $thisObject = new \ReflectionObject($this);
+            $this->_shortName = $thisObject->getShortName();
+        }
+        
+        return $this->_shortName;
+    }
+
+    // ------------------------------
+    //  Implements ValidateInterface
+    // ------------------------------
+
+    /**
+     * To inject values in object.
+     *
+     * @param array $data
+     * @return AbstractObject
+     */
+    public function setData(array $data)
+    {
+        foreach ($data as $property => $value)
+        {
+            $accessor = 'set' . ucfirst($property);
+            $this->{$accessor}($value);
+        }
+
+        return $this;
+    }
+
     /**
      * Return all properties as array.
      * Ignore any properties that begin with an underscore.
@@ -169,10 +232,6 @@ abstract class AbstractObject implements ValidateInterface
         return $resultAsArray;
     }
 
-    // ------------------------------
-    //  Implements ValidateInterface
-    // ------------------------------
-
     /**
      * Set validate object
      *
@@ -186,36 +245,40 @@ abstract class AbstractObject implements ValidateInterface
     }
 
     /**
-     * Validate Domain Object. Object without validators is default valid.
+     * Get validate object
      *
-     * If $data not present, then use values from current Domain Object.
-     * Otherwise, use the data, assigned by key with properties name.
-     * If $data fails validation, then this method returns false, and
+     * @return Xboom\Model\Validate\ValidatorInterface
+     */
+    public function getValidator()
+    {
+
+        return $this->_validator;
+    }
+
+    /**
+     * Validate current Domain Object.
+     *
+     * If fails validation, then this method returns false, and
      * getMessages() will return an array of messages that explain why the
      * validation failed.
      *
-     * @param  array $data
      * @return boolean
-     * @throws \InvalidArgumentException if $data is not array
-     * @throws Xboom\Validate\Exception If validation of $data is impossible
+     * @throws \Xboom\Model\Validate\Exception If validation of $data is impossible
      */
-    public function isValid($data = null)
+    public function isValid()
     {
-        if (null === $data)
-        {
-            $data = $this->toArray();
-        }
-        elseif (!is_array($data))
-        {
-            throw new \InvalidArgumentException;
-        }
-
         if (null === $this->_validator)
         {
-            return true;
+            throw new ValidateException('Validator is null');
         }
 
-        return $this->_validator->isValid($data);
+        $data = $this->toArray();
+        $result = $this->_validator->isValid($data);
+
+        // Mark this object as clear or dirty depending on validation result
+        $this->_markDirty(!$result);
+
+        return $result;
     }
 
     /**
@@ -240,4 +303,14 @@ abstract class AbstractObject implements ValidateInterface
         }
     }
 
+    protected function _markDirty($marker = true)
+    {
+        $this->_isDirty = $marker;
+    }
+
+    public function isDirty()
+    {
+        return $this->_isDirty;
+    }
+    
 }

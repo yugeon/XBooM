@@ -21,18 +21,31 @@
  */
 
 /**
- * Description of RegisterNewUser
+ * Test case for UserValidator
  *
  * @author yugeon
  */
-namespace Core\Model\Domain\Validator;
-use Xboom\Model\Validate\AbstractValidator;
+namespace test\Core\Model\Domain\Validator;
+use Core\Model\Domain\Validator\UserValidator;
 
-
-class RegisterUserValidator extends UserValidator
+class UserValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    public function init()
+    /**
+     *
+     * @var UserValidator
+     */
+    protected $object;
+
+    public function setUp()
     {
-        parent::init();
+        parent::setUp();
+        $this->object = new UserValidator();
+    }
+
+    public function testInit()
+    {
+        $this->assertArrayHasKey('name', $this->object->getPropertiesForValidation());
+        $this->assertArrayHasKey('login', $this->object->getPropertiesForValidation());
+        $this->assertArrayHasKey('password', $this->object->getPropertiesForValidation());
     }
 }

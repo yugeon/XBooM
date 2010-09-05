@@ -27,94 +27,45 @@
  */
 namespace Xboom\Model\Form;
 use \Xboom\Model\Validate\ValidatorInterface;
+use \Xboom\Model\Domain\ValidateInterface;
 
 class Mediator implements MediatorInterface
 {
 
     /**
-     * Mediator name.
-     *
-     * @var string
-     */
-    protected $_name;
-
-    /**
-     * Form for this mediator with name $_name
+     * Form
      *
      * @var \Zend_Form
      */
     protected $_form = null;
 
     /**
-     * Validator with name $_name
+     * Model
      *
-     * @var \Xboom\Model\Validate\ValidatorInterface
+     * @var \Xboom\Model\Domain\AbstractObject
      */
-    protected $_validator = null;
+    protected $_model = null;
 
     /**
      * Create mediator, which connect form and model validator.
      *
-     * @param string $name Name for form and validator.
+     * @param string $form Name for form and validator.
      */
-    public function __construct($name)
+    public function __construct($formObject, $modelObject)
     {
-        $this->setName($name);
-    }
-
-    /**
-     * Sets the name, in which the searched form and validator
-     *
-     * @param string $name
-     * @return Mediator
-     * @throws \InvalidArgumentException If $name not string.
-     */
-    public function setName($name)
-    {
-        if (!\is_string($name))
-        {
-            throw new \InvalidArgumentException('Argument must be a string');
-        }
-        
-        $this->_name = $name;
-
-        return $this;
-    }
-
-    /**
-     * Return form for this mediator.
-     *
-     * @return object \Zend_Form
-     * @throws \InvalidArgumentException If form not exists.
-     */
-    public function getForm()
-    {
-        if (null !== $this->_form)
-        {
-            return $this->_form;
-        }
-
-        // FIXME hardcode namespace
-        $formClass = "\\Core\\Model\\Form\\{$this->_name}Form";
-        if (\class_exists($formClass))
-        {
-            $formObject = new $formClass;
-            $this->setForm($formObject);
-            return $this->_form;
-        }
-        throw new \InvalidArgumentException("Form '{$this->_name}' not found.");
+        $this->setForm($formObject);
+        $this->setModel($modelObject);
     }
 
     /**
      * For inject form.
      *
-     * @param string $formName
+     * @param string $formObject
      * @param \Zend_Form $formObject
      * @return Mediator
      */
     public function setForm($formObject)
     {
-
         if (!($formObject instanceof \Zend_Form))
         {
             throw new \InvalidArgumentException('Form object must be instance of Zend_Form');
@@ -126,44 +77,56 @@ class Mediator implements MediatorInterface
     }
 
     /**
+     * Return form for this mediator.
+     *
+     * @return object \Zend_Form
+     */
+    public function getForm()
+    {
+        return $this->_form;
+    }
+
+    /**
+     * For inject model.
+     *
+     * @param DomainObject $modelObject
+     * @return Mediator
+     */
+    public function setModel($modelObject)
+    {
+        if (!($modelObject instanceof ValidateInterface))
+        {
+            throw new \InvalidArgumentException('Argument must be a instance of '
+                    . '\\Xboom\\Model\\Domain\AbstractObject');
+        }
+
+        $this->_model = $modelObject;
+
+        return $this;
+    }
+
+    public function getValidModel()
+    {
+        return $this->_model;
+    }
+
+    /**
      * Return validator for User Object by validator name.
      *
      * @return \Xboom\Model\Validate\ValidatorInterface
      */
     public function getValidator()
     {
-        if (null !== $this->_validator)
+        if (null !== $this->_model)
         {
-            return $this->_validator;
+            return $this->_model->getValidator();
         }
-
-        // FIXME hardcode namespace
-        $validatorClass = "\\Core\\Model\\Domain\\Validator\\{$this->_name}Validator";
-        if (\class_exists($validatorClass))
-        {
-            $validatorObject = new $validatorClass;
-            $this->setValidator($validatorObject);
-            return $this->_validator;
-        }
-        throw new \InvalidArgumentException("Validator '{$this->_name}' not found.");
     }
 
-    /**
-     * For inject validator.
-     *
-     * @param \Xboom\Model\Validate\ValidatorInterface $validatorObject
-     * @return UserService
-     */
-    public function setValidator($validatorObject)
+    public function _pushDataToModel()
     {
-        if (!($validatorObject instanceof ValidatorInterface))
-        {
-            throw new \InvalidArgumentException('Form object must be instance of ValidatorInterface');
-        }
-
-        $this->_validator = $validatorObject;
-
-        return $this;
+        $values = $this->getValues();
+        $this->_model->setData($values);
     }
 
     /**
@@ -228,12 +191,17 @@ class Mediator implements MediatorInterface
         }
 
         $validator = $this->getValidator();
+        if (null === $validator)
+        {
+            throw new \Xboom\Model\Validate\Exception('Validator is null');
+        }
         $isDataValid = $validator->isValid($data);
 
         $this->_fillFormValues($form, $validator);
 
         if ($isFormValid && $isDataValid)
         {
+            $this->_pushDataToModel();
             return true;
         }
 

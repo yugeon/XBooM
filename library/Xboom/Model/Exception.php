@@ -21,18 +21,13 @@
  */
 
 /**
- * Description of RegisterNewUser
+ * Description of Exception
  *
  * @author yugeon
  */
-namespace Core\Model\Domain\Validator;
-use Xboom\Model\Validate\AbstractValidator;
+namespace Xboom\Model;
 
-
-class RegisterUserValidator extends UserValidator
+class Exception extends \Xboom\Exception
 {
-    public function init()
-    {
-        parent::init();
-    }
+    //put your code here
 }

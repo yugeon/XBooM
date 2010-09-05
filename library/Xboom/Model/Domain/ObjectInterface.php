@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  CMF for web applications based on Zend Framework 1 and Doctrine 2
  *  Copyright (C) 2010  Eugene Gruzdev aka yugeon
@@ -21,18 +22,17 @@
  */
 
 /**
- * Description of RegisterNewUser
  *
  * @author yugeon
  */
-namespace Core\Model\Domain\Validator;
-use Xboom\Model\Validate\AbstractValidator;
 
-
-class RegisterUserValidator extends UserValidator
+namespace Xboom\Model\Domain;
+interface ObjectInterface
 {
-    public function init()
-    {
-        parent::init();
-    }
+    /**
+     * Return short name this class without the namespace/
+     *
+     * @return string
+     */
+    public function _getObjectName();
 }

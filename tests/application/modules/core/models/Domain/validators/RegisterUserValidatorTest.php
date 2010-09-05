@@ -31,7 +31,7 @@ class RegisterUserValidatorTest extends PHPUnit_Framework_TestCase
 {
     /**
      *
-     * @var RegisterNewUser
+     * @var RegisterUserValidator
      */
     protected $object;
 

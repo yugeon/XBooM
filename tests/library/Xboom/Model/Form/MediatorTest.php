@@ -59,10 +59,13 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->object = new Mediator('RegisterUser');
+        $this->userForm = m::mock('Zend_Form');
+        $this->userValidator = m::mock('\\Xboom\\Model\\Validate\\ValidatorInteface');
+        $this->userModel = m::mock('\\Xboom\\Model\\Domain\\AbstractObject');
+        $this->userModel->shouldReceive('getValidator')->andReturn($this->userValidator);
+        $this->userModel->shouldReceive('setData')->andReturn()->mock();
 
-        $this->userForm = m::mock('\\Core\\Model\\Form\\RegisterUserForm');
-        $this->userValidator = m::mock('\\Core\Model\\Domain\\Validator\RegisterUserValidator');
+        $this->object = new Mediator($this->userForm, $this->userModel);
 
         $testUserName = 'TestUserName' . rand(1, 100);
         $testUserPassword = md5($testUserName);
@@ -83,7 +86,7 @@ class MediatorTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function testCanCreateMediatorWithName()
+    public function testCanCreateMediator()
     {
         $this->assertNotNull($this->object);
     }
@@ -91,9 +94,21 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testShouldRaiseExceptionIfNameNotPass()
+    public function testShouldRaiseExceptionIfFormOrModelNotPass()
     {
-        $this->object = new Mediator(new stdClass());
+        $this->object = new Mediator(null, null);
+    }
+
+    /**
+     * @expectedException \Xboom\Model\Validate\Exception
+     */
+    public function testShouldRaiseExceptionIfValidatorIsNull()
+    {
+        $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
+        $userModel = m::mock('\\Xboom\\Model\\Domain\\AbstractObject');
+        $userModel->shouldReceive('getValidator')->andReturn(null);
+        $this->object->setModel($userModel);
+        $this->object->isValid($this->userData);
     }
 
     public function testGetForm()
@@ -104,10 +119,9 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testShouldRaiseExceptionIfFormNotExist()
+    public function testShouldRaiseExceptionIfModelNotExist()
     {
-        $this->object->setName('NotExistForm');
-        $this->assertNotNull($this->object->getForm());
+        $this->object->setModel(null);
     }
 
     public function testSetForm()
@@ -121,25 +135,20 @@ class MediatorTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($this->object->getValidator());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testShouldRaiseExceptionIfValidatorNotExist()
+    public function testValidateWhenFormIsNotValidAndDoBreak()
     {
-        $this->object->setName('NotExistValidator');
-        $this->assertNotNull($this->object->getValidator());
+        $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(false);
+
+        // not break validation if form is not valid
+        $this->assertFalse($this->object->isValid($this->userData));
     }
 
     public function testValidateWhenFormIsValidAndDataIsValid()
     {
-        // inject mock form
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
-        $this->object->setForm($this->userForm);
 
-        // inject mock user validator
         $this->userValidator->shouldReceive('isValid')->andReturn(true);
         $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
-        $this->object->setValidator($this->userValidator);
 
         // not break validation if form is not valid
         $this->assertTrue($this->object->isValid($this->userData, false));
@@ -147,14 +156,10 @@ class MediatorTest extends PHPUnit_Framework_TestCase
 
     public function testValidateWhenFormIsNotValidAndDataIsValid()
     {
-        // inject mock form
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(false);
-        $this->object->setForm($this->userForm);
 
-        // inject mock user validator
         $this->userValidator->shouldReceive('isValid')->andReturn(true);
         $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
-        $this->object->setValidator($this->userValidator);
 
         // not break validation if form is not valid
         $this->assertFalse($this->object->isValid($this->userData, false));
@@ -162,16 +167,12 @@ class MediatorTest extends PHPUnit_Framework_TestCase
 
     public function testValidateWhenFormIsValidAndDataIsNotValid()
     {
-        // inject mock form
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
         $this->userForm->shouldReceive('getElements')->andReturn(array());
-        $this->object->setForm($this->userForm);
 
-        // inject mock user validator
         $this->userValidator->shouldReceive('isValid')->andReturn(false);
         $this->userValidator->shouldReceive('getMessages')->andReturn(array());
         $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
-        $this->object->setValidator($this->userValidator);
 
         // not break validation if form is not valid
         $this->assertFalse($this->object->isValid($this->userData, false));
@@ -179,16 +180,12 @@ class MediatorTest extends PHPUnit_Framework_TestCase
 
     public function testValidateWhenFormIsNotValidAndDataIsNotValid()
     {
-        // inject mock form
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(false);
         $this->userForm->shouldReceive('getElements')->andReturn(array());
-        $this->object->setForm($this->userForm);
 
-        // inject mock user validator
         $this->userValidator->shouldReceive('isValid')->andReturn(false);
         $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
         $this->userValidator->shouldReceive('getMessages')->andReturn(array());
-        $this->object->setValidator($this->userValidator);
 
         // not break validation if form is not valid
         $this->assertFalse($this->object->isValid($this->userData, false));
@@ -199,7 +196,10 @@ class MediatorTest extends PHPUnit_Framework_TestCase
         $expected = $this->userData;
         unset($expected['confirm_password']);
 
-        // inject mock user validator
+        $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
+        $this->userForm->shouldReceive('getElements')->andReturn(array());
+
+
         $this->userValidator->shouldReceive('isValid')->andReturn(true);
 
         $elementValidator1 = m::mock('\\Xboom\\Model\\Validate\\Element\\BaseValidator');
@@ -216,9 +216,13 @@ class MediatorTest extends PHPUnit_Framework_TestCase
                                 'name'     => $elementValidator2,
                                 'password'  => $elementValidator3
                                 ));
-        $this->object->setValidator($this->userValidator);
 
         $this->object->isValid($this->userData);
         $this->assertSame($expected, $this->object->getValues());
+    }
+
+    public function testGetValidModel()
+    {
+        $this->assertNotNull($this->object->getValidModel());
     }
 }

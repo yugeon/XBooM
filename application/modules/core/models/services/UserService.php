@@ -28,11 +28,11 @@
 
 namespace Core\Model\Service;
 
-use \Core\Model\Domain\User as User;
-use \Xboom\Model\Service\Exception as ServiceException;
-use \Xboom\Model\Form\Mediator;
+use \Xboom\Model\Service\AbstractService,
+    \Core\Model\Domain\User,
+    \Xboom\Model\Service\Exception as ServiceException;
 
-class UserService extends \Xboom\Model\Service\AbstractService
+class UserService extends AbstractService
 {
 
     /**
@@ -40,65 +40,18 @@ class UserService extends \Xboom\Model\Service\AbstractService
      */
     protected $_em;
 
-    /**
-     * Contain mediators beetwen forms and model.
-     *
-     * @var array
-     */
-    protected $_mediators;
-
-    public function __construct(\Doctrine\ORM\EntityManager $em)
+    public function __construct($em)
     {
+        $this->_initService();
         $this->_em = $em;
     }
 
-    /**
-     * Return mediator by name if exist or try create it.
-     *
-     * @param string $mediatorName
-     * @return object Mediator
-     * @throws \InvalidArgumentException If form with $formName not exists.
-     */
-    public function getFormMediator($mediatorName)
+    public function _initService()
     {
-        if (isset($this->_mediators[$mediatorName]))
-        {
-            return $this->_mediators[$mediatorName];
-        }
-
-        $mediator = new Mediator($mediatorName);
-        $this->setFormMediator($mediatorName, $mediator);
-
-        return $this->_mediators[$mediatorName];
-    }
-
-    /**
-     * For inject mediator.
-     *
-     * @param string $mediatorName
-     * @param Zend_Form $mediator
-     * @return UserService
-     */
-    public function setFormMediator($mediatorName, $mediator)
-    {
-        if (!\is_string($mediatorName))
-        {
-            throw new \InvalidArgumentException('Mediator name must be a string');
-        }
-
-        if (!($mediator instanceof \Xboom\Model\Form\MediatorInterface))
-        {
-            throw new \InvalidArgumentException('Mediator object must be an instance of MediatorInterface');
-        }
-
-        $this->_mediators[$mediatorName] = $mediator;
-
-        return $this;
-    }
-
-    public function getForm($formName)
-    {
-        return $this->getFormMediator($formName)->getForm();
+        $this->setModelClassPrefix('\\Core\\Model\\Domain')
+             ->setModelName('User')
+             ->setValidatorClassPrefix('\\Core\\Model\\Domain\\Validator')
+             ->setFormClassPrefix('\\Core\\Model\\Form');
     }
 
     /**
@@ -129,18 +82,21 @@ class UserService extends \Xboom\Model\Service\AbstractService
      * @param array $data
      * @param boolean $flush If true then flush EntityManager
      * @return object User
-     * @throws \Xboom\Service\Exception If can't create new user
+     * @throws \Xboom\Model\Service\Exception If can't create new user
      */
     public function registerUser(array $data, $flush = true)
     {
         // TODO: ACL !!!
 
-        $formMediator = $this->getFormMediator('RegisterUser');
-        if ($formMediator->isValid($data, false))
+        $formToModelMediator = $this->getFormToModelMediator('RegisterUser');
+        $breakValidation = false;
+        if ($formToModelMediator->isValid($data, $breakValidation))
         {
-            $user = new User($formMediator->getValues());
+            $user = $formToModelMediator->getValidModel();
 
             //$user->register();
+
+            // TODO validation domain model
 
             $this->_em->persist($user);
 

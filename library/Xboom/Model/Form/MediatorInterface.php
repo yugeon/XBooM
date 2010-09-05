@@ -27,6 +27,8 @@ interface MediatorInterface
 
     public function getValues();
 
+    public function getValidModel();
+
     /**
      * Return form for this mediator.
      *

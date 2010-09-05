@@ -36,20 +36,31 @@ interface ValidateInterface
     public function setValidator($validator);
 
     /**
-     * Validate Domain Object. Object without validators is default valid.
+     * Get validate object
      *
-     * If $data not present, then use values from current Domain Object.
-     * Otherwise, use the data, assigned by key with properties name.
-     * If $data fails validation, then this method returns false, and
+     * @return Xboom\Model\Validate\ValidatorInterface
+     */
+    public function getValidator();
+
+    /**
+     * To inject values in object.
+     *
+     * @param array $data
+     * @return ValidateInterface
+     */
+    public function setData(array $data);
+
+    /**
+     * Validate current Domain Object.
+     *
+     * If fails validation, then this method returns false, and
      * getMessages() will return an array of messages that explain why the
      * validation failed.
      *
-     * @param  array $data
      * @return boolean
-     * @throws \InvalidArgumentException if $data is not array
-     * @throws Xboom\Validate\Exception If validation of $data is impossible
+     * @throws \Xboom\Model\Validate\Exception If validation of $data is impossible
      */
-    public function isValid($data = null);
+    public function isValid();
 
     /**
      * Returns an array of messages that explain why the most recent isValid()

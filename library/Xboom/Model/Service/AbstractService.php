@@ -45,7 +45,7 @@ abstract class AbstractService implements ServiceInterface
      *
      * @var string
      */
-    protected $_modelName = '';
+    protected $_modelShortName = '';
     /**
      * For automatic instantiation validators.
      *
@@ -112,30 +112,40 @@ abstract class AbstractService implements ServiceInterface
     }
 
     /**
-     * Set the model name what controlled this service.
+     * Set the model short name what controlled this service.
      *
      * @param string $modelName
      * @return AbstractService
      */
-    public function setModelName($modelName)
+    public function setModelShortName($modelName)
     {
-        $this->_modelName = $modelName;
+        $this->_modelShortName = $modelName;
         return $this;
     }
 
     /**
-     * Return the model name what controlled this service.
+     * Return the model short name what controlled this service.
      *
      * @return string
      * @throws \Xboom\Model\Service\Exception If model name is empty.
      */
-    public function getModelName()
+    public function getModelShortName()
     {
-        if (empty($this->_modelName))
+        if (empty($this->_modelShortName))
         {
             throw new Exception('Model name can\'t be empty.');
         }
-        return $this->_modelName;
+        return $this->_modelShortName;
+    }
+
+    /**
+     * Return full qualified model name (with namespace).
+     * 
+     * @return string
+     */
+    public function getModelFullName()
+    {
+        return $this->getModelClassPrefix() . '\\' . $this->getModelShortName();
     }
 
     /**
@@ -160,7 +170,7 @@ abstract class AbstractService implements ServiceInterface
     {
         if (null === $this->_model)
         {
-            $modelName = $this->getModelClassPrefix() . '\\' . $this->getModelName();
+            $modelName = $this->getModelClassPrefix() . '\\' . $this->getModelShortName();
             if (\class_exists($modelName))
             {
                 $this->setModel(new $modelName);
@@ -210,7 +220,7 @@ abstract class AbstractService implements ServiceInterface
 
         if (empty($validatorName))
         {
-            $validatorName = $this->getModelName();
+            $validatorName = $this->getModelShortName();
         }
 
         $validator = $this->getValidator($validatorName);
@@ -249,7 +259,7 @@ abstract class AbstractService implements ServiceInterface
     {
         if (empty($validatorName))
         {
-            $validatorName = $this->getModelName();
+            $validatorName = $this->getModelShortName();
         }
 
         if (isset($this->_validators[$validatorName]))

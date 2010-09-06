@@ -36,7 +36,7 @@ class TestService extends AbstractService
     public function _initService()
     {
         $this->setModelClassPrefix(__NAMESPACE__)
-             ->setModelName('TestDomainObject')
+             ->setModelShortName('TestDomainObject')
              ->setValidatorClassPrefix(__NAMESPACE__)
              ->setFormClassPrefix(__NAMESPACE__);
     }
@@ -88,7 +88,7 @@ class AbstractServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testGetControlledModelName()
     {
-        $this->assertTrue( \strlen($this->object->getModelName()) > 0 );
+        $this->assertTrue( \strlen($this->object->getModelShortName()) > 0 );
     }
 
     public function testGetControlledModelClassPrefix()

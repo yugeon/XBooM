@@ -37,12 +37,19 @@ interface ServiceInterface
     public function getModelClassPrefix();
 
     /**
-     * Return the model name what controlled this service.
+     * Return the model short name what controlled this service.
      *
      * @return string
      * @throws \Xboom\Model\Service\Exception If model name is empty.
      */
-    public function getModelName();
+    public function getModelShortName();
+
+    /**
+     * Return full qualified model name (with namespace).
+     *
+     * @return string
+     */
+    public function getModelFullName();
 
     /**
      * To inject model object.

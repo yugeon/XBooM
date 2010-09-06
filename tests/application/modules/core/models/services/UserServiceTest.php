@@ -129,7 +129,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
     public function testRegisterNewUser()
     {
         $this->userMediator->shouldReceive('isValid')->andReturn(true);
-        $this->userMediator->shouldReceive('getValidModel')->andReturn($this->userModel);
+        $this->userMediator->shouldReceive('getModel')->andReturn($this->userModel);
 
         $this->object->setFormToModelMediator('RegisterUser', $this->userMediator);
 

@@ -46,10 +46,10 @@ class UserService extends AbstractService
         $this->_em = $em;
     }
 
-    public function _initService()
+    protected function _initService()
     {
         $this->setModelClassPrefix('\\Core\\Model\\Domain')
-             ->setModelName('User')
+             ->setModelShortName('User')
              ->setValidatorClassPrefix('\\Core\\Model\\Domain\\Validator')
              ->setFormClassPrefix('\\Core\\Model\\Form');
     }

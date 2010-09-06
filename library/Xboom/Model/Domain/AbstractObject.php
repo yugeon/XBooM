@@ -191,6 +191,26 @@ abstract class AbstractObject implements ObjectInterface, ValidateInterface
         return $this->_shortName;
     }
 
+    /**
+     * Mark this object as dirty.
+     *
+     * @param boolean $marker
+     */
+    protected function _markDirty($marker = true)
+    {
+        $this->_isDirty = $marker;
+    }
+
+    /**
+     * Return true if this object clean.
+     *
+     * @return boolean
+     */
+    public function isDirty()
+    {
+        return $this->_isDirty;
+    }
+
     // ------------------------------
     //  Implements ValidateInterface
     // ------------------------------
@@ -301,16 +321,6 @@ abstract class AbstractObject implements ObjectInterface, ValidateInterface
         {
             return $this->_validator->getMessages();
         }
-    }
-
-    protected function _markDirty($marker = true)
-    {
-        $this->_isDirty = $marker;
-    }
-
-    public function isDirty()
-    {
-        return $this->_isDirty;
     }
     
 }

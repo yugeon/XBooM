@@ -23,17 +23,38 @@
 namespace Xboom\Model\Form;
 interface MediatorInterface
 {
+
+    /**
+     * First check is form valid with this $data.
+     * If form is not valid and $break == true, then return false.
+     * Else check Domain Object use current validator.
+     * Valid data push to model object.
+     * Errors push to form.
+     *
+     * @param array $data
+     * @param boolean $break Break validation if form is not valid.
+     * @return boolean true if $data is valid
+     */
     public function isValid($data, $break = true);
 
+    /**
+     * Return filtered values from validation.
+     *
+     * @return array
+     */
     public function getValues();
 
-    public function getValidModel();
+    /**
+     * Return model.
+     *
+     * @return \Xboom\Model\Domain\AbstractObject
+     */
+    public function getModel();
 
     /**
      * Return form for this mediator.
      *
      * @return object \Zend_Form
-     * @throws \InvalidArgumentException If form not exists.
      */
     public function getForm();
 }

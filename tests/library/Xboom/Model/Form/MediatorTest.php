@@ -223,6 +223,6 @@ class MediatorTest extends PHPUnit_Framework_TestCase
 
     public function testGetValidModel()
     {
-        $this->assertNotNull($this->object->getValidModel());
+        $this->assertNotNull($this->object->getModel());
     }
 }

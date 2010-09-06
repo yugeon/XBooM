@@ -35,4 +35,11 @@ interface ObjectInterface
      * @return string
      */
     public function _getObjectName();
+
+    /**
+     * Return true if this object clean.
+     *
+     * @return boolean
+     */
+    public function isDirty();
 }

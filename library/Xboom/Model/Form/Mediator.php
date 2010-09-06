@@ -26,8 +26,8 @@
  * @author yugeon
  */
 namespace Xboom\Model\Form;
-use \Xboom\Model\Validate\ValidatorInterface;
-use \Xboom\Model\Domain\ValidateInterface;
+use \Xboom\Model\Validate\ValidatorInterface,
+    \Xboom\Model\Domain\ValidateInterface;
 
 class Mediator implements MediatorInterface
 {
@@ -105,13 +105,18 @@ class Mediator implements MediatorInterface
         return $this;
     }
 
-    public function getValidModel()
+    /**
+     * Return model.
+     *
+     * @return \Xboom\Model\Domain\AbstractObject
+     */
+    public function getModel()
     {
         return $this->_model;
     }
 
     /**
-     * Return validator for User Object by validator name.
+     * Return current validator from model.
      *
      * @return \Xboom\Model\Validate\ValidatorInterface
      */
@@ -123,6 +128,10 @@ class Mediator implements MediatorInterface
         }
     }
 
+    /**
+     * Push data to model.
+     *
+     */
     public function _pushDataToModel()
     {
         $values = $this->getValues();
@@ -130,7 +139,7 @@ class Mediator implements MediatorInterface
     }
 
     /**
-     * Fill form values filterd values
+     * Fill form values filtered values
      *
      * @param <type> $form
      * @param <type> $validator
@@ -175,7 +184,9 @@ class Mediator implements MediatorInterface
     /**
      * First check is form valid with this $data.
      * If form is not valid and $break == true, then return false.
-     * Else check Domain Object validator.
+     * Else check Domain Object use current validator.
+     * Valid data push to model object.
+     * Errors push to form.
      *
      * @param array $data
      * @param boolean $break Break validation if form is not valid.

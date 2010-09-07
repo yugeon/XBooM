@@ -88,23 +88,16 @@ class UserService extends AbstractService
         if ($formToModelMediator->isValid($data, $breakValidation))
         {
             $user = $formToModelMediator->getModel();
+            //$user->register();
 
-            // FIXME вынести это либо в медиатор, либо в отдельный валидатор
-            
-            
-            if (empty($result))
+            $this->_em->persist($user);
+
+            if ($flush)
             {
-                //$user->register();
-
-                $this->_em->persist($user);
-
-                if ($flush)
-                {
-                    $this->_em->flush();
-                }
-
-                return $user;
+                $this->_em->flush();
             }
+
+            return $user;
         }
 
         throw new ServiceException('Can\'t create new user.');

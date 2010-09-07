@@ -34,14 +34,14 @@ $application->bootstrap();
 $sc = $application->getBootstrap()->getContainer();
 $em = $sc->getService('doctrine.orm.entitymanager');
 
-$helperSet = new \Symfony\Components\Console\Helper\HelperSet(array(
+$helperSet = new \Symfony\Component\Console\Helper\HelperSet(array(
     'db' => new \Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper($em->getConnection()),
     'em' => new \Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper($em)
 ));
 
-$helperSet = ($helperSet) ?: new \Symfony\Components\Console\Helper\HelperSet();
+$helperSet = ($helperSet) ?: new \Symfony\Component\Console\Helper\HelperSet();
 
-$cli = new \Symfony\Components\Console\Application('Doctrine Command Line Interface', Doctrine\ORM\Version::VERSION);
+$cli = new \Symfony\Component\Console\Application('Doctrine Command Line Interface', Doctrine\ORM\Version::VERSION);
 $cli->setCatchExceptions(true);
 $cli->setHelperSet($helperSet);
 $cli->addCommands(array(

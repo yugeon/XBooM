@@ -52,7 +52,7 @@ class DIContainerFactory
          * Must manually require here because the autoloader does not
          * (yet) know how to find this.
          */
-        require_once 'Symfony/Components/DependencyInjection/sfServiceContainerAutoloader.php';
+        require_once 'Symfony/Component/DependencyInjection/sfServiceContainerAutoloader.php';
         \sfServiceContainerAutoloader::register();
     }
 

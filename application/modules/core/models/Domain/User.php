@@ -39,7 +39,7 @@ class User
     /** @Column(type="string", length=50) */
     protected $name;
 
-    /** @Column(type="string", length=32) */
+    /** @Column(type="string", unique=true, length=32) */
     protected $login;
 
     /** @Column(type="string", length=32) */

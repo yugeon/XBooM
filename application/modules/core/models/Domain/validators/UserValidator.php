@@ -27,8 +27,9 @@
  */
 
 namespace Core\Model\Domain\Validator;
-use \Xboom\Model\Validate\AbstractValidator;
-use Xboom\Model\Validate\Element\BaseValidator;
+use \Xboom\Model\Validate\AbstractValidator,
+    \Xboom\Model\Validate\Element\BaseValidator,
+    \Xboom\Validate\UniqueField;
 
 class UserValidator extends AbstractValidator
 {
@@ -46,6 +47,12 @@ class UserValidator extends AbstractValidator
         $loginValidator->addValidator(new \Zend_Validate_StringLength(
                               array('min' => 4, 'max' => 32)))
                        ->addValidator(new \Zend_Validate_Alnum())
+                       ->addValidator(new UniqueField(
+                              array(
+                               'em' => $this->getEntityManager(),
+                               'entity' => $this->getEntityClass(),
+                               'field' => 'login')
+                       ))
                        ->addFilter(new \Zend_Filter_StringTrim())
                        ->addFilter(new \Zend_Filter_StringToLower('UTF-8'));
         $this->addPropertyValidator('login', $loginValidator);

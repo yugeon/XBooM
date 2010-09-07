@@ -33,6 +33,11 @@ abstract class AbstractService implements ServiceInterface
 {
 
     /**
+     * @var Doctrine\ORM\EntityManager
+     */
+    protected $_em;
+    
+    /**
      * Used to inform what model class controlled by this service.
      * Required. Full qualified form.
      *
@@ -170,7 +175,7 @@ abstract class AbstractService implements ServiceInterface
     {
         if (null === $this->_model)
         {
-            $modelName = $this->getModelClassPrefix() . '\\' . $this->getModelShortName();
+            $modelName = $this->getModelFullName();
             if (\class_exists($modelName))
             {
                 $this->setModel(new $modelName);
@@ -270,7 +275,7 @@ abstract class AbstractService implements ServiceInterface
         $validatorClass = $this->getValidatorClassPrefix() . "\\{$validatorName}Validator";
         if (\class_exists($validatorClass))
         {
-            $validatorObject = new $validatorClass;
+            $validatorObject = new $validatorClass($this->_em, $this->getModelFullName());
             $this->setValidator($validatorName, $validatorObject);
             return $this->_validators[$validatorName];
         }

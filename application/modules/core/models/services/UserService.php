@@ -29,16 +29,11 @@
 namespace Core\Model\Service;
 
 use \Xboom\Model\Service\AbstractService,
-    \Core\Model\Domain\User,
-    \Xboom\Model\Service\Exception as ServiceException;
+ \Core\Model\Domain\User,
+ \Xboom\Model\Service\Exception as ServiceException;
 
 class UserService extends AbstractService
 {
-
-    /**
-     * @var Doctrine\ORM\EntityManager
-     */
-    protected $_em;
 
     public function __construct($em)
     {
@@ -49,9 +44,9 @@ class UserService extends AbstractService
     protected function _initService()
     {
         $this->setModelClassPrefix('\\Core\\Model\\Domain')
-             ->setModelShortName('User')
-             ->setValidatorClassPrefix('\\Core\\Model\\Domain\\Validator')
-             ->setFormClassPrefix('\\Core\\Model\\Form');
+                ->setModelShortName('User')
+                ->setValidatorClassPrefix('\\Core\\Model\\Domain\\Validator')
+                ->setFormClassPrefix('\\Core\\Model\\Form');
     }
 
     /**
@@ -94,18 +89,22 @@ class UserService extends AbstractService
         {
             $user = $formToModelMediator->getModel();
 
-            //$user->register();
-
-            // TODO validation domain model
-
-            $this->_em->persist($user);
-
-            if ($flush)
-            {
-                $this->_em->flush();
-            }
+            // FIXME вынести это либо в медиатор, либо в отдельный валидатор
             
-            return $user;
+            
+            if (empty($result))
+            {
+                //$user->register();
+
+                $this->_em->persist($user);
+
+                if ($flush)
+                {
+                    $this->_em->flush();
+                }
+
+                return $user;
+            }
         }
 
         throw new ServiceException('Can\'t create new user.');

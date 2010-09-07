@@ -51,7 +51,7 @@ class Core_UserController extends Zend_Controller_Action
             try
             {
                 $result = $userService->registerUser($_POST);
-                echo 'Register ok!';
+                echo 'Register ok! Id: ' . $result->id;
             }
             catch (\Xboom\Exception $e)
             {

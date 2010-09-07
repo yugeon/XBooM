@@ -45,8 +45,30 @@ abstract class AbstractValidator implements ValidatorInterface
 
     protected $_messages = array();
 
-    public function  __construct()
+    /**
+     *
+     * @var \Doctrine\ORM\EntitiyManager
+     */
+    protected $_em;
+
+    /**
+     *
+     * @var string
+     */
+    protected $_entityClass;
+
+    public function  __construct($em = null, $entityClass = '')
     {
+        if (null !== $em)
+        {
+            $this->_em = $em;
+        }
+
+        if (!empty($entityClass))
+        {
+            $this->_entityClass = $entityClass;
+        }
+
         $this->init();
     }
 
@@ -58,6 +80,16 @@ abstract class AbstractValidator implements ValidatorInterface
     public function init()
     {
 
+    }
+
+    public function getEntityManager()
+    {
+        return $this->_em;
+    }
+
+    public function getEntityClass()
+    {
+        return $this->_entityClass;
     }
 
     /**

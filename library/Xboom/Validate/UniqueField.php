@@ -86,7 +86,8 @@ class UniqueField extends \Zend_Validate_Abstract
     {
         $this->_field = $fieldName;
     }
-        /**
+
+    /**
      * The following option keys are supported:
      * 'em'      => EntityManager
      * 'entity'  => The name of entity

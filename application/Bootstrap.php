@@ -75,7 +75,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     protected function _initAutoload()
     {
         $autoloader = Xboom\Loader\Autoloader::getInstance();
-        $autoloader->registerNamespace($this->getOption('autoloaderNamespaces'));
+        foreach ($this->getOption('autoloaderNamespaces') as $ns)
+        {
+            $autoloader->registerNamespace($ns);
+        }
+        
         $nsSuffix = $this->getOption('appnamespace');
         if (!empty($nsSuffix))
         {

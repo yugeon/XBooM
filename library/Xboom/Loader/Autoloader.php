@@ -142,7 +142,7 @@ class Autoloader
      */
     protected function __construct()
     {
-        spl_autoload_register(array(__CLASS__, 'autoload'));
+        spl_autoload_register(array(__CLASS__, 'autoload'), true, true);
     }
 
     /**

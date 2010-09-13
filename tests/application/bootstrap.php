@@ -21,6 +21,7 @@ set_include_path(implode(PATH_SEPARATOR, array(
 require_once 'Xboom/Loader/Autoloader.php';
 $autoloader = Xboom\Loader\Autoloader::getInstance();
 $autoloader->registerNamespace('Xboom');
+$autoloader->registerNamespace('Doctrine');
 $autoloader->registerNamespace(array(
     'Core'              => APPLICATION_PATH . '/modules/core',
     'Core\\Model'       => APPLICATION_PATH . '/modules/core/models',

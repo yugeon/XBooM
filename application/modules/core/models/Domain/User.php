@@ -21,13 +21,13 @@
  */
 
 namespace Core\Model\Domain;
+use \Xboom\Model\Domain\AbstractObject,
+    \Doctrine\Common\Collections\ArrayCollection;
 /**
  * @Entity
  * @Table(name="users")
  */
-class User
-    extends \Xboom\Model\Domain\AbstractObject
-    implements \Zend_Acl_Role_Interface
+class User extends AbstractObject// implements \Zend_Acl_Role_Interface
 {
 
     /**
@@ -42,19 +42,107 @@ class User
     /** @Column(type="string", unique=true, length=32) */
     protected $login;
 
-    /** @Column(type="string", length=32) */
+    /** @Column(type="string", length=48) */
     protected $password;
 
-    protected $role = 'guest';
+    /**
+     * Groups in which user is consists.
+     * 
+     * @ManyToMany(targetEntity="Group")
+     * @JoinTable(name="users_groups",
+     *      joinColumns={@JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@JoinColumn(name="group_id", referencedColumnName="id")}
+     *      )
+     *
+     * @var ArrayCollection
+     */
+    protected $groups = null;
 
     /**
-     * Returns the string identifier of the Role
-     *
-     * @return string
+     * Personal role this user.
+     * 
+     * @ManyToOne(targetEntity="Role")
+     * @var Role
      */
-    public function getRoleId()
+    protected $role = null;
+
+    /**
+     * @OneToOne(targetEntity="Resource")
+     *
+     * @var Resourse
+     */
+    protected $resource = null;
+
+    /**
+     * Default constructor.
+     * If $data exist, then assign to properties by key.
+     *
+     * @param array $data
+     */
+    public function __construct(array $data = null)
     {
-        return $this->role;
+        $this->groups = new ArrayCollection();
+        parent::__construct($data);
     }
 
+    /**
+     * Assign user to $group
+     * 
+     * @param object Group $group
+     * @return User
+     * @throws \InvalidArgumentException if $group is not object.
+     */
+    public function assignToGroup($group)
+    {
+        if (!\is_object($group))
+        {
+            throw new \InvalidArgumentException('Param must be object');
+        }
+        
+        if (!$this->groups->contains($group))
+        {
+            $this->groups[] = $group;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Override the default set method, which would add a group, rather than rewriting.
+     *
+     * @param ArrayCollection $groups
+     * @return User
+     */
+    public function  setGroups($groups)
+    {
+        foreach ($groups as $group)
+        {
+            $this->assignToGroup($group);
+        }
+        return $this;
+    }
+
+    public function getRoles()
+    {
+        $roles = array();
+        foreach ($this->getGroups() as $group)
+        {
+            if (null !== $group)
+            {
+                $role = $group->getRole()->getRoleId();
+                if (null !== $role)
+                {
+                    $roles[] = $role;
+                }
+            }
+        }
+
+        // last element has a higher priority
+        if (null !== $this->getRole())
+        {
+            $roles[] = $this->getRole()->getRoleId();
+        }
+        
+        return $roles;
+    }
 }

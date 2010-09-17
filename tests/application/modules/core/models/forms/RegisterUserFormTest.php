@@ -20,7 +20,7 @@ class RegisterUserFormTest extends PHPUnit_Framework_TestCase
     public function testInit()
     {
         $this->assertArrayHasKey('name', $this->object->getElements());
-        $this->assertArrayHasKey('login', $this->object->getElements());
+        $this->assertArrayHasKey('email', $this->object->getElements());
         $this->assertArrayHasKey('password', $this->object->getElements());
         $this->assertArrayHasKey('confirm_password', $this->object->getElements());
         $this->assertArrayHasKey('captcha', $this->object->getElements());

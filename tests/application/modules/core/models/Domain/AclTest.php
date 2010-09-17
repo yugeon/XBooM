@@ -72,5 +72,50 @@ class AclTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->object->isAllowed(null, null, null));
     }
 
+    public function testCanAddRolesAsArray()
+    {
+        $roles = array(
+            'Group-1',
+            'Group-3',
+            'User-2'
+        );
 
+        $this->object->addRole($roles);
+        $this->assertEquals($roles, $this->object->getRoles());
+    }
+
+    public function testCanCheckRole()
+    {
+        $role = 'User-232';
+        $this->object->addRole($role);
+        $this->object->allow($role);
+        $this->assertTrue($this->object->isAllowed($role));
+    }
+
+    public function testCanCheckArrayRoles()
+    {
+        $roles = array(
+            'Group-1',
+            'Group-3',
+            'User-2'
+        );
+        $this->object->addRole($roles);
+        $this->object->allow($roles[2]);
+
+        $this->assertTrue($this->object->isAllowed($roles, null, null));
+    }
+
+    public function testCheckNestedResources()
+    {
+         $parentResource = 'parent';
+         $childResource = 'child';
+         $this->object->addResource($parentResource);
+         $this->object->addResource($childResource, $parentResource);
+
+         $role = 'User-232';
+         $this->object->addRole($role);
+         $this->object->allow($role, $parentResource);
+
+         $this->assertTrue($this->object->isAllowed($role, $childResource));
+    }
 }

@@ -49,9 +49,16 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($this->object);
     }
 
-    public function testGetResourceId()
+    public function _testGetResourceId()
     {
         $this->object->setId(232);
         $this->assertEquals('232', $this->object->getResourceId());
+    }
+
+    public function testGetParent()
+    {
+        $parentResource = m::mock('Resource');
+        $this->object->setParent($parentResource);
+        $this->assertEquals($parentResource, $this->object->getParent());
     }
 }

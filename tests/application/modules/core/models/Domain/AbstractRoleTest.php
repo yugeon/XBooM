@@ -21,44 +21,51 @@
  */
 
 /**
- * Abstract Resource
+ * Description of AbstractRoleTest
  *
  * @author yugeon
  */
-namespace Core\Model\Domain;
-use \Xboom\Model\Domain\AbstractObject;
+namespace test\Core\Model\Domain;
 
-/**
- * @Entity
- * @Table(name="resources")
- */
-class Resource extends AbstractObject implements \Zend_Acl_Resource_Interface
+use \Core\Model\Domain\AbstractRole,
+    \Mockery as m;
+
+class Subject extends AbstractRole
 {
-    /**
-     * @Id @Column(type="integer")
-     * @GeneratedValue(strategy="AUTO")
-     *
-     * @var integer
-     */
-    protected $id;
 
-    /**
-     * Simple name for this resource.
-     *
-     * @Column(length=50)
-     * @var string
-     */
-    protected $name;
-
-    /**
-     *
-     * @ManyToOne(targetEntity="Resource")
-     * @var Resource
-     */
-    protected $parent;
-
-    public function  getResourceId()
+    public function  getRoleId()
     {
-        return (string) $this->name;
+        return;
     }
+}
+
+class AbstractRoleTest extends \PHPUnit_Framework_TestCase
+{
+
+    protected $object;
+
+    public function setUp()
+    {
+        $this->object = new Subject;
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+        m::close();
+    }
+
+    public function testAssingToPermissions()
+    {
+        $permission1 = m::mock('Permission');
+        $permission2 = m::mock('Permission');
+        $permission3 = m::mock('Permission');
+
+        $this->object->assignToPermission($permission1);
+        $this->object->assignToPermission($permission2);
+        $this->object->assignToPermission($permission3);
+
+        $this->assertEquals( 3, count($this->object->getPermissions()) );
+    }
+
 }

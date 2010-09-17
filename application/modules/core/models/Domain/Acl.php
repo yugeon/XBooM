@@ -31,15 +31,75 @@ use Xboom\Model\Domain\AbstractObject;
 class Acl extends \Zend_Acl
 {
 
-    public function  addRole($role, $parents = null)
+    /**
+     * {@inheritdoc}
+     * 
+     * Override, can add array by way of roles.
+     *
+     * @param string|array|Zend_Acl_Role_Interface $roles
+     * @param string $parents
+     * @return Acl
+     */
+    public function  addRole($roles, $parents = null)
     {
         if (null !== $parents)
         {
             throw new \InvalidArgumentException('Inheritance prohibited');
         }
 
-        return parent::addRole($role);
+        if (\is_array($roles))
+        {
+            foreach ($roles as $role)
+            {
+                parent::addRole($role);
+            }
+            return $this;
+        }
+        else
+        {
+            parent::addRole($roles);
+        }
+
+        return $this;
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * Override, can checking array of roles.
+     * As only meet allowed permission this function stop the checking and return true.
+     * Otherwise always return false.
+     *
+     * @see parent::isAllowed()
+     * @param Zend_Acl_Role_Interface|string|array $roles
+     * @param Zend_Acl_Resource_Interface|string $resource
+     * @param string $privilege
+     * @return boolean
+     */
+    public function  isAllowed($roles = null, $resource = null, $privilege = null)
+    {
+        $isAllow = false;
 
+        if (\is_array($roles))
+        {
+            foreach ($roles as $role)
+            {
+                if (parent::hasRole($role))
+                {
+                    $isAllow = parent::isAllowed($role, $resource, $privilege);
+                }
+
+                if ($isAllow)
+                {
+                    break;
+                }
+            }
+        }
+        elseif (parent::hasRole($roles))
+        {
+            $isAllow = parent::isAllowed($roles, $resource, $privilege);
+        }
+
+        return $isAllow;
+    }
 }

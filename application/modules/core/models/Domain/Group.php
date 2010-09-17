@@ -33,7 +33,7 @@ use \Xboom\Model\Domain\AbstractObject,
  * @Entity
  * @Table(name="groups")
  */
-class Group extends AbstractObject
+class Group extends AbstractObject implements \Zend_Acl_Role_Interface
 {
     /**
      * @Id @Column(type="integer")
@@ -50,11 +50,82 @@ class Group extends AbstractObject
     protected $name;
 
     /**
-     * Personal role this group.
+     * Description of this group.
      *
-     * @ManyToOne(targetEntity="Role")
-     * @var Role
+     * @Column(type="string", nullable=true, length=255)
+     * @var string
      */
-    protected $role = null;
+    protected $description;
 
+    /**
+     * All roles, assigned to this group.
+     *
+     * @ManyToMany(targetEntity="Role")
+     * @var ArrayCollection of Role
+     */
+    protected $roles = null;
+
+
+    /**
+     * Default constructor.
+     * If $data exist, then assign to properties by key.
+     *
+     * @param array $data
+     */
+    public function __construct(array $data = null)
+    {
+        $this->roles = new ArrayCollection();
+        parent::__construct($data);
+    }
+
+    /**
+     * Returns an array of string identifiers of roles.
+     *
+     * @return array
+     */
+    public function  getRoleId()
+    {
+        if (null !== $this->getId())
+        {
+            return $this->getAllRoles();
+        }
+
+        return null;
+    }
+
+    public function getAllRoles()
+    {
+        return $this->getRoles()->toArray();
+    }
+
+    public function assignToRole($role)
+    {
+        if (!\is_object($role))
+        {
+            throw new \InvalidArgumentException('Param must be a Role object');
+        }
+
+        if (!$this->roles->contains($role))
+        {
+            $this->roles[] = $role;
+        }
+
+        return $this;
+    }
+
+//    public function getRolesPermissionsAndResources()
+//    {
+//        $result = array();
+//        $result['role'] = $this->_getObjectName() . '-' . $this->getId();
+//        foreach ($this->getPermissions() as $permission)
+//        {
+//            $perm = array();
+//            $perm['name'] = $permission->getName();
+//            $perm['type'] = (boolean)$permission->getType();
+//            $perm['res']  = (string)$permission->getResource()->getId();
+//
+//            $result['permissions'][] = $perm;
+//        }
+//        return $result;
+//    }
 }

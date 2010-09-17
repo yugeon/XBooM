@@ -50,81 +50,169 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($testName, $this->object->getName());
     }
 
+    public function testGetSetUserEmail()
+    {
+        $testEmail = 'Vasya@mail.com';
+        $this->object->setEmail($testEmail);
+        $this->assertEquals($testEmail, $this->object->getEmail());
+    }
+
     public function testCanAssignToGroup()
     {
         $group = m::mock('Group');
-        $this->assertEquals($this->object, $this->object->assignToGroup($group));
-        $this->assertContains($group, $this->object->getGroups());
+        $this->assertEquals($this->object, $this->object->setGroup($group));
+        $this->assertEquals($group, $this->object->getGroup());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testGroupMustBeObject()
+    public function testShouldImplementZendAclRoleInterface()
     {
-        $this->object->assignToGroup(null);
+        $this->assertType('Zend_Acl_Role_Interface', $this->object);
     }
 
-    public function testUserCanBelongToSeveralGroups()
-    {
-        $group1 = m::mock('Group');
-        $group2 = m::mock('Group');
-        $this->object->assignToGroup($group1)
-                     ->assignToGroup($group2);
-        $this->assertTrue(2 == count($this->object->getGroups()) );
-    }
-
-    public function testIfUserConsistInGroupNoDouble()
-    {
-        $group1 = m::mock('Group');
-        $group2 = m::mock('Group');
-        $this->object->assignToGroup($group1)
-                     ->assignToGroup($group2)
-                     ->assignToGroup($group1);
-        $this->assertTrue(2 == count($this->object->getGroups()) );
-    }
-
-    public function testDefaultUserConsistsInGuestGroup()
+    public function testDefaultUserShouldReturnGuestRole()
     {
         $this->markTestSkipped();
-        $guestGroup = m::mock('Group');
-        $guestGroup->shouldReceive('getName')->andReturn('Guest');
-
-        $this->assertEquals('Guest', $this->object->getGroups()->getName());
+        $expected = array(
+            'Guest',
+        );
+        $this->assertEquals($expected, $this->object->getRoleId());
     }
 
-    public function testSetGetRole()
+    public function  testCanAssignToPersonalRole()
     {
-        $roleId = 1;
         $role = m::mock('Role');
-        $role->shouldReceive('getRoleId')->andReturn($roleId);
+        $role->shouldReceive('markPersonal');
         $this->object->setRole($role);
         $this->assertEquals($role, $this->object->getRole());
     }
 
-    public function testGetAllRolesAssignedToUser()
+    public function testGetRoleIdShouldReturnAllRolesAssignedToUser()
     {
-        $role1 = m::mock('Role');
-        $role2 = m::mock('Role');
-        $role3 = m::mock('Role');
-        $role1->shouldReceive('getRoleId')->andReturn('1');
-        $role2->shouldReceive('getRoleId')->andReturn('2');
-        $role3->shouldReceive('getRoleId')->andReturn('3');
+        $groupRoles = array(
+            m::mock('Role'),
+            m::mock('Role'),
+        );
+        $userGroup = m::mock('Group');
+        $userGroup->shouldReceive('getRoleId')->andReturn($groupRoles);
+        $userRole = m::mock('Role');
+        $userRole->shouldReceive('markPersonal');
+        $this->object->setId(545);
+        $this->object->setRole($userRole);
+        $this->object->setGroup($userGroup);
+
+        $expected = $groupRoles;
+        $expected[] = $userRole;
+        
+        $this->assertSame($expected, $this->object->getRoleId());
+    }
+
+    public function testPersonalRoleShouldBeEspecially()
+    {
+        $userRole = m::mock('Role');
+        $userRole->shouldReceive('markPersonal')->with(true)->once();
+        $userRole->shouldReceive('isPersonal')->andReturn(true);
+        $this->object->setRole($userRole);
+
+        $this->assertTrue($this->object->getRole()->isPersonal());
+    }
+
+    public function testShouldImplementZendAclResourceInterface()
+    {
+        $this->assertType('Zend_Acl_Resource_Interface', $this->object);
+    }
+
+    public function testGetResourceId()
+    {
+        $resourceId = 326;
+        $resource = m::mock('\\Core\\Model\\Domain\\Resource');
+        $resource->shouldReceive('getId')->andReturn($resourceId);
+        $this->object->setResource($resource);
+        $this->assertEquals('User-' . $resourceId, $this->object->getResourceId());
+    }
+
+    /**
+     * @expectedException \Xboom\Model\Exception
+     */
+    public function testShouldRaiseExceptionIfResourceNotAssign()
+    {
+        $this->object->getResourceId();
+    }
+
+    public function testGetPermissionsWithRolesAndResources()
+    {
+        $this->markTestSkipped();
+        $group1RPR = array(
+            'role' => 'Group-1',
+            'permissions' => array(
+                   array(
+                       'name' => 'priv-1',
+                       'type' => true,
+                       'res' =>  'priv-1',
+                    ),
+            )
+        );
+        $group2RPR = array(
+            'role' => 'Group-2',
+            'permissions' => array(
+                   array(
+                       'name' => 'priv-2',
+                       'type' => true,
+                       'res' =>  '2',
+                    ),
+            )
+        );
 
         $group1 = m::mock('Group');
         $group2 = m::mock('Group');
-        $group1->shouldReceive('getRole')->andReturn($role1);
-        $group2->shouldReceive('getRole')->andReturn($role2);
-        $this->object->setRole($role3);
+        $group1->shouldReceive('getRolesPermissionsAndResources')->andReturn($group1RPR);
+        $group2->shouldReceive('getRolesPermissionsAndResources')->andReturn($group2RPR);
+        $resource = m::mock('Resource');
+        $resource->shouldReceive('getId')->andReturn(3);
+        $permission = m::mock('Permission');
+        $permission->shouldReceive('getName')->andReturn('priv-3');
+        $permission->shouldReceive('getType')->andReturn(1);
+        $permission->shouldReceive('getResource')->andReturn($resource);
+
+        $this->object->setId('3');
         $this->object->assignToGroup($group1);
         $this->object->assignToGroup($group2);
+        $this->object->assignToPermission($permission);
 
         $expected = array(
-            '1',
-            '2',
-            '3',
+            array(
+                'role' => 'Group-1',
+                'permissions' => array(
+                    array(
+                       'name' => 'priv-1',
+                       'type' => true,
+                       'res' =>  'priv-1',
+                    ),
+                ),
+            ),
+            array(
+               'role' => 'Group-2',
+               'permissions' => array(
+                    array(
+                       'name' => 'priv-2',
+                       'type' => true,
+                       'res' =>  '2',
+                    ),
+                ),
+            ),
+            array(
+                'role' => 'User-3',
+                'permissions' => array(
+                    array(
+                       'name' => 'priv-3',
+                       'type' => true,
+                       'res' =>  '3',
+                    ),
+                 ),
+            ),
         );
-        $this->assertSame($expected, $this->object->getRoles());
+
+        $this->assertEquals($expected, $this->object->getRolesPermissionsAndResources());
+
 
     }
 }

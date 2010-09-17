@@ -49,6 +49,12 @@ class RoleTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($this->object);
     }
 
+    public function testCanMarkPersonal()
+    {
+        $this->object->markPersonal(true);
+        $this->assertTrue($this->object->isPersonal());
+    }
+
     public function testGetRoleID()
     {
         $this->object->setId(323);
@@ -66,5 +72,17 @@ class RoleTest extends \PHPUnit_Framework_TestCase
         $this->object->assignToPermission($permission3);
 
         $this->assertEquals( 3, count($this->object->getPermissions()) );
+    }
+
+    public function testWithoutDoublingOfPermissions()
+    {
+        $permission1 = m::mock('Permission');
+        $permission2 = m::mock('Permission');
+
+        $this->object->assignToPermission($permission1);
+        $this->object->assignToPermission($permission2);
+        $this->object->assignToPermission($permission1);
+
+        $this->assertEquals( 2, count($this->object->getPermissions()) );
     }
 }

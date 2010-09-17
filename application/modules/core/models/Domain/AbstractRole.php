@@ -21,7 +21,7 @@
  */
 
 /**
- * Role.
+ * Abstract Role
  *
  * @category AccessControl
  * @author yugeon
@@ -30,50 +30,15 @@ namespace Core\Model\Domain;
 use \Xboom\Model\Domain\AbstractObject,
     \Doctrine\Common\Collections\ArrayCollection;
 
-/**
- * @Entity
- * @Table(name="roles")
- */
-class Role extends AbstractObject implements \Zend_Acl_Role_Interface
+/** @MappedSuperclass */
+abstract class AbstractRole extends AbstractObject implements \Zend_Acl_Role_Interface
 {
-
-    /**
-     * @Id @Column(type="integer")
-     * @GeneratedValue(strategy="AUTO")
-     *
-     * @var integer
-     */
-    protected $id;
-
-    /**
-     * Simple name for this role.
-     *
-     * @Column(type="string", nullable=true, length=50)
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * Whether this is a personal role?
-     *
-     * @Column(type="boolean")
-     * @var boolean
-     */
-    protected $isPersonal = false;
-
-    /**
-     * Description of this role.
-     *
-     * @Column(type="string", nullable=true, length=255)
-     * @var string
-     */
-    protected $description;
 
     /**
      * Permissions assigned to this role. Unidirectional.
      *
      * @ManyToMany(targetEntity="Permission")
-     * @var ArrayCollection of Permission
+     * @var Permission
      */
     protected $permissions;
 
@@ -89,43 +54,11 @@ class Role extends AbstractObject implements \Zend_Acl_Role_Interface
         parent::__construct($data);
     }
 
-    /**
-     * Mark this role as personal
-     *
-     * @param boolean $flag
-     * @return Role
-     */
-    public function markPersonal($flag)
-    {
-        $this->isPersonal = $flag;
-        return $this;
-    }
-
-    /**
-     * This is personal role?
-     *
-     * @return boolean
-     */
-    public function isPersonal()
-    {
-        return $this->isPersonal;
-    }
-
-    /**
-     * Returns the string identifier of the Role
-     *
-     * @return string
-     */
-    public function  getRoleId()
-    {
-        return (string) $this->id;
-    }
-
     public function assignToPermission($permission)
     {
         if (!\is_object($permission))
         {
-            throw new \InvalidArgumentException('Param must be a Permission object');
+            throw new \InvalidArgumentException('Param must be object');
         }
 
         if (!$this->permissions->contains($permission))
@@ -140,7 +73,7 @@ class Role extends AbstractObject implements \Zend_Acl_Role_Interface
      * Override the default set method, which would add a permissions, rather than rewriting.
      *
      * @param ArrayCollection $permissions
-     * @return Role 
+     * @return Role
      */
     public function setPermissions($permissions)
     {

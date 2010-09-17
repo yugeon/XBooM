@@ -48,11 +48,36 @@ class GroupTest extends \PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function testGetRole()
+    public function testShouldImplementZendAclRoleInterface()
     {
-        $role = m::mock('Role');
-        $role->shouldReceive('getRoleId')->andReturn('1');
-        $this->object->setRole($role);
-        $this->assertEquals('1', $this->object->getRole()->getRoleId());
+        $this->assertType('Zend_Acl_Role_Interface', $this->object);
+    }
+
+    public function testGetAllRolesShouldReturnArrayOfRoles()
+    {
+        $this->object->setId(1);
+        $role1 = m::mock('Role');
+        $role2 = m::mock('Role');
+        $role3 = m::mock('Role');
+        $role1->shouldReceive('getRoleId')->andReturn('1');
+        $role2->shouldReceive('getRoleId')->andReturn('2');
+        $role3->shouldReceive('getRoleId')->andReturn('3');
+
+        $this->object->assignToRole($role1);
+        $this->object->assignToRole($role2);
+        $this->object->assignToRole($role3);
+
+        $expectedRoles = array(
+            $role1,
+            $role2,
+            $role3,
+        );
+
+        $this->assertEquals($expectedRoles, $this->object->getAllRoles());
+    }
+
+    public function testGetRoleIdShouldReturnNullIfGroupNotPersisted()
+    {
+        $this->assertNull($this->object->getRoleId());
     }
 }

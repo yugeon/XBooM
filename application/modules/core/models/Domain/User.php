@@ -27,7 +27,7 @@ use \Xboom\Model\Domain\AbstractObject,
  * @Entity
  * @Table(name="users")
  */
-class User extends AbstractObject// implements \Zend_Acl_Role_Interface
+class User extends AbstractRole implements \Zend_Acl_Resource_Interface
 {
 
     /**
@@ -36,113 +36,155 @@ class User extends AbstractObject// implements \Zend_Acl_Role_Interface
      */
     protected $id;
 
-    /** @Column(type="string", length=50) */
+    /** @Column(type="string", unique=true, length=50) */
     protected $name;
 
-    /** @Column(type="string", unique=true, length=32) */
-    protected $login;
+    /** @Column(type="string", unique=true, length=255) */
+    protected $email;
 
     /** @Column(type="string", length=48) */
     protected $password;
 
     /**
-     * Groups in which user is consists.
-     * 
-     * @ManyToMany(targetEntity="Group")
-     * @JoinTable(name="users_groups",
-     *      joinColumns={@JoinColumn(name="user_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@JoinColumn(name="group_id", referencedColumnName="id")}
-     *      )
      *
-     * @var ArrayCollection
+     * @ManyToOne(targetEntity="Group")
+     * @var Group
      */
-    protected $groups = null;
+    protected $group = null;
 
     /**
-     * Personal role this user.
-     * 
+     * Personal role, assigned to this user.
+     *
      * @ManyToOne(targetEntity="Role")
      * @var Role
      */
     protected $role = null;
 
     /**
-     * @OneToOne(targetEntity="Resource")
+     * Related resource.
      *
+     * @OneToOne(targetEntity="Resource", cascade={"persist", "remove"})
      * @var Resourse
      */
     protected $resource = null;
 
     /**
-     * Default constructor.
-     * If $data exist, then assign to properties by key.
+     * Retrieve a list of all roles as array.
+     * Check that would "null" missed the list, because is a reserved value
      *
-     * @param array $data
+     * @return array
      */
-    public function __construct(array $data = null)
+    public function  getRoleId()
     {
-        $this->groups = new ArrayCollection();
-        parent::__construct($data);
+        if (null !== $this->getId())
+        {
+            return $this->getAllRoles();
+        }
+
+        return null;
     }
 
     /**
-     * Assign user to $group
-     * 
-     * @param object Group $group
-     * @return User
-     * @throws \InvalidArgumentException if $group is not object.
-     */
-    public function assignToGroup($group)
-    {
-        if (!\is_object($group))
-        {
-            throw new \InvalidArgumentException('Param must be object');
-        }
-        
-        if (!$this->groups->contains($group))
-        {
-            $this->groups[] = $group;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Override the default set method, which would add a group, rather than rewriting.
      *
-     * @param ArrayCollection $groups
-     * @return User
+     * @return array of Role objects
      */
-    public function  setGroups($groups)
-    {
-        foreach ($groups as $group)
-        {
-            $this->assignToGroup($group);
-        }
-        return $this;
-    }
-
-    public function getRoles()
+    public function getAllRoles()
     {
         $roles = array();
-        foreach ($this->getGroups() as $group)
+        if (null !== $this->getGroup())
         {
-            if (null !== $group)
-            {
-                $role = $group->getRole()->getRoleId();
-                if (null !== $role)
-                {
-                    $roles[] = $role;
-                }
-            }
+            $roles = $this->getGroup()->getRoleId();
         }
 
         // last element has a higher priority
         if (null !== $this->getRole())
         {
-            $roles[] = $this->getRole()->getRoleId();
+            $roles[] = $this->getRole();
         }
-        
+
+        if (empty($roles))
+        {
+            $roles[] = 'Guest';
+        }
         return $roles;
+    }
+
+    public function setRole($role)
+    {
+        if (null !== $role)
+        {
+            $role->markPersonal(true);
+            $this->role = $role;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the string identifier of the Resource
+     *
+     * @return string
+     */
+    public function  getResourceId()
+    {
+        if (null !== $this->getResource())
+        {
+            return $this->_getObjectName() . '-' . $this->resource->getId();
+        }
+
+        throw new \Xboom\Model\Exception('Resource don\'t assign');
+    }
+
+    /**
+     *
+     * @param Resource $resource
+     */
+    public function setResource($resource)
+    {
+        if (! ($resource instanceof Resource))
+        {
+            throw new \InvalidArgumentException('Resource must be a object');
+        }
+
+        $this->resource = $resource;
+    }
+
+    public function getRolesPermissionsAndResources()
+    {
+        $result = array();
+        foreach ($this->getGroups() as $group)
+        {
+            if (null !== $group)
+            {
+                $grRPR = $group->getRolesPermissionsAndResources();
+                if (!empty($grRPR))
+                {
+                    $result[] = $grRPR;
+                }
+            }
+        }
+
+        $userRPR = $this->_getRolesPermissionsAndResources();
+        if (!empty($userRPR))
+        {
+            $result[] = $userRPR;
+        }
+        return $result;
+    }
+
+    public function _getRolesPermissionsAndResources()
+    {
+        $result = array();
+        $result['role'] = $this->_getObjectName() . '-' . $this->getId();
+        foreach ($this->getPermissions() as $permission)
+        {
+            $perm = array();
+            $perm['name'] = $permission->getName();
+            $perm['type'] = (boolean)$permission->getType();
+            $perm['res']  = (string)$permission->getResource()->getId();
+
+            $result['permissions'][] = $perm;
+        }
+        return $result;
     }
 }

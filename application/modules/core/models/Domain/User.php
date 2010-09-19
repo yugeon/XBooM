@@ -58,7 +58,7 @@ class User extends AbstractRole implements \Zend_Acl_Resource_Interface
      * @ManyToOne(targetEntity="Role")
      * @var Role
      */
-    protected $role = null;
+    //protected $role = null;
 
     /**
      * Related resource.
@@ -96,29 +96,25 @@ class User extends AbstractRole implements \Zend_Acl_Resource_Interface
             $roles = $this->getGroup()->getRoleId();
         }
 
-        // last element has a higher priority
-        if (null !== $this->getRole())
-        {
-            $roles[] = $this->getRole();
-        }
+//        // last element has a higher priority
+//        if (null !== $this->getRole())
+//        {
+//            $roles[] = $this->getRole();
+//        }
 
-        if (empty($roles))
-        {
-            $roles[] = 'Guest';
-        }
         return $roles;
     }
 
-    public function setRole($role)
-    {
-        if (null !== $role)
-        {
-            $role->markPersonal(true);
-            $this->role = $role;
-        }
-
-        return $this;
-    }
+//    public function setRole($role)
+//    {
+//        if (null !== $role)
+//        {
+//            $role->markPersonal(true);
+//            $this->role = $role;
+//        }
+//
+//        return $this;
+//    }
 
     /**
      * Returns the string identifier of the Resource
@@ -147,44 +143,5 @@ class User extends AbstractRole implements \Zend_Acl_Resource_Interface
         }
 
         $this->resource = $resource;
-    }
-
-    public function getRolesPermissionsAndResources()
-    {
-        $result = array();
-        foreach ($this->getGroups() as $group)
-        {
-            if (null !== $group)
-            {
-                $grRPR = $group->getRolesPermissionsAndResources();
-                if (!empty($grRPR))
-                {
-                    $result[] = $grRPR;
-                }
-            }
-        }
-
-        $userRPR = $this->_getRolesPermissionsAndResources();
-        if (!empty($userRPR))
-        {
-            $result[] = $userRPR;
-        }
-        return $result;
-    }
-
-    public function _getRolesPermissionsAndResources()
-    {
-        $result = array();
-        $result['role'] = $this->_getObjectName() . '-' . $this->getId();
-        foreach ($this->getPermissions() as $permission)
-        {
-            $perm = array();
-            $perm['name'] = $permission->getName();
-            $perm['type'] = (boolean)$permission->getType();
-            $perm['res']  = (string)$permission->getResource()->getId();
-
-            $result['permissions'][] = $perm;
-        }
-        return $result;
     }
 }

@@ -112,20 +112,4 @@ class Group extends AbstractObject implements \Zend_Acl_Role_Interface
 
         return $this;
     }
-
-//    public function getRolesPermissionsAndResources()
-//    {
-//        $result = array();
-//        $result['role'] = $this->_getObjectName() . '-' . $this->getId();
-//        foreach ($this->getPermissions() as $permission)
-//        {
-//            $perm = array();
-//            $perm['name'] = $permission->getName();
-//            $perm['type'] = (boolean)$permission->getType();
-//            $perm['res']  = (string)$permission->getResource()->getId();
-//
-//            $result['permissions'][] = $perm;
-//        }
-//        return $result;
-//    }
 }

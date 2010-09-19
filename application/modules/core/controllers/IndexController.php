@@ -40,51 +40,9 @@ class Core_IndexController extends Zend_Controller_Action
 
     public function indexAction()
     {
-    }
-
-    public function initAction()
-    {
-        /*$user = new User();
-        $user->name = 'fff' . rand(1,100);
-        $user->login = $user->name;
-        $user->password = md5($user->name);
-
-
-        $group = new Group();
-        $group->name = 'Group' . rand(1,100);
-        $group1 = new Group();
-        $group1->name = 'Group' . rand(1,100);
-
-        $user->assignToGroup($group);
-        $user->assignToGroup($group1);
-
-        $this->em->persist($group);
-        $this->em->persist($group1);
-        $this->em->persist($user);
-*/
-        $group = $this->em->find('\\Core\\Model\\Domain\\User', 1);
-
-     /*   $parentResource = new Resource();
-        $parentResource->name = 'Parent'.rand(1,100);
-        $resource = new Resource();
-        $resource->name = 'Res'.rand(1,100);
-        $resource->parent = $parentResource;
-
-        $permission = new Permission();
-        $permission->name = 'Permission' . rand(1,100);
-        $permission->setResource($resource);
-        $permission->setType(true);*/
-
-        $permission = $this->em->find('\\Core\\Model\\Domain\\Permission', 2);
-        $group->assignToPermission($permission);
-
-//        $this->em->persist($parentResource);
-  //      $this->em->persist($resource);
-    //    $this->em->persist($permission);
-        $this->em->flush();
-
-     //   echo 'User ' . $user->id . ' succeful added';
-        exit;
+        $aclService = new \Core\Model\Service\AccessControlService($this->em);
+        $acl = $aclService->getAcl('guest');
+        var_dump($acl);
     }
 }
 

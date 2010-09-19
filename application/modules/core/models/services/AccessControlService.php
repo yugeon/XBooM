@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  CMF for web applications based on Zend Framework 1 and Doctrine 2
  *  Copyright (C) 2010  Eugene Gruzdev aka yugeon
@@ -19,18 +20,20 @@
  * @copyright  Copyright (c) 2010 yugeon <yugeon.ru@gmail.com>
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
-
 /**
  * Description of AccessControlService
  *
  * @author yugeon
  */
+
 namespace Core\Model\Service;
+
 use \Xboom\Model\Service\AbstractService,
-    \Core\Model\Domain\Acl;
+ \Core\Model\Domain\Acl;
 
 class AccessControlService extends AbstractService
 {
+
     protected $_acl = array();
 
     public function __construct($em)
@@ -44,85 +47,135 @@ class AccessControlService extends AbstractService
      * @param User $currentUser
      * @return Acl
      */
-    public function getAcl($currentUser)
+    public function getAcl($currentUser = null, $currentResource = null)
     {
-        if (isset($this->_acl[$currentUser->getId()]))
+        //FIXME сделать уникальный ключ по пользователю и ресурсу.
+        if (\is_string($currentUser) && $currentUser === 'guest')
         {
-            return $this->_acl[$currentUser->getId()];
+            $aclId = 'guest';
+        }
+        elseif (null === $currentUser)
+        {
+            $aclId = 'full';
+        }
+        elseif (\is_object($currentUser))
+        {
+            $aclId = $currentUser->getId();
+
+        }
+        else
+        {
+            $aclId = $currentUser;
         }
 
-        $acl = $this->buildAcl($currentUser);
-        $this->setAcl($acl, $currentUser);
-        
-        return $this->_acl[$currentUser->getId()];
+        if (isset($this->_acl[$aclId]))
+        {
+            return $this->_acl[$aclId];
+        }
+
+        // TODO Add caching
+        $acl = $this->buildAcl($currentUser, $currentResource);
+        $this->setAcl($acl, $aclId);
+
+        return $this->_acl[$aclId];
     }
 
-    public function setAcl($acl, $currentUser)
+    public function setAcl($acl, $aclId)
     {
-        if (! ($acl instanceof \Zend_Acl) )
+        if (!($acl instanceof \Zend_Acl))
         {
             throw new \InvalidArgumentException('Acl must be instance of Zend_Acl');
         }
 
-        $this->_acl[$currentUser->getId()] = $acl;
+        $this->_acl[$aclId] = $acl;
 
         return $this;
     }
 
-    public function  buildAcl($user = null, $resource = null)
+    /**
+     * Build full ACL. If $user is passed, build on to the $user.
+     * If $resource is passed, build on to the resource.
+     *
+     * @param User|int|null $user
+     * @param Resource|int|null $resource
+     * @return Acl
+     */
+    public function buildAcl($user = null, $resource = null)
     {
         $acl = new Acl();
 
-        $permissionClass = '\\Core\\Model\\Domain\\Permission';
-        $userClass       = '\\Core\\Model\\Domain\\User';
-        $userGroupClass  = '\\Core\\Model\\Domain\\Group';
-        $roleClass  = '\\Core\\Model\\Domain\\Role';
-        $resourceClass   = '\\Core\\Model\\Domain\\Resource';
-
-        // PERMISSIONS
-//        $query = $this->_em->createQuery(
-//                "SELECT DISTINCT p, r FROM {$permissionClass} p"
-//                . " LEFT JOIN p.resource r"
-//                . " WHERE p.id IN (SELECT p1.id FROM {$userClass} u JOIN u.permissions p1 WHERE u.id = ?1)"
-//                . " OR p.id IN (SELECT p2.id FROM {$userClass} u1 JOIN u1.groups g JOIN g.permissions p2 WHERE u1.id = ?1)"
-//        );
-//        $query = $this->_em->createQuery(
-//                "SELECT p, (SELECT p1 FROM {$userClass} u JOIN u.permissions p1 WHERE u.id = ?1) as p2 FROM {$permissionClass} p"
-               // . " LEFT JOIN p2.resource r"
-//                . " WHERE p.id IN (SELECT p1.id FROM {$userClass} u JOIN u.permissions p1 WHERE u.id = ?1)"
-//                . " OR p.id IN (SELECT p2.id FROM {$userClass} u1 JOIN u1.groups g JOIN g.permissions p2 WHERE u1.id = ?1)"
-//        );
-
-        // ROLES
-//        $query = $this->_em->createQuery(
-//                "SELECT r FROM {$roleClass} r"
-//                //. " LEFT JOIN u.group g"
-//                //. " LEFT JOIN g.roles r"
-//                //. " WHERE u.id = ?1"
-//        );
-        $query = $this->_em->createQuery(
-                 "SELECT u, g, r1, r2, p1, p2, res1, res2  FROM {$userClass} u"
-               . ' LEFT JOIN u.group g'
-               . ' LEFT JOIN u.role r1'
-               . ' LEFT JOIN g.roles r2'
-               . ' LEFT JOIN r1.permissions p1'
-               . ' LEFT JOIN r2.permissions p2'
-               . ' LEFT JOIN p1.resource res1'
-               . ' LEFT JOIN p2.resource res2'
-               . ' WHERE u.id = ?1'
-        );
-        $query->setParameter(1, 1/*$user->getId()*/);
-        $fullUser = $query->getSingleResult();
-//        $query->setParameter(1, 4/*$user->getId()*/);
-//        $fullUser = $query->getSingleResult();
-        
-//        \Doctrine\Common\Util\Debug::dump($fullUser, 10);
-//        exit;
-        foreach ($fullUser->getAllRoles() as $role)
+        if (\is_string($user) && $user === 'guest')
         {
-            if (!$acl->hasRole($role))
+            return $this->_getGuestAcl($acl);
+        }
+
+        $userClass = '\\Core\\Model\\Domain\\User';
+
+        /* @var $qb \Doctrine\ORM\QueryBuilder */
+        $qb = $this->_em->createQueryBuilder();
+        //$qb->select(array('u', 'g', 'r', 'r1', 'p', 'p1', 'res', 'res1'))
+        $qb->select(array('u', 'g', 'r', 'p', 'res'))
+                ->from($userClass, 'u')
+                ->leftJoin('u.group', 'g')
+                ->leftJoin('g.roles', 'r')
+                ->leftJoin('r.permissions', 'p')
+                ->leftJoin('p.resource', 'res');
+        //->leftJoin('u.role',  'r1')
+        //->leftJoin('r1.permissions', 'p1')
+        //->leftJoin('p1.resource', 'res1')
+        // constraint by user
+        if (null !== $user)
+        {
+            $userId = $user;
+            if (\is_object($user))
             {
-                $acl->addRole($role);
+                $userId = $user->getId();
+            }
+
+            if (\is_int($userId))
+            {
+                $qb->where($qb->expr()->eq('u.id', '?1'))
+                        ->setParameter(1, $userId);
+            }
+        }
+
+        // constraint by resource
+        if (null !== $resource)
+        {
+            $resourceId = $resource;
+            if (\is_object($resource))
+            {
+                $resourceId = $resource->getId();
+            }
+
+            if (\is_int($resourceId))
+            {
+                $qb->andWhere(//$qb->expr()->orX(
+                                $qb->expr()->eq('res.id', '?2')
+                        //$qb->expr()->eq('res1.id', '?2')
+                        )//)
+                        ->setParameter(2, $resourceId);
+            }
+        }
+
+        $query = $qb->getQuery();
+        $users = $query->getResult();
+        foreach ($users as $user)
+        {
+            $roles = $user->getAllRoles();
+            $this->_extractRolesPermissionsAndResources($acl, $roles);
+        }
+
+        return $acl;
+    }
+
+    protected function _extractRolesPermissionsAndResources($acl, $roles)
+    {
+        foreach ($roles as $role)
+        {
+            if (!$acl->hasRole($role->getRoleId()))
+            {
+                $acl->addRole($role->getRoleId());
             }
 
             foreach ($role->getPermissions() as $permission)
@@ -142,17 +195,39 @@ class AccessControlService extends AbstractService
 //                $acl->add((string)$resource->getId(), $parentResource);
                 }
 
+                // TODO asserting by owner
                 if (\Core\Model\Domain\Permission::ALLOW === $permission->getType())
                 {
-                    $acl->allow($role, $resource, $permission->getName());
+                    $acl->allow($role->getRoleId(), $resource, $permission->getName());
                 }
                 else
                 {
-                    $acl->deny($role, $resource, $permission->getName());
+                    $acl->deny($role->getRoleId(), $resource, $permission->getName());
                 }
             }
         }
-                            
+    }
+
+    protected function _getGuestAcl($acl)
+    {
+        $groupClass = '\\Core\\Model\\Domain\\Group';
+        $dql = "SELECT g, r, p, res FROM {$groupClass} as g"
+                . ' LEFT JOIN g.roles as r'
+                . ' LEFT JOIN r.permissions as p'
+                . ' LEFT JOIN p.resource as res'
+                . ' WHERE g.id = :guest_group_id';
+        $query = $this->_em->createQuery($dql)
+                        // FIXME Решить как идентифицировать группу для Гостей.
+                        ->setParameter('guest_group_id', 1);
+        $group = $query->getResult();
+
+        if (!empty($group[0]))
+        {
+            $roles = $group[0]->getAllRoles();
+            $this->_extractRolesPermissionsAndResources($acl, $roles);
+        }
+
         return $acl;
     }
+
 }

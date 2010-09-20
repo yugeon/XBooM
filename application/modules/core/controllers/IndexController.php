@@ -41,8 +41,12 @@ class Core_IndexController extends Zend_Controller_Action
     public function indexAction()
     {
         $aclService = new \Core\Model\Service\AccessControlService($this->em);
-        $acl = $aclService->getAcl('guest');
-        var_dump($acl);
+        $acl = $aclService->getAcl(null, 'Concrete Resource');
+        \Doctrine\Common\Util\Debug::dump($acl, 50);
+//        $acl->addRole('ffd');
+//        $acl->add(new \Zend_Acl_Resource('jj'));
+//        $acl->allow('ffd', null, null);
+//        var_dump($acl->isAllowed('ffd', null, null));
     }
 }
 

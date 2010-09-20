@@ -26,7 +26,8 @@
  * @author yugeon
  */
 namespace test\Core\Model\Domain;
-use Core\Model\Domain\Permission;
+use \Core\Model\Domain\Permission,
+    \Mockery as m;
 
 class PermissionTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,6 +37,12 @@ class PermissionTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
         $this->object = new Permission;
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+        m::close();
     }
 
     public function testCanCreatePermission()

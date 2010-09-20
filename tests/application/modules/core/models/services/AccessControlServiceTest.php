@@ -35,7 +35,9 @@ class AccessControlServiceTest extends \PHPUnit_Framework_TestCase
 
     protected $object;
     protected $em;
-    protected $currentUser;
+    protected $user;
+    protected $resource;
+    protected $permission;
 
     public function setUp()
     {
@@ -45,8 +47,62 @@ class AccessControlServiceTest extends \PHPUnit_Framework_TestCase
 
         $this->object = new AccessControlService($this->em);
 
-        $this->currentUser = m::mock('User');
-        $this->currentUser->shouldReceive('getId')->andReturn(232);
+        $this->user = m::mock('User');
+        $this->user->shouldReceive('getId')->andReturn(232);
+
+        $this->resource = m::mock('\\Zend_Acl_Resource_Interface');
+        $this->resource->shouldReceive('getId')->andReturn(2);
+        $this->resource->shouldReceive('getLevel')->andReturn(0);
+        $this->resource->shouldReceive('getResourceId')->andReturn('test-resource-id');
+        $this->resource->shouldReceive('getParent')->andReturn(null);
+
+        $this->permission = m::mock('Permission');
+        $this->permission->shouldReceive('getResource')->andReturn($this->resource);
+        $this->permission->shouldReceive('getId')->andReturn(2);
+        $this->permission->shouldReceive('getName')->andReturn('test-permission-name');
+        $this->permission->shouldReceive('getType')->andReturn(true);
+
+        $permission1 = m::mock('Permission');
+        $permission1->shouldReceive('getResource')->andReturn($this->resource);
+        $permission1->shouldReceive('getName')->andReturn('test-permission-name1');
+        $permission1->shouldReceive('getType')->andReturn(false);
+
+        $permissions = array(
+            $this->permission,
+            $permission1
+        );
+
+        $role = m::mock('Role');
+        $role->shouldReceive('getPermissions')->andReturn($permissions);
+        $role->shouldReceive('getRoleId')->andReturn('test-role-id');
+
+        $roles = array(
+            $role,
+            $role
+        );
+        $this->user->shouldReceive('getAllRoles')->andReturn($roles);
+
+        $result = array(
+            $this->user,
+            $this->user
+        );
+
+        $query = m::mock('Query');
+        $qb = m::mock('QueryBuilder');
+        $qb->shouldReceive('select')->andReturn($qb);
+        $qb->shouldReceive('from')->andReturn($qb);
+        $qb->shouldReceive('leftJoin')->andReturn($qb);
+        $qb->shouldReceive('where')->andReturn($qb);
+        $qb->shouldReceive('andWhere')->andReturn($qb);
+        $qb->shouldReceive('expr')->andReturn($qb);
+        $qb->shouldReceive('eq')->andReturn($qb);
+        $qb->shouldReceive('in')->andReturn($qb);
+        $qb->shouldReceive('setParameter');
+        $qb->shouldReceive('getQuery')->andReturn($query);
+
+        $this->em->shouldReceive('createQueryBuilder')->andReturn($qb);
+        $this->em->shouldReceive('find')->andReturn($this->resource);
+        $query->shouldReceive('getResult')->andReturn($result);
     }
 
     public function tearDown()
@@ -59,252 +115,97 @@ class AccessControlServiceTest extends \PHPUnit_Framework_TestCase
     {
         $acl = m::mock('Zend_Acl');
 
-        $this->object->setAcl($acl, 'guest');
+        $this->object->setAcl($acl, $this->object->getAclId('guest'));
         $this->assertEquals($acl, $this->object->getAcl('guest'));
     }
 
     public function testGetFullAcl()
     {
-        $resource = m::mock('\\Zend_Acl_Resource_Interface');
-        $resource->shouldReceive('getResourceId')->andReturn('test-resource-id');
-        $permission = m::mock('Permission');
-        $permission->shouldReceive('getResource')->andReturn($resource);
-        $permission->shouldReceive('getName')->andReturn('test-permission-name');
-        $permission->shouldReceive('getType')->andReturn(true);
-        $permission1 = m::mock('Permission');
-        $permission1->shouldReceive('getResource')->andReturn($resource);
-        $permission1->shouldReceive('getName')->andReturn('test-permission-name1');
-        $permission1->shouldReceive('getType')->andReturn(false);
-
-        $permissions = array(
-            $permission,
-            $permission1
-        );
-        $role = m::mock('Role');
-        $role->shouldReceive('getPermissions')->andReturn($permissions);
-        $role->shouldReceive('getRoleId')->andReturn('test-role-id');
-        $roles = array(
-            $role,
-            $role
-        );
-        $user = m::mock('User');
-        $user->shouldReceive('getAllRoles')->andReturn($roles);
-        $result = array(
-            $user,
-            $user
-        );
-        $query = m::mock('Query');
-        $qb = m::mock('QueryBuilder');
-        $qb->shouldReceive('select')->andReturn($qb);
-        $qb->shouldReceive('from')->andReturn($qb);
-        $qb->shouldReceive('leftJoin')->andReturn($qb);
-        $qb->shouldReceive('where')->andReturn($qb);
-        $qb->shouldReceive('getQuery')->andReturn($query);
-        $this->em->shouldReceive('createQueryBuilder')->andReturn($qb);
-        $query->shouldReceive('getResult')->andReturn($result);
-
-        $this->assertNotNull($this->object->getAcl());
-        $this->assertType('Zend_Acl', $this->object->getAcl());
+        $acl = $this->object->getAcl();
+        $this->assertNotNull($acl);
+        $this->assertType('Zend_Acl', $acl);
         $this->assertTrue(
-                $this->object->getAcl()
-                ->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
         $this->assertFalse(
-                $this->object->getAcl()
-                ->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
     }
 
     public function testGetAclByUser()
     {
-        $resource = m::mock('\\Zend_Acl_Resource_Interface');
-        $resource->shouldReceive('getResourceId')->andReturn('test-resource-id');
-        $permission = m::mock('Permission');
-        $permission->shouldReceive('getResource')->andReturn($resource);
-        $permission->shouldReceive('getName')->andReturn('test-permission-name');
-        $permission->shouldReceive('getType')->andReturn(true);
-        $permission1 = m::mock('Permission');
-        $permission1->shouldReceive('getResource')->andReturn($resource);
-        $permission1->shouldReceive('getName')->andReturn('test-permission-name1');
-        $permission1->shouldReceive('getType')->andReturn(false);
-
-        $permissions = array(
-            $permission,
-            $permission1
-        );
-        $role = m::mock('Role');
-        $role->shouldReceive('getPermissions')->andReturn($permissions);
-        $role->shouldReceive('getRoleId')->andReturn('test-role-id');
-        $roles = array(
-            $role,
-            $role
-        );
-        $user = m::mock('User');
-        $user->shouldReceive('getId')->andReturn(2);
-        $user->shouldReceive('getAllRoles')->andReturn($roles);
-        $result = array(
-            $user,
-            $user
-        );
-        $query = m::mock('Query');
-        $qb = m::mock('QueryBuilder');
-        $qb->shouldReceive('select')->andReturn($qb);
-        $qb->shouldReceive('from')->andReturn($qb);
-        $qb->shouldReceive('leftJoin')->andReturn($qb);
-        $qb->shouldReceive('where')->andReturn($qb);
-        $qb->shouldReceive('andWhere')->andReturn($qb);
-        $qb->shouldReceive('expr')->andReturn($qb);
-        $qb->shouldReceive('eq')->andReturn($qb);
-        $qb->shouldReceive('setParameter');
-        $qb->shouldReceive('getQuery')->andReturn($query);
-        $this->em->shouldReceive('createQueryBuilder')->andReturn($qb);
-        $query->shouldReceive('getResult')->andReturn($result);
-
         $userId = 1;
-        $this->assertNotNull($this->object->getAcl($userId));
-        $this->assertType('Zend_Acl', $this->object->getAcl($userId));
+        $acl = $this->object->getAcl($userId);
+        $this->assertNotNull($acl);
+        $this->assertType('Zend_Acl', $acl);
         $this->assertTrue(
-                $this->object->getAcl($userId)
-                ->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
         $this->assertFalse(
-                $this->object->getAcl($userId)
-                ->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
 
+        $acl = $this->object->getAcl($this->user);
         $this->assertTrue(
-                $this->object->getAcl($user)
-                ->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
         $this->assertFalse(
-                $this->object->getAcl($user)
-                ->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
     }
 
     public function testGetAclByResource()
     {
-        $resource = m::mock('\\Zend_Acl_Resource_Interface');
-        $resource->shouldReceive('getResourceId')->andReturn('test-resource-id');
-        $resource->shouldReceive('getId')->andReturn(1);
-
-        $permission = m::mock('Permission');
-        $permission->shouldReceive('getResource')->andReturn($resource);
-        $permission->shouldReceive('getName')->andReturn('test-permission-name');
-        $permission->shouldReceive('getType')->andReturn(true);
-        $permission1 = m::mock('Permission');
-        $permission1->shouldReceive('getResource')->andReturn($resource);
-        $permission1->shouldReceive('getName')->andReturn('test-permission-name1');
-        $permission1->shouldReceive('getType')->andReturn(false);
-
-        $permissions = array(
-            $permission,
-            $permission1
-        );
-        $role = m::mock('Role');
-        $role->shouldReceive('getPermissions')->andReturn($permissions);
-        $role->shouldReceive('getRoleId')->andReturn('test-role-id');
-        $roles = array(
-            $role,
-            $role
-        );
-        $user = m::mock('User');
-        $user->shouldReceive('getAllRoles')->andReturn($roles);
-        $result = array(
-            $user,
-            $user
-        );
-        $query = m::mock('Query');
-        $qb = m::mock('QueryBuilder');
-        $qb->shouldReceive('select')->andReturn($qb);
-        $qb->shouldReceive('from')->andReturn($qb);
-        $qb->shouldReceive('leftJoin')->andReturn($qb);
-        $qb->shouldReceive('where')->andReturn($qb);
-        $qb->shouldReceive('andWhere')->andReturn($qb);
-        $qb->shouldReceive('expr')->andReturn($qb);
-        $qb->shouldReceive('eq')->andReturn($qb);
-        $qb->shouldReceive('setParameter');
-        $qb->shouldReceive('getQuery')->andReturn($query);
-        $this->em->shouldReceive('createQueryBuilder')->andReturn($qb);
-        $query->shouldReceive('getResult')->andReturn($result);
-
         $userId = null;
         $resourceId = 1;
-        $this->assertNotNull($this->object->getAcl($userId, $resourceId));
-        $this->assertType('Zend_Acl', $this->object->getAcl($userId, $resourceId));
+        $acl = $this->object->getAcl($userId, $resourceId);
+        $this->assertNotNull($acl);
+        $this->assertType('Zend_Acl', $acl);
         $this->assertTrue(
-                $this->object->getAcl($userId, $resourceId)
-                ->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
         $this->assertFalse(
-                $this->object->getAcl($userId, $resourceId)
-                ->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
 
+        $acl = $this->object->getAcl($userId, $this->resource);
         $this->assertTrue(
-                $this->object->getAcl($userId, $resource)
-                ->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
         $this->assertFalse(
-                $this->object->getAcl($userId, $resource)
-                ->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
 
     }
 
     public function testGetAclByUserAndResource()
     {
-        $resource = m::mock('\\Zend_Acl_Resource_Interface');
-        $resource->shouldReceive('getResourceId')->andReturn('test-resource-id');
-        $resource->shouldReceive('getId')->andReturn(1);
-
-        $permission = m::mock('Permission');
-        $permission->shouldReceive('getResource')->andReturn($resource);
-        $permission->shouldReceive('getName')->andReturn('test-permission-name');
-        $permission->shouldReceive('getType')->andReturn(true);
-        $permission1 = m::mock('Permission');
-        $permission1->shouldReceive('getResource')->andReturn($resource);
-        $permission1->shouldReceive('getName')->andReturn('test-permission-name1');
-        $permission1->shouldReceive('getType')->andReturn(false);
-
-        $permissions = array(
-            $permission,
-            $permission1
-        );
-        $role = m::mock('Role');
-        $role->shouldReceive('getPermissions')->andReturn($permissions);
-        $role->shouldReceive('getRoleId')->andReturn('test-role-id');
-        $roles = array(
-            $role,
-            $role
-        );
-        $user = m::mock('User');
-        $user->shouldReceive('getAllRoles')->andReturn($roles);
-        $result = array(
-            $user,
-            $user
-        );
-        $query = m::mock('Query');
-        $qb = m::mock('QueryBuilder');
-        $qb->shouldReceive('select')->andReturn($qb);
-        $qb->shouldReceive('from')->andReturn($qb);
-        $qb->shouldReceive('leftJoin')->andReturn($qb);
-        $qb->shouldReceive('where')->andReturn($qb);
-        $qb->shouldReceive('andWhere')->andReturn($qb);
-        $qb->shouldReceive('expr')->andReturn($qb);
-        $qb->shouldReceive('eq')->andReturn($qb);
-        $qb->shouldReceive('setParameter');
-        $qb->shouldReceive('getQuery')->andReturn($query);
-        $this->em->shouldReceive('createQueryBuilder')->andReturn($qb);
-        $query->shouldReceive('getResult')->andReturn($result);
-
         $userId = 1;
         $resourceId = 1;
-        $this->assertNotNull($this->object->getAcl($userId, $resourceId));
-        $this->assertType('Zend_Acl', $this->object->getAcl($userId, $resourceId));
+        $acl = $this->object->getAcl($userId, $resourceId);
+        $this->assertNotNull($acl);
+        $this->assertType('Zend_Acl', $acl);
         $this->assertTrue(
-                $this->object->getAcl($userId, $resourceId)
-                ->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
         $this->assertFalse(
-                $this->object->getAcl($userId, $resourceId)
-                ->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
 
+        $acl = $this->object->getAcl($userId, $this->resource);
         $this->assertTrue(
-                $this->object->getAcl($userId, $resource)
-                ->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
         $this->assertFalse(
-                $this->object->getAcl($userId, $resource)
-                ->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
+
+    }
+
+    public function testGetAclByUserResourceAndPermission()
+    {
+        $userId = 1;
+        $resourceId = 1;
+        $permissionId = 1;
+        $acl = $this->object->getAcl($userId, $resourceId, $permissionId);
+        $this->assertNotNull($acl);
+        $this->assertType('Zend_Acl', $acl);
+        $this->assertTrue(
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
+        $this->assertFalse(
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
+
+        $acl = $this->object->getAcl($userId, $this->resource, $this->permission);
+        $this->assertTrue(
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
+        $this->assertFalse(
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
 
     }
 
@@ -312,6 +213,7 @@ class AccessControlServiceTest extends \PHPUnit_Framework_TestCase
     {
         $resource = m::mock('\\Zend_Acl_Resource_Interface');
         $resource->shouldReceive('getResourceId')->andReturn('test-resource-id');
+        $resource->shouldReceive('getParent')->andReturn(null);
         $resource->shouldReceive('getId')->andReturn(1);
 
         $permission = m::mock('Permission');
@@ -352,18 +254,7 @@ class AccessControlServiceTest extends \PHPUnit_Framework_TestCase
     public function testShouldRaiseExceptionIfAclIncorrect()
     {
         $acl = new \stdClass();
-        $this->object->setAcl($acl, $this->currentUser);
+        $this->object->setAcl($acl, $this->user);
     }
 
-    public function testBuildAclForUser()
-    {
-        $result = array();
-
-        $user = m::mock('User');
-        $query = m::mock('Query');
-        $query->shouldReceive('getResult')->andReturn($result);
-        $this->em->shouldReceive('createQuery')->andReturn($query);
-
-        //$this->assertEquals($this->object->buildAcl($user));
-    }
 }

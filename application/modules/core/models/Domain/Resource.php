@@ -52,6 +52,22 @@ class Resource extends AbstractObject implements \Zend_Acl_Resource_Interface
 
     /**
      *
+     * @Column(type="boolean")
+     * @var boolean
+     */
+    //protected $isSection =  false;
+
+    /**
+     * Current nesting level.
+     * Needed to quickly build a list of the resource hierarchy.
+     *
+     * @Column(type="integer")
+     * @var int
+     */
+    protected $level = 0;
+
+    /**
+     *
      * @ManyToOne(targetEntity="Resource")
      * @var Resource
      */
@@ -60,5 +76,36 @@ class Resource extends AbstractObject implements \Zend_Acl_Resource_Interface
     public function  getResourceId()
     {
         return (string) $this->name;
+    }
+
+    /**
+     * Set parent resource. It increases the count of nesting level.
+     *
+     * @param Resource $parent
+     * @return Resource
+     */
+    public function setParent($parent)
+    {
+        $parentLevel = $parent->getLevel();
+        $this->setLevel($parentLevel + 1);
+        $this->parent = $parent;
+        return $this;
+    }
+
+    /**
+     * Recursively gets all the parents.
+     *
+     * @return array
+     */
+    public function getAllParents()
+    {
+        $result = array();
+        $parentResource = $this->getParent();
+        if (null !== $parentResource)
+        {
+            $result = $parentResource->getAllParents();
+            $result[] = $this->getParent();
+        }
+        return $result;
     }
 }

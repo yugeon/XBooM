@@ -32,10 +32,14 @@ use \Core\Model\Domain\Resource,
 class ResourceTest extends \PHPUnit_Framework_TestCase
 {
     protected $object;
+    protected $parentResource;
 
     public function setUp()
     {
         $this->object = new Resource;
+
+        $this->parentResource = m::mock('Resource');
+        $this->parentResource->shouldReceive('getLevel')->andReturn(1);
     }
 
     public function tearDown()
@@ -49,16 +53,49 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($this->object);
     }
 
-    public function _testGetResourceId()
+    public function testGetResourceId()
     {
-        $this->object->setId(232);
-        $this->assertEquals('232', $this->object->getResourceId());
+        $this->object->setName('News');
+        $this->assertEquals('News', $this->object->getResourceId());
     }
 
     public function testGetParent()
     {
-        $parentResource = m::mock('Resource');
-        $this->object->setParent($parentResource);
-        $this->assertEquals($parentResource, $this->object->getParent());
+        $this->object->setParent($this->parentResource);
+        $this->assertEquals($this->parentResource, $this->object->getParent());
+    }
+
+    public function testGetSetLevelOfNesting()
+    {
+        $this->object->setLevel(2);
+        $this->assertEquals(2, $this->object->getLevel());
+    }
+
+    public function testCalculationOfNestingLevel()
+    {
+        $this->object->setParent($this->parentResource);
+        $this->assertEquals(2, $this->object->getLevel());
+    }
+
+    public function testGetAllParents()
+    {
+        $resourceNews = m::mock('Resource');
+        $resourceConfirmNews = m::mock('Resource');
+
+        $resourceNews->shouldReceive('getParent')->andReturn(null);
+        $resourceConfirmNews->shouldReceive('getParent')->andReturn($resourceNews);
+
+        $resourceNews->shouldReceive('getAllParents')->andReturn(array());
+        $resourceConfirmNews->shouldReceive('getAllParents')->andReturn(array($resourceNews));
+        $resourceConfirmNews->shouldReceive('getLevel')->andReturn(2);
+        
+        $this->object->setParent($resourceConfirmNews);
+
+        $expected = array(
+            $resourceNews,
+            $resourceConfirmNews,
+        );
+
+        $this->assertEquals($expected, $this->object->getAllParents());
     }
 }

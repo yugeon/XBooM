@@ -42,31 +42,59 @@ class AccessControlService extends AbstractService
     }
 
     /**
-     * Retrieve ACL for $user.
-     *
-     * @param User $currentUser
-     * @return Acl
+     * Get a unique key for user and resource.
+     * 
+     * @param User|int|string $user 
+     * @param Resource|int|string $resource
+     * @param Permission|int|string $permission
+     * @return string
      */
-    public function getAcl($currentUser = null, $currentResource = null)
+    public function getAclId($user = null, $resource = null, $permission = null)
     {
-        //FIXME сделать уникальный ключ по пользователю и ресурсу.
-        if (\is_string($currentUser) && $currentUser === 'guest')
-        {
-            $aclId = 'guest';
-        }
-        elseif (null === $currentUser)
-        {
-            $aclId = 'full';
-        }
-        elseif (\is_object($currentUser))
-        {
-            $aclId = $currentUser->getId();
+        $user = (null === $user)? 'full' : $user;
+        $resource = (null === $resource)? 'full' : $resource;
+        $permission = (null === $permission)? 'full' : $permission;
 
+        $aclId = $user;
+        if (\is_object($user))
+        {
+            $aclId = (string) $user->getId();
+        }
+
+        $aclId .= '::';
+
+        if (\is_object($resource))
+        {
+            $aclId .= (string) $resource->getId();
         }
         else
         {
-            $aclId = $currentUser;
+            $aclId .= (string) $resource;
         }
+
+        $aclId .= '::';
+
+        if (\is_object($permission))
+        {
+            $aclId .= (string) $permission->getId();
+        }
+        else
+        {
+            $aclId .= (string) $permission;
+        }
+
+        return \md5($aclId);
+    }
+
+    /**
+     * Retrieve ACL for $user.
+     *
+     * @param User|string|int $user
+     * @return Acl
+     */
+    public function getAcl($user = null, $resource = null, $permission = null)
+    {
+        $aclId = $this->getAclId($user, $resource, $permission);
 
         if (isset($this->_acl[$aclId]))
         {
@@ -74,7 +102,8 @@ class AccessControlService extends AbstractService
         }
 
         // TODO Add caching
-        $acl = $this->buildAcl($currentUser, $currentResource);
+
+        $acl = $this->buildAcl($user, $resource, $permission);
         $this->setAcl($acl, $aclId);
 
         return $this->_acl[$aclId];
@@ -98,9 +127,10 @@ class AccessControlService extends AbstractService
      *
      * @param User|int|null $user
      * @param Resource|int|null $resource
+     * @param Permission|int|string|null
      * @return Acl
      */
-    public function buildAcl($user = null, $resource = null)
+    public function buildAcl($user = null, $resource = null, $permission = null)
     {
         $acl = new Acl();
 
@@ -113,16 +143,13 @@ class AccessControlService extends AbstractService
 
         /* @var $qb \Doctrine\ORM\QueryBuilder */
         $qb = $this->_em->createQueryBuilder();
-        //$qb->select(array('u', 'g', 'r', 'r1', 'p', 'p1', 'res', 'res1'))
         $qb->select(array('u', 'g', 'r', 'p', 'res'))
                 ->from($userClass, 'u')
                 ->leftJoin('u.group', 'g')
                 ->leftJoin('g.roles', 'r')
                 ->leftJoin('r.permissions', 'p')
                 ->leftJoin('p.resource', 'res');
-        //->leftJoin('u.role',  'r1')
-        //->leftJoin('r1.permissions', 'p1')
-        //->leftJoin('p1.resource', 'res1')
+
         // constraint by user
         if (null !== $user)
         {
@@ -142,24 +169,41 @@ class AccessControlService extends AbstractService
         // constraint by resource
         if (null !== $resource)
         {
-            $resourceId = $resource;
-            if (\is_object($resource))
+            // Когда запрос по конкретному ресурсу, то необходимо так же
+            // подгружать все роли и привилегии для родительских ресурсов
+            // Для этого надо знать все id родительских ресурсов.
+
+            $resIds = $this->_getResourceParentsId($resource);
+            if (empty($resIds))
             {
-                $resourceId = $resource->getId();
+                return $acl;
+            }
+            $qb->andWhere($qb->expr()->in('res.id', $resIds));
+
+        }
+
+        // constraint by permission
+        if (null !== $permission)
+        {
+            $permissionId = $permission;
+            if (\is_object($permission))
+            {
+                $permissionId = $permission->getId();
             }
 
-            if (\is_int($resourceId))
+            if (\is_int($permissionId))
             {
-                $qb->andWhere(//$qb->expr()->orX(
-                                $qb->expr()->eq('res.id', '?2')
-                        //$qb->expr()->eq('res1.id', '?2')
-                        )//)
-                        ->setParameter(2, $resourceId);
+                $qb->andWhere($qb->expr()->eq('p.id', '?3'))
+                        ->setParameter(3, $permissionId);
             }
         }
 
         $query = $qb->getQuery();
         $users = $query->getResult();
+        // var_dump($qb->getQuery()->getSQL());
+        //\Doctrine\Common\Util\Debug::dump($users, 50);
+        //exit;
+
         foreach ($users as $user)
         {
             $roles = $user->getAllRoles();
@@ -167,6 +211,64 @@ class AccessControlService extends AbstractService
         }
 
         return $acl;
+    }
+
+    /**
+     * Get all the ids of parents resources by single query without recursion.
+     *
+     * @param Resource|int|string $resource
+     * @return array
+     */
+    protected function _getResourceParentsId($resource)
+    {
+        $result = array();
+
+        $resourceClass = '\\Core\\Model\\Domain\\Resource';
+        if (\is_int($resource))
+        {
+            $resource = $this->_em->find($resourceClass, $resource);
+        }
+        elseif (\is_string($resource))
+        {
+            $resource = $this->_em->getRepository($resourceClass)->findOneByName( $resource);
+        }
+
+        if (!\is_object($resource))
+        {
+            return $result;
+        }
+
+        $resourceId = $resource->getId();
+        $currentLevel = $resource->getLevel();
+        $result = array($resourceId);
+        if (0 >= $currentLevel)
+        {
+            return $result;
+        }
+
+        /* @var $qb \Doctrine\ORM\QueryBuilder */
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select(array('r0.id r0_id', 'r1.id r1_id'))
+           ->from($resourceClass, 'r0')
+           ->leftJoin('r0.parent', 'r1')
+           ->where($qb->expr()->eq('r0.id', '?1'))
+           ->setParameter(1, $resourceId);
+
+        for ($i = 1; $i < $currentLevel; $i++)
+        {
+            $qb->addSelect('r' . ($i+1) . '.id r' . ($i+1) . '_id');
+            $qb->leftJoin('r' . $i . '.parent', 'r' . ($i+1));
+        }
+
+        $query = $qb->getQuery();
+        $result = $query->getArrayResult();
+
+//        var_dump($qb->getDQL());
+//        var_dump($qb->getQuery()->getSQL());
+//        \Doctrine\Common\Util\Debug::dump($result, 50);
+//        exit;
+
+        return $result[0];
     }
 
     protected function _extractRolesPermissionsAndResources($acl, $roles)
@@ -181,19 +283,12 @@ class AccessControlService extends AbstractService
             foreach ($role->getPermissions() as $permission)
             {
                 $resource = $permission->getResource();
-                if (!$acl->has($resource))
+                if (null === $resource)
                 {
-                    $acl->add($resource);
-
-                    // FIXME разобраться с вложенными ресурсами
-//                $parentResource = null;
-//                if (null !== $resource->getParent())
-//                {
-//                    $parentResource = (string)$resource->getParent()->getId();
-//                    $acl->add($parentResource);
-//                }
-//                $acl->add((string)$resource->getId(), $parentResource);
+                    // Resource must have.
+                    continue;
                 }
+                $this->_addResource($acl, $resource);
 
                 // TODO asserting by owner
                 if (\Core\Model\Domain\Permission::ALLOW === $permission->getType())
@@ -205,6 +300,19 @@ class AccessControlService extends AbstractService
                     $acl->deny($role->getRoleId(), $resource, $permission->getName());
                 }
             }
+        }
+    }
+
+    protected function _addResource($acl, $resource)
+    {
+        if (!$acl->has($resource))
+        {
+            $parentResource = $resource->getParent();
+            if (null !== $parentResource)
+            {
+                $this->_addResource($acl, $parentResource);
+            }
+            $acl->add($resource, $parentResource);
         }
     }
 

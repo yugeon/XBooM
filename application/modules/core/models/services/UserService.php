@@ -56,7 +56,7 @@ class UserService extends AbstractService
      */
     public function getUsersList()
     {
-        return $this->_em->createQuery('SELECT u FROM Core\\Model\\Domain\\User u')
+        return $this->_em->createQuery('SELECT u FROM ' . $this->getModelFullName() . ' u')
                 ->getResult();
     }
 
@@ -68,7 +68,7 @@ class UserService extends AbstractService
      */
     public function getUserById($userId)
     {
-        return $this->_em->find('Core\\Model\\Domain\\User', (int) $userId);
+        return $this->_em->find($this->getModelFullName(), (int) $userId);
     }
 
     /**

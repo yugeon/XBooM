@@ -21,31 +21,51 @@
  */
 
 /**
- * Test case for UserValidator
+ * Description of AbstractRoleTest
  *
  * @author yugeon
  */
-namespace test\Core\Model\Domain\Validator;
-use Core\Model\Domain\Validator\UserValidator;
+namespace test\Core\Model\Domain;
 
-class UserValidatorTest extends \PHPUnit_Framework_TestCase
+use \Core\Model\Domain\AbstractRole,
+    \Mockery as m;
+
+class Subject extends AbstractRole
 {
-    /**
-     *
-     * @var UserValidator
-     */
+
+    public function  getRoleId()
+    {
+        return;
+    }
+}
+
+class AbstractRoleTest extends \PHPUnit_Framework_TestCase
+{
+
     protected $object;
 
     public function setUp()
     {
-        parent::setUp();
-        $this->object = new UserValidator();
+        $this->object = new Subject;
     }
 
-    public function testInit()
+    public function tearDown()
     {
-        $this->assertArrayHasKey('name', $this->object->getPropertiesForValidation());
-        $this->assertArrayHasKey('email', $this->object->getPropertiesForValidation());
-        $this->assertArrayHasKey('password', $this->object->getPropertiesForValidation());
+        parent::tearDown();
+        m::close();
     }
+
+    public function testAssingToPermissions()
+    {
+        $permission1 = m::mock('Permission');
+        $permission2 = m::mock('Permission');
+        $permission3 = m::mock('Permission');
+
+        $this->object->assignToPermission($permission1);
+        $this->object->assignToPermission($permission2);
+        $this->object->assignToPermission($permission3);
+
+        $this->assertEquals( 3, count($this->object->getPermissions()) );
+    }
+
 }

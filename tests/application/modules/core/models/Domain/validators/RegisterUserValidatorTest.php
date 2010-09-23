@@ -44,7 +44,7 @@ class RegisterUserValidatorTest extends PHPUnit_Framework_TestCase
     public function testInit()
     {
         $this->assertArrayHasKey('name', $this->object->getPropertiesForValidation());
-        $this->assertArrayHasKey('login', $this->object->getPropertiesForValidation());
+        $this->assertArrayHasKey('email', $this->object->getPropertiesForValidation());
         $this->assertArrayHasKey('password', $this->object->getPropertiesForValidation());
     }
 }

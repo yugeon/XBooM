@@ -20,49 +20,66 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
+/**
+ * Description of Group
+ *
+ * @author yugeon
+ */
 namespace Core\Model\Domain;
 use \Xboom\Model\Domain\AbstractObject,
     \Doctrine\Common\Collections\ArrayCollection;
+
 /**
  * @Entity
- * @Table(name="users")
+ * @Table(name="groups")
  */
-class User extends AbstractObject implements \Zend_Acl_Role_Interface, \Zend_Acl_Resource_Interface
+class Group extends AbstractObject implements \Zend_Acl_Role_Interface
 {
-
     /**
      * @Id @Column(type="integer")
      * @GeneratedValue(strategy="AUTO")
      */
     protected $id;
 
-    /** @Column(type="string", unique=true, length=50) */
+    /**
+     * Name of group
+     *
+     * @var string
+     * @Column(type="string", unique=true, length=100)
+     */
     protected $name;
 
-    /** @Column(type="string", unique=true, length=255) */
-    protected $email;
-
-    /** @Column(type="string", length=48) */
-    protected $password;
-
     /**
+     * Description of this group.
      *
-     * @ManyToOne(targetEntity="Group")
-     * @var Group
+     * @Column(type="string", nullable=true, length=255)
+     * @var string
      */
-    protected $group = null;
+    protected $description;
 
     /**
-     * Related resource.
+     * All roles, assigned to this group.
      *
-     * @OneToOne(targetEntity="Resource", cascade={"persist", "remove"})
-     * @var Resourse
+     * @ManyToMany(targetEntity="Role")
+     * @var ArrayCollection of Role
      */
-    protected $resource = null;
+    protected $roles = null;
+
 
     /**
-     * Retrieve a list of all roles as array.
-     * Check that would "null" missed the list, because is a reserved value
+     * Default constructor.
+     * If $data exist, then assign to properties by key.
+     *
+     * @param array $data
+     */
+    public function __construct(array $data = null)
+    {
+        $this->roles = new ArrayCollection();
+        parent::__construct($data);
+    }
+
+    /**
+     * Returns an array of string identifiers of roles.
      *
      * @return array
      */
@@ -76,47 +93,23 @@ class User extends AbstractObject implements \Zend_Acl_Role_Interface, \Zend_Acl
         return null;
     }
 
-    /**
-     *
-     * @return array of Role objects
-     */
     public function getAllRoles()
     {
-        $roles = array();
-        if (null !== $this->getGroup())
-        {
-            $roles = $this->getGroup()->getRoleId();
-        }
-
-        return $roles;
+        return $this->getRoles()->toArray();
     }
 
-    /**
-     * Returns the string identifier of the Resource
-     *
-     * @return string
-     */
-    public function  getResourceId()
+    public function assignToRole($role)
     {
-        if (null !== $this->getResource())
+        if (!\is_object($role))
         {
-            return $this->_getObjectName() . '-' . $this->resource->getId();
+            throw new \InvalidArgumentException('Param must be a Role object');
         }
 
-        throw new \Xboom\Model\Exception('Resource don\'t assign');
-    }
-
-    /**
-     *
-     * @param Resource $resource
-     */
-    public function setResource($resource)
-    {
-        if (! ($resource instanceof Resource))
+        if (!$this->roles->contains($role))
         {
-            throw new \InvalidArgumentException('Resource must be a object');
+            $this->roles[] = $role;
         }
 
-        $this->resource = $resource;
+        return $this;
     }
 }

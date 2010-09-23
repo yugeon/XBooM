@@ -49,7 +49,7 @@ class UniqueFieldTest extends \PHPUnit_Framework_TestCase
 
         $em = m::mock('\\Doctrine\\ORM\\EntityManager');
 
-        $this->query = m::mock('\\Doctrine\\ORM\\Query');
+        $this->query = m::mock('Query');
 
         $queryBuilder = m::mock('\\Doctrine\\ORM\\QueryBuilder');
         $queryBuilder->shouldReceive('select')->andReturn($queryBuilder);

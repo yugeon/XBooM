@@ -37,8 +37,8 @@ class RegisterUserForm extends \Zend_Form
             'label' => 'Username'
         ));
 
-        $this->addElement('text', 'login', array(
-            'label' => 'Login'
+        $this->addElement('text', 'email', array(
+            'label' => 'Email address'
         ));
 
         $this->addElement('password', 'password', array(

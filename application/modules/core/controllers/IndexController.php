@@ -19,16 +19,33 @@
  * @copyright  Copyright (c) 2010 yugeon <yugeon.ru@gmail.com>
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
+use \Core\Model\Domain\User,
+    \Core\Model\Domain\Group,
+    \Core\Model\Domain\Resource,
+    \Core\Model\Domain\Permission;
 
 class Core_IndexController extends Zend_Controller_Action
 {
+    /**
+     *
+     * @var Doctrine\ORM\EntityManager
+     */
+    protected  $em;
 
     public function init()
     {
+        $sc = $this->getInvokeArg('bootstrap')->getContainer();
+        $this->em = $sc->getService('doctrine.orm.entitymanager');
     }
 
     public function indexAction()
     {
+        $aclService = new \Core\Model\Service\AccessControlService($this->em);
+        $user = $this->em->find('\\Core\\Model\\Domain\\User', 1);
+        $acl = $aclService->getAcl($user);
+        //\Doctrine\Common\Util\Debug::dump($acl, 8);
+        $result = $acl->isAllowed($user, 'Concrete Resource', 'edit');
+        var_dump($result);
     }
 }
 

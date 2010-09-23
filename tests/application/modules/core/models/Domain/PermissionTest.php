@@ -21,31 +21,38 @@
  */
 
 /**
- * Test case for UserValidator
+ * Test case for Permission
  *
  * @author yugeon
  */
-namespace test\Core\Model\Domain\Validator;
-use Core\Model\Domain\Validator\UserValidator;
+namespace test\Core\Model\Domain;
+use \Core\Model\Domain\Permission,
+    \Mockery as m;
 
-class UserValidatorTest extends \PHPUnit_Framework_TestCase
+class PermissionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     *
-     * @var UserValidator
-     */
     protected $object;
 
     public function setUp()
     {
         parent::setUp();
-        $this->object = new UserValidator();
+        $this->object = new Permission;
     }
 
-    public function testInit()
+    public function tearDown()
     {
-        $this->assertArrayHasKey('name', $this->object->getPropertiesForValidation());
-        $this->assertArrayHasKey('email', $this->object->getPropertiesForValidation());
-        $this->assertArrayHasKey('password', $this->object->getPropertiesForValidation());
+        parent::tearDown();
+        m::close();
+    }
+
+    public function testCanCreatePermission()
+    {
+        $this->assertNotNull($this->object);
+    }
+
+    public function testIsOwnerRestriction()
+    {
+        $this->object->setIsOwnerRestriction(true);
+        $this->assertTrue($this->object->isOwnerRestriction());
     }
 }

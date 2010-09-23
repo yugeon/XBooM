@@ -42,20 +42,17 @@ class UserValidator extends AbstractValidator
                       ->addFilter(new \Zend_Filter_StringTrim());
         $this->addPropertyValidator('name', $nameValidator);
 
-        // login
-        $loginValidator = new BaseValidator();
-        $loginValidator->addValidator(new \Zend_Validate_StringLength(
-                              array('min' => 4, 'max' => 32)))
-                       ->addValidator(new \Zend_Validate_Alnum())
+        // email
+        $emailValidator = new BaseValidator();
+        $emailValidator->addValidator(new \Zend_Validate_EmailAddress())
                        ->addValidator(new UniqueField(
                               array(
                                'em' => $this->getEntityManager(),
                                'entity' => $this->getEntityClass(),
-                               'field' => 'login')
+                               'field' => 'email')
                        ))
-                       ->addFilter(new \Zend_Filter_StringTrim())
-                       ->addFilter(new \Zend_Filter_StringToLower('UTF-8'));
-        $this->addPropertyValidator('login', $loginValidator);
+                       ->addFilter(new \Zend_Filter_StringTrim());
+        $this->addPropertyValidator('email', $emailValidator);
 
         // password
         $passwordValidator = new BaseValidator();

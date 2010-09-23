@@ -21,31 +21,35 @@
  */
 
 /**
- * Test case for UserValidator
+ * Test case for IsOwnerAssertion
  *
  * @author yugeon
  */
-namespace test\Core\Model\Domain\Validator;
-use Core\Model\Domain\Validator\UserValidator;
 
-class UserValidatorTest extends \PHPUnit_Framework_TestCase
+namespace test\Xboom\Acl\Assert;
+
+use \Xboom\Acl\Assert\IsOwnerAssertion,
+    \Mockery as m;
+
+class IsOwnerAssertionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     *
-     * @var UserValidator
-     */
+
     protected $object;
 
     public function setUp()
     {
-        parent::setUp();
-        $this->object = new UserValidator();
+        $this->object = new IsOwnerAssertion;
     }
 
-    public function testInit()
+    public function tearDown()
     {
-        $this->assertArrayHasKey('name', $this->object->getPropertiesForValidation());
-        $this->assertArrayHasKey('email', $this->object->getPropertiesForValidation());
-        $this->assertArrayHasKey('password', $this->object->getPropertiesForValidation());
+        parent::tearDown();
+        m::close();
     }
+
+    public function testCanCreateAssertion()
+    {
+        $this->assertNotNull($this->object);
+    }
+
 }

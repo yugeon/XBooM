@@ -21,22 +21,24 @@
  */
 
 /**
- * Test case for Permission
+ * Test case for IsOwnerAssertion
  *
  * @author yugeon
  */
-namespace test\Core\Model\Domain;
-use \Core\Model\Domain\Permission,
+
+namespace test\Xboom\Acl\Assert;
+
+use \Xboom\Acl\Assert\IsOwnerAssertion,
     \Mockery as m;
 
-class PermissionTest extends \PHPUnit_Framework_TestCase
+class IsOwnerAssertionTest extends \PHPUnit_Framework_TestCase
 {
+
     protected $object;
 
     public function setUp()
     {
-        parent::setUp();
-        $this->object = new Permission;
+        $this->object = new IsOwnerAssertion;
     }
 
     public function tearDown()
@@ -45,14 +47,9 @@ class PermissionTest extends \PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function testCanCreatePermission()
+    public function testCanCreateAssertion()
     {
         $this->assertNotNull($this->object);
     }
 
-    public function testIsOwnerRestriction()
-    {
-        $this->object->setIsOwnerRestriction(true);
-        $this->assertTrue($this->object->isOwnerRestriction());
-    }
 }

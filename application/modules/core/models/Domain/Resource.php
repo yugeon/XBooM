@@ -26,7 +26,8 @@
  * @author yugeon
  */
 namespace Core\Model\Domain;
-use \Xboom\Model\Domain\AbstractObject;
+use \Xboom\Model\Domain\AbstractObject,
+    \Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @Entity
@@ -51,13 +52,6 @@ class Resource extends AbstractObject implements \Zend_Acl_Resource_Interface
     protected $name;
 
     /**
-     *
-     * @Column(type="boolean")
-     * @var boolean
-     */
-    //protected $isSection =  false;
-
-    /**
      * Current nesting level.
      * Needed to quickly build a list of the resource hierarchy.
      *
@@ -72,6 +66,32 @@ class Resource extends AbstractObject implements \Zend_Acl_Resource_Interface
      * @var Resource
      */
     protected $parent;
+
+    /**
+     * Resource owner.
+     *
+     * @ManyToOne(targetEntity="User")
+     * @var User
+     */
+    protected $owner = null;
+
+    /**
+     * @OneToMany(targetEntity="Permission", mappedBy="resource")
+     * @var Permission
+     */
+    protected $permissions = null;
+
+    /**
+     * Default constructor.
+     * If $data exist, then assign to properties by key.
+     * 
+     * @param array $data 
+     */
+    public function __construct(array $data = null)
+    {
+        $this->permissions = new ArrayCollection();
+        parent::__construct($data);
+    }
 
     public function  getResourceId()
     {

@@ -98,4 +98,11 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $this->object->getAllParents());
     }
+
+    public function testGetSetOwner()
+    {
+        $owner = m::mock('User');
+        $this->object->setOwner($owner);
+        $this->assertEquals($owner, $this->object->getOwner());
+    }
 }

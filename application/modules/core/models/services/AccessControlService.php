@@ -24,36 +24,63 @@
  * Description of AccessControlService
  *
  * @author yugeon
+ * @todo refactoring
  */
 
 namespace Core\Model\Service;
 
 use \Xboom\Model\Service\AbstractService,
- \Core\Model\Domain\Acl;
+ \Xboom\Acl\Acl;
 
-class AccessControlService extends AbstractService
+class AccessControlService //extends AbstractService
 {
 
+    protected $_em;
     protected $_acl = array();
+    protected $_assertions = array();
 
     public function __construct($em)
     {
         $this->_em = $em;
     }
 
+    public function getAssertion($assertionName)
+    {
+        if (!isset($this->_assertions[$assertionName]))
+        {
+            $assertionClass = "Xboom\\Acl\\Assert\\Is{$assertionName}Assertion";
+            $assertionObject = new $assertionClass;
+            $this->setAssertion($assertionName, $assertionObject);
+        }
+
+        return $this->_assertions[$assertionName];
+    }
+
+    public function setAssertion($assertionName, $assertion)
+    {
+        if (!($assertion instanceof \Zend_Acl_Assert_Interface))
+        {
+            throw new \InvalidArgumentException(
+                    'Assertion must be implement of Zend_Acl_Assert_Interface');
+        }
+
+        $this->_assertions[$assertionName] = $assertion;
+        return $this;
+    }
+
     /**
      * Get a unique key for user and resource.
      * 
-     * @param User|int|string $user 
+     * @param User|int|string $user
      * @param Resource|int|string $resource
      * @param Permission|int|string $permission
      * @return string
      */
     public function getAclId($user = null, $resource = null, $permission = null)
     {
-        $user = (null === $user)? 'full' : $user;
-        $resource = (null === $resource)? 'full' : $resource;
-        $permission = (null === $permission)? 'full' : $permission;
+        $user = (null === $user) ? 'full' : $user;
+        $resource = (null === $resource) ? 'full' : $resource;
+        $permission = (null === $permission) ? 'full' : $permission;
 
         $aclId = $user;
         if (\is_object($user))
@@ -134,81 +161,112 @@ class AccessControlService extends AbstractService
     {
         $acl = new Acl();
 
-        if (\is_string($user) && $user === 'guest')
-        {
-            return $this->_getGuestAcl($acl);
-        }
-
-        $userClass = '\\Core\\Model\\Domain\\User';
+        $resourceClass = '\\Core\\Model\\Domain\\Resource';
 
         /* @var $qb \Doctrine\ORM\QueryBuilder */
         $qb = $this->_em->createQueryBuilder();
-        $qb->select(array('u', 'g', 'r', 'p', 'res'))
-                ->from($userClass, 'u')
-                ->leftJoin('u.group', 'g')
-                ->leftJoin('g.roles', 'r')
-                ->leftJoin('r.permissions', 'p')
-                ->leftJoin('p.resource', 'res');
+
+//        // Resources, permissions, roles
+//        $dql = 'SELECT res, p, r, res_own'
+//                . ' FROM \Core\Model\Domain\Resource res'
+//                . ' LEFT JOIN res.owner res_own'
+//                . ' LEFT JOIN res.permissions p'
+//                . ' LEFT JOIN p.roles r'
+//                . '   WITH r.id IN'
+//                . '     (SELECT ur.id FROM \Core\Model\Domain\User u'
+//                . '      JOIN u.group g JOIN g.roles ur WHERE u.id = 1)'
+//                . " WHERE res.id IN (1,2,3,4)"
+//        ;
+//        // ROLES
+//        $dql = 'SELECT r.id'
+//                . ' FROM \Core\Model\Domain\User u'
+//                . ' JOIN u.group g'
+//                . ' JOIN g.roles r'
+//                . " WHERE u.id = 1";
+//                ;
+//        $query = $this->_em->createQuery($dql);
+//        $resources = $query->getResult();
+//        var_dump($dql);
+//        var_dump($query->getSQL());
+//        \Doctrine\Common\Util\Debug::dump($resources, 6);
+//        exit;
+        $qb->select(array('res', 'p', 'r', 'res_own'))
+                ->from($resourceClass, 'res')
+                ->leftJoin('res.owner', 'res_own');
+
+        // constraint by permission
+        $permissionId = $permission;
+        if (\is_object($permission))
+        {
+            $permissionId = $permission->getId();
+        }
+
+        if (\is_int($permissionId))
+        {
+            $qb->leftJoin('res.permissions', 'p', 'WITH', 'p.id = ?1')
+                    ->setParameter(1, $permissionId);
+        }
+        elseif (\is_string($permissionId))
+        {
+            $qb->leftJoin('res.permissions', 'p', 'WITH', 'p.name = ?1')
+                    ->setParameter(1, $permissionId);
+        }
+        else
+        {
+            $qb->leftJoin('res.permissions', 'p');
+        }
 
         // constraint by user
-        if (null !== $user)
+        $userId = $user;
+        if (\is_object($user))
         {
-            $userId = $user;
-            if (\is_object($user))
+            $userId = $user->getId();
+        }
+
+        if (\is_int($userId))
+        {
+            $qb->leftJoin('p.roles', 'r', 'WITH',
+                            'r.id IN (SELECT ur.id FROM \Core\Model\Domain\User u'
+                            . ' JOIN u.group g JOIN g.roles ur WHERE u.id = :id)')
+                    ->setParameter('id', $userId);
+        }
+        elseif (\is_string($userId))
+        {
+            if ('guest' === $userId)
             {
-                $userId = $user->getId();
+                $userId = 'guest@guest';
             }
 
-            if (\is_int($userId))
-            {
-                $qb->where($qb->expr()->eq('u.id', '?1'))
-                        ->setParameter(1, $userId);
-            }
+            $qb->leftJoin('p.roles', 'r', 'WITH',
+                            'r.id IN (SELECT ur.id FROM \Core\Model\Domain\User u'
+                            . ' JOIN u.group g JOIN g.roles ur WHERE u.email = :email)')
+                    ->setParameter('email', $userId);
+        }
+        else
+        {
+            $qb->leftJoin('p.roles', 'r');
         }
 
         // constraint by resource
         if (null !== $resource)
         {
-            // Когда запрос по конкретному ресурсу, то необходимо так же
-            // подгружать все роли и привилегии для родительских ресурсов
-            // Для этого надо знать все id родительских ресурсов.
-
             $resIds = $this->_getResourceParentsId($resource);
             if (empty($resIds))
             {
+                // non-existent resource
                 return $acl;
             }
             $qb->andWhere($qb->expr()->in('res.id', $resIds));
-
-        }
-
-        // constraint by permission
-        if (null !== $permission)
-        {
-            $permissionId = $permission;
-            if (\is_object($permission))
-            {
-                $permissionId = $permission->getId();
-            }
-
-            if (\is_int($permissionId))
-            {
-                $qb->andWhere($qb->expr()->eq('p.id', '?3'))
-                        ->setParameter(3, $permissionId);
-            }
         }
 
         $query = $qb->getQuery();
-        $users = $query->getResult();
-        // var_dump($qb->getQuery()->getSQL());
-        //\Doctrine\Common\Util\Debug::dump($users, 50);
-        //exit;
+        $resources = $query->getResult();
+//        var_dump($qb->getDQL());
+//        var_dump($query->getSQL());
+//        \Doctrine\Common\Util\Debug::dump($resources, 6);
+//        exit;
 
-        foreach ($users as $user)
-        {
-            $roles = $user->getAllRoles();
-            $this->_extractRolesPermissionsAndResources($acl, $roles);
-        }
+        $this->_extractResourcesRolesAndPermissions($acl, $resources);
 
         return $acl;
     }
@@ -230,7 +288,7 @@ class AccessControlService extends AbstractService
         }
         elseif (\is_string($resource))
         {
-            $resource = $this->_em->getRepository($resourceClass)->findOneByName( $resource);
+            $resource = $this->_em->getRepository($resourceClass)->findOneByName($resource);
         }
 
         if (!\is_object($resource))
@@ -249,15 +307,15 @@ class AccessControlService extends AbstractService
         /* @var $qb \Doctrine\ORM\QueryBuilder */
         $qb = $this->_em->createQueryBuilder();
         $qb->select(array('r0.id r0_id', 'r1.id r1_id'))
-           ->from($resourceClass, 'r0')
-           ->leftJoin('r0.parent', 'r1')
-           ->where($qb->expr()->eq('r0.id', '?1'))
-           ->setParameter(1, $resourceId);
+                ->from($resourceClass, 'r0')
+                ->leftJoin('r0.parent', 'r1')
+                ->where($qb->expr()->eq('r0.id', '?1'))
+                ->setParameter(1, $resourceId);
 
         for ($i = 1; $i < $currentLevel; $i++)
         {
-            $qb->addSelect('r' . ($i+1) . '.id r' . ($i+1) . '_id');
-            $qb->leftJoin('r' . $i . '.parent', 'r' . ($i+1));
+            $qb->addSelect('r' . ($i + 1) . '.id r' . ($i + 1) . '_id');
+            $qb->leftJoin('r' . $i . '.parent', 'r' . ($i + 1));
         }
 
         $query = $qb->getQuery();
@@ -265,39 +323,46 @@ class AccessControlService extends AbstractService
 
 //        var_dump($qb->getDQL());
 //        var_dump($qb->getQuery()->getSQL());
-//        \Doctrine\Common\Util\Debug::dump($result, 50);
+//        \Doctrine\Common\Util\Debug::dump($result, 5);
 //        exit;
 
         return $result[0];
     }
 
-    protected function _extractRolesPermissionsAndResources($acl, $roles)
+    protected function _extractResourcesRolesAndPermissions($acl, $resources)
     {
-        foreach ($roles as $role)
+        foreach ($resources as $resource)
         {
-            if (!$acl->hasRole($role->getRoleId()))
+            if (null === $resource)
             {
-                $acl->addRole($role->getRoleId());
+                // Resource required.
+                continue;
             }
+            $this->_addResource($acl, $resource);
 
-            foreach ($role->getPermissions() as $permission)
+            foreach ($resource->getPermissions() as $permission)
             {
-                $resource = $permission->getResource();
-                if (null === $resource)
+                $assertion = null;
+                if ($permission->isOwnerRestriction())
                 {
-                    // Resource must have.
-                    continue;
+                    $assertion = $this->getAssertion('Owner');
                 }
-                $this->_addResource($acl, $resource);
 
-                // TODO asserting by owner
-                if (\Core\Model\Domain\Permission::ALLOW === $permission->getType())
+                foreach ($permission->getRoles() as $role)
                 {
-                    $acl->allow($role->getRoleId(), $resource, $permission->getName());
-                }
-                else
-                {
-                    $acl->deny($role->getRoleId(), $resource, $permission->getName());
+                    if (!$acl->hasRole($role->getRoleId()))
+                    {
+                        $acl->addRole($role->getRoleId());
+                    }
+
+                    if (\Core\Model\Domain\Permission::ALLOW === $permission->getType())
+                    {
+                        $acl->allow($role->getRoleId(), $resource, $permission->getName(), $assertion);
+                    }
+                    else
+                    {
+                        $acl->deny($role->getRoleId(), $resource, $permission->getName());
+                    }
                 }
             }
         }
@@ -314,28 +379,6 @@ class AccessControlService extends AbstractService
             }
             $acl->add($resource, $parentResource);
         }
-    }
-
-    protected function _getGuestAcl($acl)
-    {
-        $groupClass = '\\Core\\Model\\Domain\\Group';
-        $dql = "SELECT g, r, p, res FROM {$groupClass} as g"
-                . ' LEFT JOIN g.roles as r'
-                . ' LEFT JOIN r.permissions as p'
-                . ' LEFT JOIN p.resource as res'
-                . ' WHERE g.id = :guest_group_id';
-        $query = $this->_em->createQuery($dql)
-                        // FIXME Решить как идентифицировать группу для Гостей.
-                        ->setParameter('guest_group_id', 1);
-        $group = $query->getResult();
-
-        if (!empty($group[0]))
-        {
-            $roles = $group[0]->getAllRoles();
-            $this->_extractRolesPermissionsAndResources($acl, $roles);
-        }
-
-        return $acl;
     }
 
 }

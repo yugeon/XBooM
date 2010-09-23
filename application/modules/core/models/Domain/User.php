@@ -27,7 +27,7 @@ use \Xboom\Model\Domain\AbstractObject,
  * @Entity
  * @Table(name="users")
  */
-class User extends AbstractRole implements \Zend_Acl_Resource_Interface
+class User extends AbstractObject implements \Zend_Acl_Role_Interface, \Zend_Acl_Resource_Interface
 {
 
     /**
@@ -51,14 +51,6 @@ class User extends AbstractRole implements \Zend_Acl_Resource_Interface
      * @var Group
      */
     protected $group = null;
-
-    /**
-     * Personal role, assigned to this user.
-     *
-     * @ManyToOne(targetEntity="Role")
-     * @var Role
-     */
-    //protected $role = null;
 
     /**
      * Related resource.
@@ -96,25 +88,8 @@ class User extends AbstractRole implements \Zend_Acl_Resource_Interface
             $roles = $this->getGroup()->getRoleId();
         }
 
-//        // last element has a higher priority
-//        if (null !== $this->getRole())
-//        {
-//            $roles[] = $this->getRole();
-//        }
-
         return $roles;
     }
-
-//    public function setRole($role)
-//    {
-//        if (null !== $role)
-//        {
-//            $role->markPersonal(true);
-//            $this->role = $role;
-//        }
-//
-//        return $this;
-//    }
 
     /**
      * Returns the string identifier of the Resource

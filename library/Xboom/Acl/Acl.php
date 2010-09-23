@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  CMF for web applications based on Zend Framework 1 and Doctrine 2
  *  Copyright (C) 2010  Eugene Gruzdev aka yugeon
@@ -19,18 +20,19 @@
  * @copyright  Copyright (c) 2010 yugeon <yugeon.ru@gmail.com>
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
-
 /**
  * Access Control List
  *
  * @author yugeon
  */
-namespace Core\Model\Domain;
-use Xboom\Model\Domain\AbstractObject;
+
+namespace Xboom\Acl;
 
 class Acl extends \Zend_Acl
 {
 
+    protected $_user;
+    
     /**
      * {@inheritdoc}
      * 
@@ -40,7 +42,7 @@ class Acl extends \Zend_Acl
      * @param string $parents
      * @return Acl
      */
-    public function  addRole($roles, $parents = null)
+    public function addRole($roles, $parents = null)
     {
         if (null !== $parents)
         {
@@ -76,18 +78,25 @@ class Acl extends \Zend_Acl
      * @param string $privilege
      * @return boolean
      */
-    public function  isAllowed($roles = null, $resource = null, $privilege = null)
+    public function isAllowed($roles = null, $resource = null, $privilege = null)
     {
         $isAllow = false;
+        
+        // Clear verifiable user.
+        $this->_user = null;
+
+        if ($roles instanceof \Zend_Acl_Role_Interface)
+        {
+            // remember verifiable user.
+            $this->_user = $roles;
+            $roles = $roles->getRoleId();
+        }
 
         if (\is_array($roles))
         {
             foreach ($roles as $role)
             {
-                if (parent::hasRole($role))
-                {
-                    $isAllow = parent::isAllowed($role, $resource, $privilege);
-                }
+                $isAllow = $this->_isAllowed($role, $resource, $privilege);
 
                 if ($isAllow)
                 {
@@ -95,11 +104,34 @@ class Acl extends \Zend_Acl
                 }
             }
         }
-        elseif (parent::hasRole($roles))
+        else
         {
-            $isAllow = parent::isAllowed($roles, $resource, $privilege);
+            $isAllow = $this->_isAllowed($roles, $resource, $privilege);
         }
 
         return $isAllow;
+    }
+
+    protected function _isAllowed($role = null, $resource = null, $privilege = null)
+    {
+        $isAllow = false;
+        if (null !== $role && !parent::hasRole($role))
+        {
+            $isAllow = false;
+        }
+        elseif (null !== $resource && !parent::has($resource))
+        {
+            $isAllow = false;
+        }
+        else
+        {
+            $isAllow = parent::isAllowed($role, $resource, $privilege);
+        }
+        return $isAllow;
+    }
+
+    public function getRememberedUser()
+    {
+        return $this->_user;
     }
 }

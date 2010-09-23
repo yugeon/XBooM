@@ -27,7 +27,8 @@
  * @author yugeon
  */
 namespace Core\Model\Domain;
-use \Xboom\Model\Domain\AbstractObject;
+use \Xboom\Model\Domain\AbstractObject,
+    \Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @Entity
@@ -63,10 +64,41 @@ class Permission extends AbstractObject
     protected $type = self::DENY;
 
     /**
+     * By owner restriction.
+     * 
+     * @Column(name="by_owner", type="boolean")
+     * @var boolean
+     */
+    protected $isOwnerRestriction = false;
+
+    /**
      * The resource. Any object or something else that could be a resource.
      *
-     * @ManyToOne(targetEntity="Resource")
+     * @ManyToOne(targetEntity="Resource", inversedBy="permissions")
      * @var Resource
      */
     protected $resource = null;
+
+    /**
+     * @ManyToMany(targetEntity="Role", mappedBy="permissions")
+     * @var Role
+     */
+    protected $roles = null;
+
+    /**
+     * Default constructor.
+     * If $data exist, then assign to properties by key.
+     *
+     * @param array $data
+     */
+    public function __construct(array $data = null)
+    {
+        $this->roles = new ArrayCollection();
+        parent::__construct($data);
+    }
+
+    public function isOwnerRestriction()
+    {
+        return $this->isOwnerRestriction;
+    }
 }

@@ -72,7 +72,7 @@ class Role extends AbstractObject implements \Zend_Acl_Role_Interface
     /**
      * Permissions assigned to this role. Unidirectional.
      *
-     * @ManyToMany(targetEntity="Permission")
+     * @ManyToMany(targetEntity="Permission", inversedBy="roles")
      * @var ArrayCollection of Permission
      */
     protected $permissions;

@@ -25,8 +25,9 @@
  *
  * @author yugeon
  */
-namespace test\Core\Model\Domain;
-use \Core\Model\Domain\Acl;
+namespace test\Xboom\Acl;
+use \Xboom\Acl\Acl,
+    \Mockery as m;
 
 class AclTest extends \PHPUnit_Framework_TestCase
 {
@@ -42,6 +43,12 @@ class AclTest extends \PHPUnit_Framework_TestCase
         $this->object = new Acl;
     }
 
+    public function tearDown()
+    {
+        parent::tearDown();
+        m::close();
+    }
+    
     public function testCanAddRole()
     {
         $this->assertEquals($this->object, $this->object->addRole('TestRole'));
@@ -87,22 +94,47 @@ class AclTest extends \PHPUnit_Framework_TestCase
     public function testCanCheckRole()
     {
         $role = 'User-232';
+        $resource = new \Zend_Acl_Resource('resource');
         $this->object->addRole($role);
+        //$this->object->add($resource);
         $this->object->allow($role);
         $this->assertTrue($this->object->isAllowed($role));
+    }
+
+    public function testCheckRoleAndResource()
+    {
+        $role = 'User-232';
+        $resource = new \Zend_Acl_Resource('resource');
+        $this->object->addRole($role);
+        $this->object->add($resource);
+        $this->object->allow($role);
+        $this->assertTrue($this->object->isAllowed($role, $resource));
+    }
+
+    public function testShouldReturnFalseIfRoleDosnotExists()
+    {
+        $role = 'User-232';
+        $this->assertFalse($this->object->isAllowed($role));
+    }
+
+    public function testShouldReturnFalseIfResourceDosnotExists()
+    {
+        $this->object->addRole('role-232');
+        $resource = new \Zend_Acl_Resource('non-exists-resource-id');
+        $this->assertFalse($this->object->isAllowed('role-232', $resource));
     }
 
     public function testCanCheckArrayRoles()
     {
         $roles = array(
-            'Group-1',
-            'Group-3',
-            'User-2'
+            'Role-1',
+            'Role-2',
+            'Role-3'
         );
         $this->object->addRole($roles);
         $this->object->allow($roles[2]);
 
-        $this->assertTrue($this->object->isAllowed($roles, null, null));
+        $this->assertTrue($this->object->isAllowed($roles));
     }
 
     public function testCheckNestedResources()
@@ -117,5 +149,14 @@ class AclTest extends \PHPUnit_Framework_TestCase
          $this->object->allow($role, $parentResource);
 
          $this->assertTrue($this->object->isAllowed($role, $childResource));
+    }
+
+    public function testRememberVerifiableUser()
+    {
+        $user = m::mock('Zend_Acl_Role_Interface');
+        $roleId = 'test-role-id';
+        $user->shouldReceive('getRoleId')->andReturn($roleId);
+        $this->object->isAllowed($user, null, null);
+        $this->assertEquals($user, $this->object->getRememberedUser());
     }
 }

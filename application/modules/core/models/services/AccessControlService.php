@@ -48,7 +48,7 @@ class AccessControlService //extends AbstractService
     {
         if (!isset($this->_assertions[$assertionName]))
         {
-            $assertionClass = "Xboom\\Acl\\Assert\\Is{$assertionName}Assertion";
+            $assertionClass = "\\Xboom\\Acl\\Assert\\Is{$assertionName}Assertion";
             $assertionObject = new $assertionClass;
             $this->setAssertion($assertionName, $assertionObject);
         }
@@ -78,9 +78,9 @@ class AccessControlService //extends AbstractService
      */
     public function getAclId($user = null, $resource = null, $permission = null)
     {
-        $user = (null === $user) ? 'full' : $user;
-        $resource = (null === $resource) ? 'full' : $resource;
-        $permission = (null === $permission) ? 'full' : $permission;
+        $user = (null === $user) ? 'all' : $user;
+        $resource = (null === $resource) ? 'all' : $resource;
+        $permission = (null === $permission) ? 'all' : $permission;
 
         $aclId = $user;
         if (\is_object($user))
@@ -368,6 +368,12 @@ class AccessControlService //extends AbstractService
         }
     }
 
+    /**
+     * Recursively adds resources and their parents
+     *
+     * @param Zend_Acl $acl
+     * @param Resource $resource
+     */
     protected function _addResource($acl, $resource)
     {
         if (!$acl->has($resource))

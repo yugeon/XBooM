@@ -84,6 +84,7 @@ class UserService extends AbstractService
         // TODO: ACL !!!
 
         $formToModelMediator = $this->getFormToModelMediator('RegisterUser');
+        $formToModelMediator->setDomainValidator($this->getValidator('UserDomain'));
         $breakValidation = false;
         if ($formToModelMediator->isValid($data, $breakValidation))
         {

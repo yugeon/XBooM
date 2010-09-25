@@ -225,4 +225,51 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     {
         $this->assertNotNull($this->object->getModel());
     }
+
+    public function testGetSetDomainValidator()
+    {
+        $testDomainValidator = m::mock('\\Xboom\\Model\\Validate\ValidatorInterface');
+        $this->assertEquals($this->object, $this->object->setDomainValidator($testDomainValidator));
+        $this->assertEquals($testDomainValidator, $this->object->getDomainValidator());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testShouldRaiseExceptionIfValidatorIncorrectObject()
+    {
+        $incorrectValidator = new stdClass();
+        $this->object->setDomainValidator($incorrectValidator);
+    }
+
+    public function testValidateWhenDomainValidatorExistsAndDataIsValid()
+    {
+        $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
+        $this->userValidator->shouldReceive('isValid')->andReturn(true);
+        $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
+
+        $domainValidator = m::mock('\\Xboom\\Model\\Validate\\ValidatorInterface');
+        $domainValidator->shouldReceive('isValid')->andReturn(true);
+
+        $this->object->setDomainValidator($domainValidator);
+
+        $this->assertTrue($this->object->isValid($this->userData, false));
+    }
+
+    public function testValidateWhenDomainValidatorExistsAndDataIsNotValid()
+    {
+        $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
+        $this->userForm->shouldReceive('getElements')->andReturn(array());
+        $this->userValidator->shouldReceive('isValid')->andReturn(true);
+        $this->userValidator->shouldReceive('getMessages')->andReturn(array());
+        $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
+
+        $domainValidator = m::mock('\\Xboom\\Model\\Validate\\ValidatorInterface');
+        $domainValidator->shouldReceive('isValid')->andReturn(false);
+        $domainValidator->shouldReceive('getMessages')->andReturn(array());
+
+        $this->object->setDomainValidator($domainValidator);
+
+        $this->assertFalse($this->object->isValid($this->userData, false));
+    }
 }

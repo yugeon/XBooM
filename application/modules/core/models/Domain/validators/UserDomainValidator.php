@@ -21,7 +21,7 @@
  */
 
 /**
- * Default validator for User Domain Object
+ * Domain validator for User Domain Object
  *
  * @author yugeon
  */
@@ -31,33 +31,28 @@ use \Xboom\Model\Validate\AbstractValidator,
     \Xboom\Model\Validate\Element\BaseValidator,
     \Xboom\Validate\UniqueField;
 
-class UserValidator extends AbstractValidator
+class UserDomainValidator extends AbstractValidator
 {
     public function init()
     {
         // name
         $nameValidator = new BaseValidator();
-        $nameValidator->addValidator(new \Zend_Validate_NotEmpty(), true)
-                      ->addValidator(new \Zend_Validate_StringLength(
-                              array('min' => 1, 'max' => 50)))
-                      ->addFilter(new \Zend_Filter_StringTrim());
+        $nameValidator->addValidator(new UniqueField(
+                              array(
+                               'em' => $this->getEntityManager(),
+                               'entity' => $this->getEntityClass(),
+                               'field' => 'name')
+                         ));
         $this->addPropertyValidator('name', $nameValidator);
 
         // email
         $emailValidator = new BaseValidator();
-        $emailValidator->addValidator(new \Zend_Validate_NotEmpty(), true)
-                       ->addValidator(new \Zend_Validate_EmailAddress())
-                       ->addFilter(new \Zend_Filter_StringTrim());
+        $emailValidator->addValidator(new UniqueField(
+                              array(
+                               'em' => $this->getEntityManager(),
+                               'entity' => $this->getEntityClass(),
+                               'field' => 'email')
+                       ));
         $this->addPropertyValidator('email', $emailValidator);
-
-        // password
-        $passwordValidator = new BaseValidator();
-        $passwordValidator->addValidator(new \Zend_Validate_NotEmpty(), true)
-                          ->addValidator(new \Zend_Validate_StringLength(
-                              array('min' => 4, 'max' => 32)))
-                          ->addFilter(new \Zend_Filter_StringTrim())
-                          ->setObscureValue(true);
-        $this->addPropertyValidator('password', $passwordValidator);
-
     }
 }

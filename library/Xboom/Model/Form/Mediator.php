@@ -47,6 +47,12 @@ class Mediator implements MediatorInterface
     protected $_model = null;
 
     /**
+     *
+     * @var ValidatorInterface
+     */
+    protected $_domainValidator = null;
+
+    /**
      * Create mediator, which connect form and model validator.
      *
      * @param string $form Name for form and validator.
@@ -129,6 +135,32 @@ class Mediator implements MediatorInterface
     }
 
     /**
+     *
+     * @param ValidatorInterface $domainValidator
+     * @return Mediator
+     */
+    public function setDomainValidator($domainValidator)
+    {
+        if (! ($domainValidator instanceof ValidatorInterface))
+        {
+            throw new \InvalidArgumentException(
+                    'Domain validator must be instance of ValidatorInterface');
+        }
+
+        $this->_domainValidator = $domainValidator;
+        return $this;
+    }
+
+    /**
+     *
+     * @return ValidatorInterface
+     */
+    public function getDomainValidator()
+    {
+        return $this->_domainValidator;
+    }
+
+    /**
      * Push data to model.
      *
      */
@@ -170,6 +202,11 @@ class Mediator implements MediatorInterface
      */
     protected function _fillFormErrors($form, $validator)
     {
+        if (null === $form || null === $validator)
+        {
+            return;
+        }
+
         $messages = $validator->getMessages();
         $formElements = $form->getElements();
         foreach ($formElements as $key => $element)
@@ -189,14 +226,15 @@ class Mediator implements MediatorInterface
      * Errors push to form.
      *
      * @param array $data
-     * @param boolean $break Break validation if form is not valid.
+     * @param boolean $break1 Break validation if form is not valid.
+     * @param boolean $break2 Break validation if model is not valid.
      * @return boolean true if $data is valid
      */
-    public function isValid($data, $break = true)
+    public function isValid($data, $break1 = true, $break2 = true)
     {
         $form = $this->getForm();
         $isFormValid = $form->isValid($data);
-        if (!$isFormValid && $break)
+        if (!$isFormValid && $break1)
         {
             return false;
         }
@@ -210,6 +248,16 @@ class Mediator implements MediatorInterface
 
         $this->_fillFormValues($form, $validator);
 
+        // Do domain validation if validator is set.
+        $domainValidator = $this->getDomainValidator();
+        if (null !== $domainValidator)
+        {
+            if (!(!$isDataValid && $break2))
+            {
+                $isDataValid = $domainValidator->isValid($data) && $isDataValid;
+            }
+        }
+
         if ($isFormValid && $isDataValid)
         {
             $this->_pushDataToModel();
@@ -220,6 +268,7 @@ class Mediator implements MediatorInterface
         if (!$isDataValid)
         {
             $this->_fillFormErrors($form, $validator);
+            $this->_fillFormErrors($form, $domainValidator);
         }
 
         return false;

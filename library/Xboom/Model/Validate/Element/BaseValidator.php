@@ -30,10 +30,5 @@ namespace Xboom\Model\Validate\Element;
 
 class BaseValidator extends \Xboom\Model\Validate\Element\AbstractValidator
 {
-    public function __construct()
-    {
-        $this->addValidator(new \Zend_Validate_NotEmpty(), true);
-        return $this;
-    }
 
 }

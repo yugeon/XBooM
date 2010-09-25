@@ -76,6 +76,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->em->shouldReceive('flush');
 
         $this->userMediator = m::mock('\\Xboom\Model\\Form\\Mediator');
+        $this->userMediator->shouldReceive('setDomainValidator')->andReturn($this->userMediator);
 
         $this->userModel = m::mock('\\Xboom\\Model\\Domain\\AbstractObject');
 

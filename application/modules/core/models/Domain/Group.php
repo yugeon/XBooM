@@ -60,7 +60,7 @@ class Group extends AbstractObject implements \Zend_Acl_Role_Interface
     /**
      * All roles, assigned to this group.
      *
-     * @ManyToMany(targetEntity="Role")
+     * @ManyToMany(targetEntity="\Xboom\Model\Domain\Acl\Role")
      * @var ArrayCollection of Role
      */
     protected $roles = null;

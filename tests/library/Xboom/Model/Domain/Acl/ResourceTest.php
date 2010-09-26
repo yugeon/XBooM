@@ -25,8 +25,8 @@
  *
  * @author yugeon
  */
-namespace test\Core\Model\Domain;
-use \Core\Model\Domain\Resource,
+namespace test\Xboom\Model\Domain\Acl;
+use \Xboom\Model\Domain\Acl\Resource,
     \Mockery as m;
 
 class ResourceTest extends \PHPUnit_Framework_TestCase

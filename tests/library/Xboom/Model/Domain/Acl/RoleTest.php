@@ -21,38 +21,44 @@
  */
 
 /**
- * Description of AbstractRoleTest
+ * Description of RoleTest
  *
  * @author yugeon
  */
-namespace test\Core\Model\Domain;
-
-use \Core\Model\Domain\AbstractRole,
+namespace test\Xboom\Model\Domain\Acl;
+use \Xboom\Model\Domain\Acl\Role,
     \Mockery as m;
 
-class Subject extends AbstractRole
+class RoleTest extends \PHPUnit_Framework_TestCase
 {
-
-    public function  getRoleId()
-    {
-        return;
-    }
-}
-
-class AbstractRoleTest extends \PHPUnit_Framework_TestCase
-{
-
     protected $object;
 
     public function setUp()
     {
-        $this->object = new Subject;
+        $this->object = new Role;
     }
 
     public function tearDown()
     {
         parent::tearDown();
         m::close();
+    }
+    
+    public function testCanCreateRole()
+    {
+        $this->assertNotNull($this->object);
+    }
+
+    public function testCanMarkPersonal()
+    {
+        $this->object->markPersonal(true);
+        $this->assertTrue($this->object->isPersonal());
+    }
+
+    public function testGetRoleID()
+    {
+        $this->object->setId(323);
+        $this->assertEquals('323', $this->object->getRoleId());
     }
 
     public function testAssingToPermissions()
@@ -68,4 +74,15 @@ class AbstractRoleTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals( 3, count($this->object->getPermissions()) );
     }
 
+    public function testWithoutDoublingOfPermissions()
+    {
+        $permission1 = m::mock('Permission');
+        $permission2 = m::mock('Permission');
+
+        $this->object->assignToPermission($permission1);
+        $this->object->assignToPermission($permission2);
+        $this->object->assignToPermission($permission1);
+
+        $this->assertEquals( 2, count($this->object->getPermissions()) );
+    }
 }

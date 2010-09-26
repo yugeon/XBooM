@@ -29,28 +29,31 @@ class Core_UserController extends Zend_Controller_Action
      */
     protected  $em;
 
+    /**
+     *
+     * @var UserService
+     */
+    protected $userService;
+
     public function init()
     {
         $sc = $this->getInvokeArg('bootstrap')->getContainer();
-        $this->em = $sc->getService('doctrine.orm.entitymanager');
+        $this->userService = new Core\Model\Service\UserService($sc);
     }
 
     public function indexAction()
     {
-        $results = $this->em->createQuery('SELECT u FROM Core\\Model\\Domain\\User u')
-                            ->getResult();
-        $this->view->users = $results;
+        $this->view->users = $this->userService->getUsersList();
     }
 
     public function addAction()
     {
-        $userService = new Core\Model\Service\UserService($this->em);
-
         if ($this->getRequest()->isPost())
         {
             try
             {
-                $result = $userService->registerUser($_POST);
+                $result = $this->userService
+                        ->registerUser($this->getRequest()->getPost());
                 echo 'Register ok! Id: ' . $result->id;
             }
             catch (\Xboom\Exception $e)
@@ -60,7 +63,7 @@ class Core_UserController extends Zend_Controller_Action
             }
         }
 
-        $form = $userService->getForm('RegisterUser');
+        $form = $this->userService->getForm('RegisterUser');
         echo $form;
 
 //        return $this->_helper->getHelper('Redirector')

@@ -22,6 +22,7 @@
 
 namespace Core\Model\Domain;
 use \Xboom\Model\Domain\AbstractObject,
+    \Xboom\Model\Domain\Acl\Resource,
     \Doctrine\Common\Collections\ArrayCollection;
 /**
  * @Entity
@@ -55,7 +56,7 @@ class User extends AbstractObject implements \Zend_Acl_Role_Interface, \Zend_Acl
     /**
      * Related resource.
      *
-     * @OneToOne(targetEntity="Resource", cascade={"persist", "remove"})
+     * @OneToOne(targetEntity="\Xboom\Model\Domain\Acl\Resource")
      * @var Resourse
      */
     protected $resource = null;

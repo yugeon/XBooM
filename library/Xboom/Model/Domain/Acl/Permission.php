@@ -26,7 +26,7 @@
  * @category AccessControl
  * @author yugeon
  */
-namespace Core\Model\Domain;
+namespace Xboom\Model\Domain\Acl;
 use \Xboom\Model\Domain\AbstractObject,
     \Doctrine\Common\Collections\ArrayCollection;
 

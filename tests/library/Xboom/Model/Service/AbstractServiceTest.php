@@ -41,8 +41,9 @@ class TestService extends AbstractService
              ->setFormClassPrefix(__NAMESPACE__);
     }
 
-    public function __construct()
+    public function __construct($sc)
     {
+        parent::__construct($sc);
         $this->_initService();
     }
 }
@@ -69,11 +70,15 @@ class AbstractServiceTest extends \PHPUnit_Framework_TestCase
      * @var TestService
      */
     protected $object;
+    protected $sc;
 
     public function setUp()
     {
         parent::setUp();
-        $this->object = new TestService();
+        $em = m::mock('EntityManager');
+        $this->sc = m::mock('ServiceContainer');
+        $this->sc->shouldReceive('getService')->with('doctrine.orm.entitymanager')->andReturn($em);
+        $this->object = new TestService($this->sc);
     }
 
     public function tearDown()
@@ -147,5 +152,12 @@ class AbstractServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($userForm, $this->object->getForm($formName));
     }
 
+    public function testGetAclService()
+    {
+        $aclService = m::mock('AclService');
+        $this->sc->shouldReceive('getService')->with('AclService')->andReturn($aclService);
+        $this->assertEquals($aclService,
+                $this->object->getServiceContainer()->getService('AclService'));
+    }
 
 }

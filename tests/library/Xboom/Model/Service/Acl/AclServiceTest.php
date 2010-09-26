@@ -25,12 +25,12 @@
  *
  * @author yugeon
  */
-namespace test\Core\Model\Service;
+namespace test\Xboom\Model\Service\Acl;
 
-use \Core\Model\Service\AccessControlService,
+use Xboom\Model\Service\Acl\AclService,
     \Mockery as m;
 
-class AccessControlServiceTest extends \PHPUnit_Framework_TestCase
+class AclServiceTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $object;
@@ -45,7 +45,7 @@ class AccessControlServiceTest extends \PHPUnit_Framework_TestCase
         $this->em->shouldReceive('persist');
         $this->em->shouldReceive('flush');
 
-        $this->object = new AccessControlService($this->em);
+        $this->object = new AclService($this->em);
 
         $this->user = m::mock('User');
         $this->user->shouldReceive('getId')->andReturn(232);
@@ -220,37 +220,6 @@ class AccessControlServiceTest extends \PHPUnit_Framework_TestCase
 
     public function _testGetGuestAcl()
     {
-//        $resource = m::mock('\\Zend_Acl_Resource_Interface');
-//        $resource->shouldReceive('getResourceId')->andReturn('test-resource-id');
-//        $resource->shouldReceive('getParent')->andReturn(null);
-//        $resource->shouldReceive('getId')->andReturn(1);
-//
-//        $permission1 = m::mock('Permission');
-//        $permission1->shouldReceive('getResource')->andReturn($resource);
-//        $permission1->shouldReceive('isOwnerRestriction')->andReturn(false);
-//        $permission1->shouldReceive('getName')->andReturn('test-permission-name1');
-//        $permission1->shouldReceive('getType')->andReturn(false);
-//
-//        $permissions = array(
-//            $this->permission,
-//            $permission1
-//        );
-//        $role = m::mock('Role');
-//        $role->shouldReceive('getPermissions')->andReturn($permissions);
-//        $role->shouldReceive('getRoleId')->andReturn('test-role-id');
-//        $roles = array(
-//            $role,
-//            $role
-//        );
-//
-//        $guestGroup = m::mock('Group');
-//        $guestGroup->shouldReceive('getAllRoles')->andReturn($roles);
-//        $result = array($guestGroup);
-//        $query = m::mock('Query');
-//        $query->shouldReceive('setParameter')->andReturn($query);
-//        $query->shouldReceive('getResult')->andReturn($result);
-//        $this->em->shouldReceive('createQuery')->andReturn($query);
-
         $this->assertNotNull($this->object->getAcl('guest'));
     }
 
@@ -269,5 +238,11 @@ class AccessControlServiceTest extends \PHPUnit_Framework_TestCase
         $assertion = m::mock('Zend_Acl_Assert_Interface');
         $this->object->setAssertion($assertName, $assertion);
         $this->assertEquals($assertion, $this->object->getAssertion($assertName));
+    }
+
+    public function testIsAllowed()
+    {
+        $result = $this->object->isAllowed($this->user, $this->resource, $this->permission);
+        $this->assertTrue($result);
     }
 }

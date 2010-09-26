@@ -25,7 +25,7 @@
  *
  * @author yugeon
  */
-namespace Core\Model\Domain;
+namespace Xboom\Model\Domain\Acl;
 use \Xboom\Model\Domain\AbstractObject,
     \Doctrine\Common\Collections\ArrayCollection;
 
@@ -70,7 +70,7 @@ class Resource extends AbstractObject implements \Zend_Acl_Resource_Interface
     /**
      * Resource owner.
      *
-     * @ManyToOne(targetEntity="User")
+     * @ManyToOne(targetEntity="\Core\Model\Domain\User")
      * @var User
      */
     protected $owner = null;

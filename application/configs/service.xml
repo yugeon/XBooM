@@ -4,4 +4,12 @@
     <import resource="entitymanager.xml" />
   </imports>
 
+  <services>
+
+    <service id="AclService" class="Xboom\Model\Service\Acl\AclService">
+        <argument type="service" id="doctrine.orm.entitymanager" />
+    </service>
+
+  </services>
+  
 </container>

@@ -33,6 +33,11 @@
         <argument type="service" id="mail.transport" />
       </call>
     </service>
+    
+    <service id="AclService" class="Xboom\Model\Service\Acl\AclService">
+        <argument type="service" id="doctrine.orm.entitymanager" />
+    </service>
+
   </services>
 
 </container>

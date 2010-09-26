@@ -30,15 +30,16 @@ namespace Core\Model\Service;
 
 use \Xboom\Model\Service\AbstractService,
  \Core\Model\Domain\User,
- \Xboom\Model\Service\Exception as ServiceException;
+ \Xboom\Model\Service\Exception as ServiceException,
+ \Xboom\Model\Service\Acl\AccessDeniedException;
 
 class UserService extends AbstractService
 {
 
-    public function __construct($em)
+    public function __construct($sc)
     {
+        parent::__construct($sc);
         $this->_initService();
-        $this->_em = $em;
     }
 
     protected function _initService()
@@ -81,7 +82,13 @@ class UserService extends AbstractService
      */
     public function registerUser(array $data, $flush = true)
     {
-        // TODO: ACL !!!
+        // TODO ACL
+        $aclService = $this->getServiceContainer()->getService('AclService');
+        $currentUser = 1;
+        if (! $aclService->isAllowed($currentUser, 'Users', 'register'))
+        {
+            throw new AccessDeniedException('Access denied');
+        }
 
         $formToModelMediator = $this->getFormToModelMediator('RegisterUser');
         $formToModelMediator->setDomainValidator($this->getValidator('UserDomain'));

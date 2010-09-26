@@ -33,6 +33,13 @@ abstract class AbstractService implements ServiceInterface
 {
 
     /**
+     * Service container
+     * 
+     * @var sfServiceContainer
+     */
+    protected $_sc;
+
+    /**
      * @var Doctrine\ORM\EntityManager
      */
     protected $_em;
@@ -88,6 +95,22 @@ abstract class AbstractService implements ServiceInterface
      */
     protected $_validators = array();
 
+    public function __construct($sc)
+    {
+        $this->setServiceContainer($sc);
+        $this->_em = $this->getServiceContainer()->getService('doctrine.orm.entitymanager');
+    }
+
+    public function setServiceContainer($sc)
+    {
+        $this->_sc = $sc;
+        return $this;
+    }
+
+    public function getServiceContainer()
+    {
+        return $this->_sc;
+    }
 
     /**
      * Set the model class name what controlled this service.

@@ -21,38 +21,15 @@
  */
 
 /**
- * Test case for Permission
+ * Description of AccessDeniedException
  *
  * @author yugeon
  */
-namespace test\Core\Model\Domain;
-use \Core\Model\Domain\Permission,
-    \Mockery as m;
+namespace Xboom\Model\Service\Acl;
 
-class PermissionTest extends \PHPUnit_Framework_TestCase
+use \Xboom\Model\Service\Exception as ServiceException;
+
+class AccessDeniedException extends ServiceException
 {
-    protected $object;
 
-    public function setUp()
-    {
-        parent::setUp();
-        $this->object = new Permission;
-    }
-
-    public function tearDown()
-    {
-        parent::tearDown();
-        m::close();
-    }
-
-    public function testCanCreatePermission()
-    {
-        $this->assertNotNull($this->object);
-    }
-
-    public function testIsOwnerRestriction()
-    {
-        $this->object->setIsOwnerRestriction(true);
-        $this->assertTrue($this->object->isOwnerRestriction());
-    }
 }

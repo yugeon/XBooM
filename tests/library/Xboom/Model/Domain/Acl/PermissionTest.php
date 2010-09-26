@@ -19,33 +19,40 @@
  * @copyright  Copyright (c) 2010 yugeon <yugeon.ru@gmail.com>
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
-use \Core\Model\Domain\User,
-    \Core\Model\Domain\Group;
 
-class Core_IndexController extends Zend_Controller_Action
+/**
+ * Test case for Permission
+ *
+ * @author yugeon
+ */
+namespace test\Xboom\Model\Domain\Acl;
+use \Xboom\Model\Domain\Acl\Permission,
+    \Mockery as m;
+
+class PermissionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     *
-     * @var Doctrine\ORM\EntityManager
-     */
-    protected  $em;
+    protected $object;
 
-    protected $sc;
-
-    public function init()
+    public function setUp()
     {
-        $this->sc = $this->getInvokeArg('bootstrap')->getContainer();
-        $this->em = $sc->getService('doctrine.orm.entitymanager');
+        parent::setUp();
+        $this->object = new Permission;
     }
 
-    public function indexAction()
+    public function tearDown()
     {
-        $aclService = new \Xboom\Model\Service\Acl\AclService($this->em);
-        $user = $this->em->find('\\Core\\Model\\Domain\\User', 1);
-        $acl = $aclService->getAcl($user);
-        //\Doctrine\Common\Util\Debug::dump($acl, 8);
-        $result = $acl->isAllowed($user, 'Concrete Resource', 'edit');
-        var_dump($result);
+        parent::tearDown();
+        m::close();
+    }
+
+    public function testCanCreatePermission()
+    {
+        $this->assertNotNull($this->object);
+    }
+
+    public function testIsOwnerRestriction()
+    {
+        $this->object->setIsOwnerRestriction(true);
+        $this->assertTrue($this->object->isOwnerRestriction());
     }
 }
-

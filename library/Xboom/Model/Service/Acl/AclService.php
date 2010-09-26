@@ -21,23 +21,25 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 /**
- * Description of AccessControlService
+ * Description of AclService
  *
  * @author yugeon
  * @todo refactoring
  */
 
-namespace Core\Model\Service;
+namespace Xboom\Model\Service\Acl;
 
 use \Xboom\Model\Service\AbstractService,
+ \Xboom\Model\Domain\Acl\Permission,
  \Xboom\Acl\Acl;
 
-class AccessControlService //extends AbstractService
+class AclService //extends AbstractService
 {
 
     protected $_em;
     protected $_acl = array();
     protected $_assertions = array();
+    protected $resourceClass = '\\Xboom\\Model\\Domain\\Acl\\Resource';
 
     public function __construct($em)
     {
@@ -161,37 +163,11 @@ class AccessControlService //extends AbstractService
     {
         $acl = new Acl();
 
-        $resourceClass = '\\Core\\Model\\Domain\\Resource';
-
         /* @var $qb \Doctrine\ORM\QueryBuilder */
         $qb = $this->_em->createQueryBuilder();
 
-//        // Resources, permissions, roles
-//        $dql = 'SELECT res, p, r, res_own'
-//                . ' FROM \Core\Model\Domain\Resource res'
-//                . ' LEFT JOIN res.owner res_own'
-//                . ' LEFT JOIN res.permissions p'
-//                . ' LEFT JOIN p.roles r'
-//                . '   WITH r.id IN'
-//                . '     (SELECT ur.id FROM \Core\Model\Domain\User u'
-//                . '      JOIN u.group g JOIN g.roles ur WHERE u.id = 1)'
-//                . " WHERE res.id IN (1,2,3,4)"
-//        ;
-//        // ROLES
-//        $dql = 'SELECT r.id'
-//                . ' FROM \Core\Model\Domain\User u'
-//                . ' JOIN u.group g'
-//                . ' JOIN g.roles r'
-//                . " WHERE u.id = 1";
-//                ;
-//        $query = $this->_em->createQuery($dql);
-//        $resources = $query->getResult();
-//        var_dump($dql);
-//        var_dump($query->getSQL());
-//        \Doctrine\Common\Util\Debug::dump($resources, 6);
-//        exit;
         $qb->select(array('res', 'p', 'r', 'res_own'))
-                ->from($resourceClass, 'res')
+                ->from($this->resourceClass, 'res')
                 ->leftJoin('res.owner', 'res_own');
 
         // constraint by permission
@@ -281,14 +257,13 @@ class AccessControlService //extends AbstractService
     {
         $result = array();
 
-        $resourceClass = '\\Core\\Model\\Domain\\Resource';
         if (\is_int($resource))
         {
-            $resource = $this->_em->find($resourceClass, $resource);
+            $resource = $this->_em->find($this->resourceClass, $resource);
         }
         elseif (\is_string($resource))
         {
-            $resource = $this->_em->getRepository($resourceClass)->findOneByName($resource);
+            $resource = $this->_em->getRepository($this->resourceClass)->findOneByName($resource);
         }
 
         if (!\is_object($resource))
@@ -307,7 +282,7 @@ class AccessControlService //extends AbstractService
         /* @var $qb \Doctrine\ORM\QueryBuilder */
         $qb = $this->_em->createQueryBuilder();
         $qb->select(array('r0.id r0_id', 'r1.id r1_id'))
-                ->from($resourceClass, 'r0')
+                ->from($this->resourceClass, 'r0')
                 ->leftJoin('r0.parent', 'r1')
                 ->where($qb->expr()->eq('r0.id', '?1'))
                 ->setParameter(1, $resourceId);
@@ -355,7 +330,7 @@ class AccessControlService //extends AbstractService
                         $acl->addRole($role->getRoleId());
                     }
 
-                    if (\Core\Model\Domain\Permission::ALLOW === $permission->getType())
+                    if (Permission::ALLOW === $permission->getType())
                     {
                         $acl->allow($role->getRoleId(), $resource, $permission->getName(), $assertion);
                     }
@@ -387,4 +362,9 @@ class AccessControlService //extends AbstractService
         }
     }
 
+    public function isAllowed($user, $resource, $permission)
+    {
+        $acl = $this->getAcl($user, $resource, $permission);
+        return $acl->isAllowed($user, 'Concrete Resource', 'edit');
+    }
 }

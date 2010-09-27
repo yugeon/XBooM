@@ -41,6 +41,15 @@ class FunctionalTestCase extends ControllerTestCase
         parent::setUp();
         $this->_sc = $this->application->getBootstrap()->getContainer();
         $this->_em = $this->_sc->getService('doctrine.orm.entitymanager');
+        $this->_em->getConnection()->beginTransaction();
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        $this->_em->getConnection()->rollback();
+        $this->_em->close();
     }
 
 }

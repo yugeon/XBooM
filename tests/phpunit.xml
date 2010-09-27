@@ -3,10 +3,14 @@
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
+         syntaxCheck="true"
          colors="true">
-    <testsuite name="XBoom">
-        <directory>./</directory>
-    </testsuite>
+
+    <testsuites>
+        <testsuite name="XBoom">
+            <directory>./</directory>
+        </testsuite>
+    </testsuites>
 
     <filter>
         <whitelist>

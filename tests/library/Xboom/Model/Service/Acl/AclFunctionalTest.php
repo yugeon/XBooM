@@ -33,6 +33,9 @@ use \Core\Model\Domain\User,
     \Xboom\Model\Domain\Acl\Permission,
     \Xboom\Model\Domain\Acl\Role;
 
+/**
+ * @group functional
+ */
 class AclFunctionalTest extends \FunctionalTestCase
 {
     
@@ -48,8 +51,6 @@ class AclFunctionalTest extends \FunctionalTestCase
         parent::setUp();
 
         $this->aclService = $this->_sc->getService('AclService');
-
-        $this->_em->getConnection()->beginTransaction();
 
         $resourceOwner = new User();
         $resourceOwner->name = 'testName'. \rand(1, 100);
@@ -97,14 +98,6 @@ class AclFunctionalTest extends \FunctionalTestCase
         $this->_em->persist($emptyRole);
 
         $this->_em->flush();
-    }
-
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        $this->_em->getConnection()->rollback();
-        $this->_em->close();
     }
 
     public function testAllThatIsNotAllowedThenDenieded()

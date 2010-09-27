@@ -64,8 +64,11 @@ class RoleTest extends \PHPUnit_Framework_TestCase
     public function testAssingToPermissions()
     {
         $permission1 = m::mock('Permission');
+        $permission1->shouldReceive('assignToRole');
         $permission2 = m::mock('Permission');
+        $permission2->shouldReceive('assignToRole');
         $permission3 = m::mock('Permission');
+        $permission3->shouldReceive('assignToRole');
 
         $this->object->assignToPermission($permission1);
         $this->object->assignToPermission($permission2);
@@ -77,7 +80,9 @@ class RoleTest extends \PHPUnit_Framework_TestCase
     public function testWithoutDoublingOfPermissions()
     {
         $permission1 = m::mock('Permission');
+        $permission1->shouldReceive('assignToRole');
         $permission2 = m::mock('Permission');
+        $permission2->shouldReceive('assignToRole');
 
         $this->object->assignToPermission($permission1);
         $this->object->assignToPermission($permission2);

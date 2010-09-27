@@ -154,9 +154,9 @@ class AclTest extends \PHPUnit_Framework_TestCase
     public function testRememberVerifiableUser()
     {
         $user = m::mock('Zend_Acl_Role_Interface');
-        $roleId = 'test-role-id';
-        $user->shouldReceive('getRoleId')->andReturn($roleId);
-        $this->object->isAllowed($user, null, null);
+        $user->shouldReceive('getRoleId')->andReturn('test-role-id');
+
+        $this->object->isAllowed($user, null, null, $user);
         $this->assertEquals($user, $this->object->getRememberedUser());
     }
 }

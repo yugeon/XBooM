@@ -75,14 +75,20 @@ class AclService //extends AbstractService
     /**
      * Get a unique key for role, resource and permission.
      *
-     * @param string $roleId
+     * @param array $roleId
      * @param string $resourceId
      * @param string $permissionId
      * @return string
      */
-    public function getAclId($roleId = 'all', $resourceId = 'all', $permissionId = 'all')
+    protected function _getAclId($roleId = array(), $resourceId = null, $permissionId = null)
     {
-        $aclId = $roleId . '::' . $resourceId . '::' . $permissionId;
+        $aclId = 'all';
+        foreach ($roleId as $value)
+        {
+            $aclId .= '::' . $value;
+        }
+
+        $aclId = $aclId . '::' . $resourceId . '::' . $permissionId;
         return \md5($aclId);
     }
 
@@ -92,18 +98,43 @@ class AclService //extends AbstractService
      * @param Zend_Acl_Role_Interface|int $role
      * @return string
      */
-    protected function _normalizeRoleId($role = null)
+    protected function _normalizeSingleRoleId($role = null)
     {
         $roleId = 'all';
         if ($role instanceof \Zend_Acl_Role_Interface)
         {
-            $roleId = $role->getRoleId();
+            $roleId = (string) $role->getRoleId();
         }
         elseif (\is_int($role))
         {
             $roleId = (string) $role;
         }
+
         return $roleId;
+    }
+
+    /**
+     *
+     * @param array|Zend_Acl_Role_Interface|int $roleId
+     * @return array
+     */
+    public function _normalizeRoleId($roleId)
+    {
+        $result = array();
+
+        if (\is_array($roleId))
+        {
+            foreach ($roleId as $value)
+            {
+                $result[] = $this->_normalizeSingleRoleId($value);
+            }
+        }
+        else
+        {
+            $result[] = $this->_normalizeSingleRoleId($roleId);
+        }
+
+        return $result;
     }
 
     /**
@@ -149,16 +180,18 @@ class AclService //extends AbstractService
     /**
      * Retrieve ACL for $user.
      *
-     * @param Role|string|int $role
+     * @param Zend_Acl_Role_Inreface|int|array $role
+     * @param Zend_Acl_Resource_Inreface|string $resource
+     * @param Permission|string $permission
      * @return Acl
      */
-    public function getAcl($role = null, $resource = null, $permission = null)
+    public function getAcl($role = array(), $resource = null, $permission = null)
     {
         $roleId = $this->_normalizeRoleId($role);
         $resourceId = $this->_normalizeResourceId($resource);
         $permissionId = $this->_normalizePermissionId($permission);
 
-        $aclId = $this->getAclId($roleId, $resourceId, $permissionId);
+        $aclId = $this->_getAclId($roleId, $resourceId, $permissionId);
 
         if (isset($this->_acl[$aclId]))
         {
@@ -189,9 +222,9 @@ class AclService //extends AbstractService
      * Build full ACL. If $user is passed, build on to the $user.
      * If $resource is passed, build on to the resource.
      *
-     * @param User|int|null $role
-     * @param Resource|int|null $resource
-     * @param Permission|int|string|null
+     * @param array $role
+     * @param string    $resource
+     * @param string    $permission
      * @return Acl
      */
     public function buildAcl($role, $resource, $permission)
@@ -217,14 +250,13 @@ class AclService //extends AbstractService
         }
 
         // constraint by role
-        if ('all' !== $role)
+        if (empty($role))
         {
-            $roleIds = (array) $role;
-            $qb->leftJoin('p.roles', 'r', 'WITH', $qb->expr()->in('res.id', $roleIds));
+            $qb->leftJoin('p.roles', 'r');
         }
         else
         {
-            $qb->leftJoin('p.roles', 'r');
+            $qb->leftJoin('p.roles', 'r', 'WITH', $qb->expr()->in('res.id', $role));
         }
 
 //        if (\is_int($userId))

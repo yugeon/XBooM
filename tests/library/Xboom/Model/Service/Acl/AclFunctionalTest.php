@@ -40,6 +40,7 @@ class AclFunctionalTest extends \FunctionalTestCase
 {
     
     protected $role;
+    protected $emptyRole;
     protected $newsResource;
     protected $concreateNews;
     protected $viewPermission;
@@ -93,9 +94,9 @@ class AclFunctionalTest extends \FunctionalTestCase
         $this->role->assignToPermission($permission2);
         $this->_em->persist($this->role);
 
-        $emptyRole = new Role();
-        $emptyRole->name = 'Role 2';
-        $this->_em->persist($emptyRole);
+        $this->emptyRole = new Role();
+        $this->emptyRole->name = 'Role 2';
+        $this->_em->persist($this->emptyRole);
 
         $this->_em->flush();
     }
@@ -120,7 +121,7 @@ class AclFunctionalTest extends \FunctionalTestCase
         );
     }
 
-    public function testCehckByRole()
+    public function testCheckByRole()
     {
         $acl = $this->aclService->getAcl($this->role->getId());
 
@@ -143,7 +144,25 @@ class AclFunctionalTest extends \FunctionalTestCase
         );
     }
 
-    public function testCehckByResource()
+    public function testCheckByRoles()
+    {
+        $roles = array(
+            $this->role,
+            $this->emptyRole,
+        );
+
+        $acl = $this->aclService->getAcl($roles);
+
+        $this->assertTrue(
+                $acl->isAllowed(
+                        $roles,
+                        $this->newsResource,
+                        $this->viewPermission->getName()
+                )
+        );
+    }
+
+    public function testCheckByResource()
     {
         $acl = $this->aclService->getAcl(null, 'News');
 
@@ -166,7 +185,7 @@ class AclFunctionalTest extends \FunctionalTestCase
         );
     }
 
-    public function testCehckByPermission()
+    public function testCheckByPermission()
     {
         $acl = $this->aclService->getAcl(null, null, 'view');
 
@@ -189,7 +208,7 @@ class AclFunctionalTest extends \FunctionalTestCase
         );
     }
 
-    public function testCehckByRolesAndResource()
+    public function testCheckByRoleAndResource()
     {
         $acl = $this->aclService->getAcl($this->role->getId(), 'News');
 
@@ -212,7 +231,7 @@ class AclFunctionalTest extends \FunctionalTestCase
         );
     }
 
-    public function testCehckByRolesResourceAndPermission()
+    public function testCheckByRoleResourceAndPermission()
     {
         $acl = $this->aclService->getAcl($this->role->getId(), 'News', 'view');
 

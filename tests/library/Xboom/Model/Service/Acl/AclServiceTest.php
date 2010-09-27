@@ -38,6 +38,7 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
     protected $role;
     protected $resource;
     protected $permission;
+    protected $permission1;
 
     public function setUp()
     {
@@ -61,16 +62,16 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
         $this->permission->shouldReceive('getName')->andReturn('test-permission-name');
         $this->permission->shouldReceive('getType')->andReturn(true);
 
-        $permission1 = m::mock('\\Xboom\\Model\\Domain\\Acl\\Permission');
-        $permission1->shouldReceive('getResource')->andReturn($this->resource);
-        $permission1->shouldReceive('isOwnerRestriction')->andReturn(false);
-        $permission1->shouldReceive('getName')->andReturn('test-permission-name1');
-        $permission1->shouldReceive('getType')->andReturn(false);
-        $permission1->shouldReceive('getRoles')->andReturn(array());
+        $this->permission1 = m::mock('\\Xboom\\Model\\Domain\\Acl\\Permission');
+        $this->permission1->shouldReceive('getResource')->andReturn($this->resource);
+        $this->permission1->shouldReceive('isOwnerRestriction')->andReturn(false);
+        $this->permission1->shouldReceive('getName')->andReturn('test-permission-name1');
+        $this->permission1->shouldReceive('getType')->andReturn(false);
+        $this->permission1->shouldReceive('getRoles')->andReturn(array());
 
         $permissions = array(
             $this->permission,
-            $permission1
+            $this->permission1
         );
 
         $this->resource->shouldReceive('getPermissions')->andReturn($permissions);
@@ -118,26 +119,6 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function testGetAclId()
-    {
-        $roleId = 1;
-        $resourceId = 'News';
-        $permissionId = 'view';
-        $expectedAclId = \md5($roleId . '::' . $resourceId . '::' . $permissionId);
-
-        $this->assertEquals($expectedAclId,
-                $this->object->getAclId($roleId, $resourceId, $permissionId));
-    }
-
-    public function testSetAcl()
-    {
-        $acl = m::mock('Zend_Acl');
-        $roleId = 1;
-
-        $this->object->setAcl($acl, $this->object->getAclId($roleId));
-        $this->assertEquals($acl, $this->object->getAcl($roleId));
-    }
-
     public function testGetFullAcl()
     {
         $acl = $this->object->getAcl();
@@ -161,6 +142,26 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
                 $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
 
         $acl = $this->object->getAcl($this->role);
+        $this->assertTrue(
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
+        $this->assertFalse(
+                $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
+    }
+
+    public function testGetAclByRoles()
+    {
+        $role2 = m::mock('Zend_Acl_Role_Interface');
+        $role2->shouldReceive('getPermissions')->andReturn($this->permission1);
+        $role2->shouldReceive('getRoleId')->andReturn('test-role-id2');
+
+        $roles = array(
+            $this->role,
+            $role2
+        );
+
+        $acl = $this->object->getAcl($roles);
+        $this->assertNotNull($acl);
+        $this->assertType('Zend_Acl', $acl);
         $this->assertTrue(
                 $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
         $this->assertFalse(
@@ -234,7 +235,7 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
     public function testShouldRaiseExceptionIfAclIncorrect()
     {
         $acl = new \stdClass();
-        $this->object->setAcl($acl, $this->object->getAclId());
+        $this->object->setAcl($acl, 'acl_id');
     }
 
     public function testGetSetAssertions()

@@ -33,6 +33,7 @@ $autoloader->registerNamespace(array(
 );
 
 require_once 'ControllerTestCase.php';
+require_once 'FunctionalTestCase.php';
 
 // Autoloader for Mockery Framework
 require_once 'Mockery/Loader.php';

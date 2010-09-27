@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  CMF for web applications based on Zend Framework 1 and Doctrine 2
  *  Copyright (C) 2010  Eugene Gruzdev aka yugeon
@@ -23,9 +24,9 @@
 namespace test\Core\Model\Service;
 
 use \Mockery as m,
-    Core\Model\Service\UserService,
-    Core\Model\Form\RegisterUserForm,
-    Core\Model\Domain\Validator\RegisterUserValidator;
+ Core\Model\Service\UserService,
+ Core\Model\Form\RegisterUserForm,
+ Core\Model\Domain\Validator\RegisterUserValidator;
 
 require_once 'PHPUnit/Framework.php';
 require_once 'Mockery.php';
@@ -48,20 +49,16 @@ class UserTest extends \PHPUnit_Framework_TestCase
      * @var \Doctrine\ORM\EntityManager 
      */
     protected $em;
-
     /**
      *
      * @var RegisterUserForm
      */
     protected $userMediator;
-
-
     /**
      *
      * @var \Xboom\Model\Domain\AbstractObject
      */
     protected $userModel;
-
     /**
      *
      * @var array
@@ -71,16 +68,27 @@ class UserTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
+
         $this->em = m::mock('\\Doctrine\\ORM\\EntityManager');
         $this->em->shouldReceive('persist');
         $this->em->shouldReceive('flush');
+
+        $acl = m::mock('Zend_Acl');
+        $acl->shouldReceive('isAllowed')->andReturn(true);
+
+        $aclService = m::mock('AclService');
+        $aclService->shouldReceive('getAcl')->andReturn($acl);
+
+        $sc = m::mock('ServiceContainer');
+        $sc->shouldReceive('getService')->with('doctrine.orm.entitymanager')->andReturn($this->em);
+        $sc->shouldReceive('getService')->with('AclService')->andReturn($aclService);
 
         $this->userMediator = m::mock('\\Xboom\Model\\Form\\Mediator');
         $this->userMediator->shouldReceive('setDomainValidator')->andReturn($this->userMediator);
 
         $this->userModel = m::mock('\\Xboom\\Model\\Domain\\AbstractObject');
 
-        $this->object = new UserService($this->em);
+        $this->object = new UserService($sc);
 
         $testUserName = 'TestUserName' . rand(1, 100);
         $testUserPassword = md5($testUserName);
@@ -138,7 +146,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotNull($this->userModel);
     }
-    
+
     /**
      * @expectedException \Xboom\Model\Service\Exception
      */
@@ -150,71 +158,4 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
         $user = $this->object->registerUser($this->userData);
     }
-//
-//    public function _testUserFormMustContainAllErrorsIfCannotRegisterUser()
-//    {
-//        // inject mock form
-//        $this->userMediator->shouldReceive('isValid')->andReturn(true);
-//        $this->userMediator->shouldReceive('getValues')->andReturn($this->userData);
-//        $this->userMediator->shouldReceive('getElements')->andReturn(array());
-//        $this->userMediator->shouldReceive('getMessages');
-//        $this->object->setForm('RegisterUser', $this->userMediator);
-//
-//        // inject mock user validator
-//        $this->userValidator->shouldReceive('isValid')->andReturn(false);
-//        $this->userValidator->shouldReceive('getMessages')->andReturn(array('error1', 'error2'));
-//        $this->object->setValidator('RegisterUser', $this->userValidator);
-//
-//        try
-//        {
-//            $user = $this->object->registerUser($this->userData);
-//        }
-//        catch (\Xboom\Service\Exception $e)
-//        {
-//            $this->assertEquals(2, count($this->object->getForm('RegisterUser')->getMessages()) );
-//        }
-//    }
-//
-//    public function _testIfUserFormIsInvalidThenMustReturnUserFormWithErrors()
-//    {
-//        $testUserName = 'TestUserName' . rand(1, 100);
-//        $testUserPassword = '123456';
-//        $testConfirmUserPassword = '654321';
-//        $userData = array(
-//            'login' => $testUserName,
-//            'name' => $testUserName,
-//            'password' => $testUserPassword,
-//            'confirm_password' => $testConfirmUserPassword,
-//        );
-//
-//        try
-//        {
-//            $user = $this->object->registerUser($userData);
-//            $this->fail('Must raise exception');
-//        }
-//        catch (\Xboom\Service\Exception $e)
-//        {
-//            $user = null;
-//        }
-//
-//        $form = $this->object->getForm('RegisterUser');
-//
-//        $this->assertNull($user);
-//        $this->assertNotNull($form);
-//        $this->assertTrue($form->getMessages() > 0);
-//    }
-//
-//
-//    public function _testGetValidator()
-//    {
-//        $this->assertNotNull($this->object->getValidator('RegisterUser'));
-//    }
-//
-//    /**
-//     * @expectedException \InvalidArgumentException
-//     */
-//    public function _testShouldRaiseExceptionIfValidatorNotExist()
-//    {
-//        $this->assertNotNull($this->object->getValidator('NotExistValidator'));
-//    }
 }

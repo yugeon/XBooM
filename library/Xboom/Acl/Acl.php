@@ -76,19 +76,23 @@ class Acl extends \Zend_Acl
      * @param Zend_Acl_Role_Interface|string|array $roles
      * @param Zend_Acl_Resource_Interface|string $resource
      * @param string $privilege
+     * @param User $user
      * @return boolean
      */
-    public function isAllowed($roles = null, $resource = null, $privilege = null)
+    public function isAllowed($roles = null, $resource = null, $privilege = null, $user = null)
     {
         $isAllow = false;
         
         // Clear verifiable user.
         $this->_user = null;
+        if (null !== $user)
+        {
+            // remember verifiable user.
+            $this->_user = $user;
+        }
 
         if ($roles instanceof \Zend_Acl_Role_Interface)
         {
-            // remember verifiable user.
-            $this->_user = $roles;
             $roles = $roles->getRoleId();
         }
 

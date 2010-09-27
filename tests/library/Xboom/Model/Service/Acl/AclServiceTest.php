@@ -35,7 +35,7 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
 
     protected $object;
     protected $em;
-    protected $user;
+    protected $role;
     protected $resource;
     protected $permission;
 
@@ -44,11 +44,9 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
         $this->em = m::mock('\\Doctrine\\ORM\\EntityManager');
         $this->em->shouldReceive('persist');
         $this->em->shouldReceive('flush');
+        $this->em->shouldReceive('getRepository')->andReturn($this->em);
 
         $this->object = new AclService($this->em);
-
-        $this->user = m::mock('User');
-        $this->user->shouldReceive('getId')->andReturn(232);
 
         $this->resource = m::mock('Zend_Acl_Resource_Interface');
         $this->resource->shouldReceive('getId')->andReturn(2);
@@ -63,7 +61,7 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
         $this->permission->shouldReceive('getName')->andReturn('test-permission-name');
         $this->permission->shouldReceive('getType')->andReturn(true);
 
-        $permission1 = m::mock('Permission');
+        $permission1 = m::mock('\\Xboom\\Model\\Domain\\Acl\\Permission');
         $permission1->shouldReceive('getResource')->andReturn($this->resource);
         $permission1->shouldReceive('isOwnerRestriction')->andReturn(false);
         $permission1->shouldReceive('getName')->andReturn('test-permission-name1');
@@ -77,17 +75,16 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
 
         $this->resource->shouldReceive('getPermissions')->andReturn($permissions);
 
-        $role = m::mock('Role');
-        $role->shouldReceive('getPermissions')->andReturn($permissions);
-        $role->shouldReceive('getRoleId')->andReturn('test-role-id');
+        $this->role = m::mock('Zend_Acl_Role_Interface');
+        $this->role->shouldReceive('getPermissions')->andReturn($permissions);
+        $this->role->shouldReceive('getRoleId')->andReturn('test-role-id');
 
         $roles = array(
-            $role,
-            $role
+            $this->role,
+            $this->role
         );
 
         $this->permission->shouldReceive('getRoles')->andReturn($roles);
-        $this->user->shouldReceive('getAllRoles')->andReturn($roles);
 
         $result = array(
             $this->resource,
@@ -111,6 +108,7 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
         $this->em->shouldReceive('createQueryBuilder')->andReturn($qb);
         $this->em->shouldReceive('createQuery')->andReturn($query);
         $this->em->shouldReceive('find')->andReturn($this->resource);
+        $this->em->shouldReceive('findOneByName')->andReturn($this->resource);
         $query->shouldReceive('getResult')->andReturn($result);
     }
 
@@ -120,12 +118,24 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
         m::close();
     }
 
+    public function testGetAclId()
+    {
+        $roleId = 1;
+        $resourceId = 'News';
+        $permissionId = 'view';
+        $expectedAclId = \md5($roleId . '::' . $resourceId . '::' . $permissionId);
+
+        $this->assertEquals($expectedAclId,
+                $this->object->getAclId($roleId, $resourceId, $permissionId));
+    }
+
     public function testSetAcl()
     {
         $acl = m::mock('Zend_Acl');
+        $roleId = 1;
 
-        $this->object->setAcl($acl, $this->object->getAclId('guest'));
-        $this->assertEquals($acl, $this->object->getAcl('guest'));
+        $this->object->setAcl($acl, $this->object->getAclId($roleId));
+        $this->assertEquals($acl, $this->object->getAcl($roleId));
     }
 
     public function testGetFullAcl()
@@ -139,10 +149,10 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
                 $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
     }
 
-    public function testGetAclByUser()
+    public function testGetAclByRole()
     {
-        $userId = 1;
-        $acl = $this->object->getAcl($userId);
+        $roleId = 1;
+        $acl = $this->object->getAcl($roleId);
         $this->assertNotNull($acl);
         $this->assertType('Zend_Acl', $acl);
         $this->assertTrue(
@@ -150,7 +160,7 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
                 $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
 
-        $acl = $this->object->getAcl($this->user);
+        $acl = $this->object->getAcl($this->role);
         $this->assertTrue(
                 $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
         $this->assertFalse(
@@ -159,9 +169,9 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAclByResource()
     {
-        $userId = null;
-        $resourceId = 1;
-        $acl = $this->object->getAcl($userId, $resourceId);
+        $roleId = null;
+        $resourceId = $this->resource->getResourceId();
+        $acl = $this->object->getAcl($roleId, $resourceId);
         $this->assertNotNull($acl);
         $this->assertType('Zend_Acl', $acl);
         $this->assertTrue(
@@ -169,7 +179,7 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
                 $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name1'));
 
-        $acl = $this->object->getAcl($userId, $this->resource);
+        $acl = $this->object->getAcl($roleId, $this->resource);
         $this->assertTrue(
                 $acl->isAllowed('test-role-id', 'test-resource-id', 'test-permission-name'));
         $this->assertFalse(
@@ -180,7 +190,7 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
     public function testGetAclByUserAndResource()
     {
         $userId = 1;
-        $resourceId = 1;
+        $resourceId = $this->resource->getResourceId();
         $acl = $this->object->getAcl($userId, $resourceId);
         $this->assertNotNull($acl);
         $this->assertType('Zend_Acl', $acl);
@@ -200,8 +210,8 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
     public function testGetAclByUserResourceAndPermission()
     {
         $userId = 1;
-        $resourceId = 1;
-        $permissionId = 1;
+        $resourceId = $this->resource->getResourceId();
+        $permissionId = 'test-permission-name';
         $acl = $this->object->getAcl($userId, $resourceId, $permissionId);
         $this->assertNotNull($acl);
         $this->assertType('Zend_Acl', $acl);
@@ -218,18 +228,13 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function _testGetGuestAcl()
-    {
-        $this->assertNotNull($this->object->getAcl('guest'));
-    }
-
     /**
      * @expectedException \InvalidArgumentException
      */
     public function testShouldRaiseExceptionIfAclIncorrect()
     {
         $acl = new \stdClass();
-        $this->object->setAcl($acl, $this->user);
+        $this->object->setAcl($acl, $this->object->getAclId());
     }
 
     public function testGetSetAssertions()
@@ -240,9 +245,4 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($assertion, $this->object->getAssertion($assertName));
     }
 
-    public function testIsAllowed()
-    {
-        $result = $this->object->isAllowed($this->user, $this->resource, $this->permission);
-        $this->assertTrue($result);
-    }
 }

@@ -124,7 +124,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
     public function testGetResourceId()
     {
         $resourceId = 326;
-        $resource = m::mock('\\Core\\Model\\Domain\\Resource');
+        $resource = m::mock('Zend_Acl_Resource_Interface');
         $resource->shouldReceive('getId')->andReturn($resourceId);
         $this->object->setResource($resource);
         $this->assertEquals('User-' . $resourceId, $this->object->getResourceId());

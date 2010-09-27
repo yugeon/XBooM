@@ -97,8 +97,38 @@ class Permission extends AbstractObject
         parent::__construct($data);
     }
 
+    public function setResource($resource)
+    {
+        $this->resource = $resource;
+        $resource->assignToPermission($this);
+        return $this;
+    }
+
     public function isOwnerRestriction()
     {
         return $this->isOwnerRestriction;
+    }
+
+    public function setTypeAllow()
+    {
+        $this->type = self::ALLOW;
+        return $this;
+    }
+
+    public function setTypeDenied()
+    {
+        $this->type = self::DENY;
+        return $this;
+    }
+
+    public function assignToRole($role)
+    {
+
+        if (!$this->roles->contains($role))
+        {
+            $this->roles->add($role);
+        }
+
+        return $this;
     }
 }

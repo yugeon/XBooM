@@ -31,6 +31,8 @@ namespace Xboom\Model\Service\Acl;
 
 use \Xboom\Model\Service\AbstractService,
  \Xboom\Model\Domain\Acl\Permission,
+ \Xboom\Model\Domain\Acl\Resource,
+ \Xboom\Model\Domain\Acl\Role,
  \Xboom\Acl\Acl;
 
 class AclService //extends AbstractService
@@ -71,59 +73,92 @@ class AclService //extends AbstractService
     }
 
     /**
-     * Get a unique key for user and resource.
-     * 
-     * @param User|int|string $user
-     * @param Resource|int|string $resource
-     * @param Permission|int|string $permission
+     * Get a unique key for role, resource and permission.
+     *
+     * @param string $roleId
+     * @param string $resourceId
+     * @param string $permissionId
      * @return string
      */
-    public function getAclId($user = null, $resource = null, $permission = null)
+    public function getAclId($roleId = 'all', $resourceId = 'all', $permissionId = 'all')
     {
-        $user = (null === $user) ? 'all' : $user;
-        $resource = (null === $resource) ? 'all' : $resource;
-        $permission = (null === $permission) ? 'all' : $permission;
-
-        $aclId = $user;
-        if (\is_object($user))
-        {
-            $aclId = (string) $user->getId();
-        }
-
-        $aclId .= '::';
-
-        if (\is_object($resource))
-        {
-            $aclId .= (string) $resource->getId();
-        }
-        else
-        {
-            $aclId .= (string) $resource;
-        }
-
-        $aclId .= '::';
-
-        if (\is_object($permission))
-        {
-            $aclId .= (string) $permission->getId();
-        }
-        else
-        {
-            $aclId .= (string) $permission;
-        }
-
+        $aclId = $roleId . '::' . $resourceId . '::' . $permissionId;
         return \md5($aclId);
+    }
+
+    /**
+     * Normalize the role id.
+     *
+     * @param Zend_Acl_Role_Interface|int $role
+     * @return string
+     */
+    protected function _normalizeRoleId($role = null)
+    {
+        $roleId = 'all';
+        if ($role instanceof \Zend_Acl_Role_Interface)
+        {
+            $roleId = $role->getRoleId();
+        }
+        elseif (\is_int($role))
+        {
+            $roleId = (string) $role;
+        }
+        return $roleId;
+    }
+
+    /**
+     * Normalize the resource id.
+     *
+     * @param Zend_Acl_Resource_Interface|string $resource
+     * @return string
+     */
+    protected function _normalizeResourceId($resource = 'all')
+    {
+        $resourceId = 'all';
+        if ($resource instanceof \Zend_Acl_Resource_Interface)
+        {
+            $resourceId = (string) $resource->getResourceId();
+        }
+        elseif (\is_string($resource))
+        {
+            $resourceId = $resource;
+        }
+        return $resourceId;
+    }
+
+    /**
+     * Normalize the permission id.
+     *
+     * @param Permission|string $permission
+     * @return string
+     */
+    protected function _normalizePermissionId($permission = null)
+    {
+        $permissionId = 'all';
+        if ($permission instanceof Permission)
+        {
+            $permissionId = (string) $permission->getName();
+        }
+        elseif (\is_string($permission))
+        {
+            $permissionId = (string) $permission;
+        }
+        return $permissionId;
     }
 
     /**
      * Retrieve ACL for $user.
      *
-     * @param User|string|int $user
+     * @param Role|string|int $role
      * @return Acl
      */
-    public function getAcl($user = null, $resource = null, $permission = null)
+    public function getAcl($role = null, $resource = null, $permission = null)
     {
-        $aclId = $this->getAclId($user, $resource, $permission);
+        $roleId = $this->_normalizeRoleId($role);
+        $resourceId = $this->_normalizeResourceId($resource);
+        $permissionId = $this->_normalizePermissionId($permission);
+
+        $aclId = $this->getAclId($roleId, $resourceId, $permissionId);
 
         if (isset($this->_acl[$aclId]))
         {
@@ -132,7 +167,7 @@ class AclService //extends AbstractService
 
         // TODO Add caching
 
-        $acl = $this->buildAcl($user, $resource, $permission);
+        $acl = $this->buildAcl($roleId, $resourceId, $permissionId);
         $this->setAcl($acl, $aclId);
 
         return $this->_acl[$aclId];
@@ -154,12 +189,12 @@ class AclService //extends AbstractService
      * Build full ACL. If $user is passed, build on to the $user.
      * If $resource is passed, build on to the resource.
      *
-     * @param User|int|null $user
+     * @param User|int|null $role
      * @param Resource|int|null $resource
      * @param Permission|int|string|null
      * @return Acl
      */
-    public function buildAcl($user = null, $resource = null, $permission = null)
+    public function buildAcl($role, $resource, $permission)
     {
         $acl = new Acl();
 
@@ -171,60 +206,52 @@ class AclService //extends AbstractService
                 ->leftJoin('res.owner', 'res_own');
 
         // constraint by permission
-        $permissionId = $permission;
-        if (\is_object($permission))
-        {
-            $permissionId = $permission->getId();
-        }
-
-        if (\is_int($permissionId))
-        {
-            $qb->leftJoin('res.permissions', 'p', 'WITH', 'p.id = ?1')
-                    ->setParameter(1, $permissionId);
-        }
-        elseif (\is_string($permissionId))
+        if ('all' !== $permission)
         {
             $qb->leftJoin('res.permissions', 'p', 'WITH', 'p.name = ?1')
-                    ->setParameter(1, $permissionId);
+                    ->setParameter(1, $permission);
         }
         else
         {
             $qb->leftJoin('res.permissions', 'p');
         }
 
-        // constraint by user
-        $userId = $user;
-        if (\is_object($user))
+        // constraint by role
+        if ('all' !== $role)
         {
-            $userId = $user->getId();
-        }
-
-        if (\is_int($userId))
-        {
-            $qb->leftJoin('p.roles', 'r', 'WITH',
-                            'r.id IN (SELECT ur.id FROM \Core\Model\Domain\User u'
-                            . ' JOIN u.group g JOIN g.roles ur WHERE u.id = :id)')
-                    ->setParameter('id', $userId);
-        }
-        elseif (\is_string($userId))
-        {
-            if ('guest' === $userId)
-            {
-                $userId = 'guest@guest';
-            }
-
-            $qb->leftJoin('p.roles', 'r', 'WITH',
-                            'r.id IN (SELECT ur.id FROM \Core\Model\Domain\User u'
-                            . ' JOIN u.group g JOIN g.roles ur WHERE u.email = :email)')
-                    ->setParameter('email', $userId);
+            $roleIds = (array) $role;
+            $qb->leftJoin('p.roles', 'r', 'WITH', $qb->expr()->in('res.id', $roleIds));
         }
         else
         {
             $qb->leftJoin('p.roles', 'r');
         }
 
+//        if (\is_int($userId))
+//        {
+//            $qb->leftJoin('p.roles', 'r', 'WITH',
+//                            'r.id IN (SELECT ur.id FROM \Core\Model\Domain\User u'
+//                            . ' JOIN u.group g JOIN g.roles ur WHERE u.id = :id)')
+//                    ->setParameter('id', $userId);
+//        }
+//        elseif (\is_string($userId))
+//        {
+//            if ('guest' === $userId)
+//            {
+//                $userId = 'guest@guest';
+//            }
+//
+//            $qb->leftJoin('p.roles', 'r', 'WITH',
+//                            'r.id IN (SELECT ur.id FROM \Core\Model\Domain\User u'
+//                            . ' JOIN u.group g JOIN g.roles ur WHERE u.email = :email)')
+//                    ->setParameter('email', $userId);
+//        }
+//        else
+//        {
+//            $qb->leftJoin('p.roles', 'r');
+//        }
         // constraint by resource
-        if (null !== $resource)
+        if ('all' !== $resource)
         {
             $resIds = $this->_getResourceParentsId($resource);
             if (empty($resIds))
@@ -250,21 +277,14 @@ class AclService //extends AbstractService
     /**
      * Get all the ids of parents resources by single query without recursion.
      *
-     * @param Resource|int|string $resource
+     * @param string $resource
      * @return array
      */
-    protected function _getResourceParentsId($resource)
+    protected function _getResourceParentsId($resourceId)
     {
         $result = array();
 
-        if (\is_int($resource))
-        {
-            $resource = $this->_em->find($this->resourceClass, $resource);
-        }
-        elseif (\is_string($resource))
-        {
-            $resource = $this->_em->getRepository($this->resourceClass)->findOneByName($resource);
-        }
+        $resource = $this->_em->getRepository($this->resourceClass)->findOneByName($resourceId);
 
         if (!\is_object($resource))
         {
@@ -362,9 +382,4 @@ class AclService //extends AbstractService
         }
     }
 
-    public function isAllowed($user, $resource, $permission)
-    {
-        $acl = $this->getAcl($user, $resource, $permission);
-        return $acl->isAllowed($user, 'Concrete Resource', 'edit');
-    }
 }

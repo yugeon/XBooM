@@ -19,38 +19,28 @@
  * @copyright  Copyright (c) 2010 yugeon <yugeon.ru@gmail.com>
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
-use \Core\Model\Domain\User,
-    \Core\Model\Domain\Group;
 
-class Core_IndexController extends Zend_Controller_Action
+/**
+ * Description of FunctionalTestCase
+ *
+ * @author yugeon
+ */
+
+class FunctionalTestCase extends ControllerTestCase
 {
-//    /**
-//     *
-//     * @var Doctrine\ORM\EntityManager
-//     */
-//    protected  $em;
-
     /**
-     * Service container
      *
-     * @var sfServiceContainer
+     * @var \Doctrine\ORM\EntityManager
      */
-    protected $sc;
+    protected $_em;
 
-    public function init()
+    protected $_sc;
+
+    public function setUp()
     {
-        $this->sc = $this->getInvokeArg('bootstrap')->getContainer();
-//        $this->em = $this->sc->getService('doctrine.orm.entitymanager');
+        parent::setUp();
+        $this->_sc = $this->application->getBootstrap()->getContainer();
+        $this->_em = $this->_sc->getService('doctrine.orm.entitymanager');
     }
 
-    public function indexAction()
-    {
-//        $aclService = new \Xboom\Model\Service\Acl\AclService($this->em);
-//        $user = $this->em->find('\\Core\\Model\\Domain\\User', 1);
-//        $acl = $aclService->getAcl($user);
-//        //\Doctrine\Common\Util\Debug::dump($acl, 8);
-//        $result = $acl->isAllowed($user, 'Concrete Resource', 'edit');
-//        var_dump($result);
-    }
 }
-

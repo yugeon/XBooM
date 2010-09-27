@@ -5,8 +5,17 @@ ob_start();
 defined('APPLICATION_PATH')
     || define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../../application'));
 
-// Define application environment
-define('APPLICATION_ENV', 'development');
+$env = 'development';
+foreach ($_SERVER['argv'] as $key => $option)
+{
+    if (strstr($option, '--testing'))
+    {
+        $env = 'testing';
+        unset($_SERVER['argv'][$key]);
+    }
+}
+
+defined('APPLICATION_ENV') || define('APPLICATION_ENV', $env);
 
 // Ensure library/ is on include_path
 set_include_path(implode(PATH_SEPARATOR, array(

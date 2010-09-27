@@ -82,10 +82,12 @@ class UserService extends AbstractService
      */
     public function registerUser(array $data, $flush = true)
     {
-        // TODO ACL
-        $aclService = $this->getServiceContainer()->getService('AclService');
+        // FIXME получение текущего пользователя
         $currentUser = 1;
-        if (! $aclService->isAllowed($currentUser, 'Users', 'register'))
+        $aclService = $this->getServiceContainer()->getService('AclService');
+        $roles = null;
+        $acl = $aclService->getAcl($roles);
+        if (! $acl->isAllowed($roles, 'Users', 'register'))
         {
             throw new AccessDeniedException('Access denied');
         }

@@ -123,14 +123,11 @@ class Role extends AbstractObject implements \Zend_Acl_Role_Interface
 
     public function assignToPermission($permission)
     {
-        if (!\is_object($permission))
-        {
-            throw new \InvalidArgumentException('Param must be a Permission object');
-        }
 
         if (!$this->permissions->contains($permission))
         {
-            $this->permissions[] = $permission;
+            $this->permissions->add($permission);
+            $permission->assignToRole($this);
         }
 
         return $this;

@@ -113,7 +113,7 @@ class User extends AbstractObject implements \Zend_Acl_Role_Interface, \Zend_Acl
      */
     public function setResource($resource)
     {
-        if (! ($resource instanceof Resource))
+        if (! ($resource instanceof \Zend_Acl_Resource_Interface))
         {
             throw new \InvalidArgumentException('Resource must be a object');
         }

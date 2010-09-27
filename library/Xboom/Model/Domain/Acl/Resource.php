@@ -65,7 +65,7 @@ class Resource extends AbstractObject implements \Zend_Acl_Resource_Interface
      * @ManyToOne(targetEntity="Resource")
      * @var Resource
      */
-    protected $parent;
+    protected $parent = null;
 
     /**
      * Resource owner.
@@ -127,5 +127,15 @@ class Resource extends AbstractObject implements \Zend_Acl_Resource_Interface
             $result[] = $this->getParent();
         }
         return $result;
+    }
+
+    public function assignToPermission($permission)
+    {
+        if (!$this->permissions->contains($permission))
+        {
+            $this->permissions->add($permission);
+        }
+
+        return $this;
     }
 }

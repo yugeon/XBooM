@@ -56,10 +56,13 @@ class Core_UserController extends Zend_Controller_Action
                         ->registerUser($this->getRequest()->getPost());
                 echo 'Register ok! Id: ' . $result->id;
             }
-            catch (\Xboom\Exception $e)
+            catch (\Xboom\Model\Service\Acl\AccessDeniedException $e)
+            {
+                echo 'Access denied. You can\'t do this action.';
+            }
+            catch (\Xboom\Model\Service\Exception $e)
             {
                 echo 'Register Failed, try again';
-
             }
         }
 

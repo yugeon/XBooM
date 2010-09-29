@@ -31,6 +31,8 @@ namespace Xboom\Auth\Adapter;
 class Doctrine implements \Zend_Auth_Adapter_Interface
 {
 
+    const AUTH_FAILED = 'Authentication failed';
+
     /**
      *
      * @var string
@@ -140,28 +142,24 @@ class Doctrine implements \Zend_Auth_Adapter_Interface
         {
             $this->_checkEnviroment();
 
-            $criteria = array(
-                $this->getIdentityName() => $this->getIdentity()
-            );
+            $entity = $this->_getEntity();
 
-            $user = $this->_em->getRepository($this->getEntityName())
-                            ->findOneBy($criteria);
-
-            if (null === $user)
+            if (null === $entity)
             {
                 $result = $this->_createAuthResult(
-                        \Zend_Auth_Result::FAILURE_IDENTITY_NOT_FOUND);
+                        \Zend_Auth_Result::FAILURE_IDENTITY_NOT_FOUND, null, array(self::AUTH_FAILED));
             }
             else
             {
-                if ($user->authenticate($this->getCredential()))
+                $authResult = $entity->authenticate($this->getCredential());
+                if ($authResult)
                 {
-                    $result = $this->_createAuthResult(\Zend_Auth_Result::SUCCESS);
+                    $result = $this->_createAuthResult(\Zend_Auth_Result::SUCCESS, $authResult);
                 }
                 else
                 {
                     $result = $this->_createAuthResult(
-                            \Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID);
+                            \Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID, null, array(self::AUTH_FAILED));
                 }
             }
         }
@@ -201,6 +199,16 @@ class Doctrine implements \Zend_Auth_Adapter_Interface
         }
 
         return true;
+    }
+
+    public function _getEntity()
+    {
+        $criteria = array(
+            $this->getIdentityName() => $this->getIdentity()
+        );
+
+        return $this->_em->getRepository($this->getEntityName())
+                        ->getForAuth($criteria);
     }
 
     protected function _createAuthResult($code, $identity = null, $messages = array())

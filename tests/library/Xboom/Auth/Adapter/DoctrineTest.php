@@ -45,14 +45,16 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
             'email' => 'ExistIdentity'
         );
 
+        $identity = m::mock('stdClass');
+
         $user = m::mock('User');
         $user->shouldReceive('authenticate')->with(null)->andReturn(false);
-        $user->shouldReceive('authenticate')->with('validPass')->andReturn(true);
+        $user->shouldReceive('authenticate')->with('validPass')->andReturn($identity);
 
         $em = m::mock('\\Doctrine\\ORM\\EntityManager');
         $em->shouldReceive('getRepository')->andReturn($em);
-        $em->shouldReceive('findOneBy')->with($this->nonExistIdentityCriteria)->andReturn(null);
-        $em->shouldReceive('findOneBy')->with($this->existIdentityCriteria)->andReturn($user);
+        $em->shouldReceive('getForAuth')->with($this->nonExistIdentityCriteria)->andReturn(null);
+        $em->shouldReceive('getForAuth')->with($this->existIdentityCriteria)->andReturn($user);
 
         $this->object = new Doctrine($em);
     }
@@ -89,6 +91,9 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(\Zend_Auth_Result::FAILURE_IDENTITY_NOT_FOUND,
                 $this->object->authenticate()->getCode());
+
+        $this->assertContains('Authentication failed',
+                $this->object->authenticate()->getMessages());
     }
 
     public function testAuthentificateFailedIfCredentialInvalid()
@@ -99,6 +104,9 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(\Zend_Auth_Result::FAILURE_CREDENTIAL_INVALID,
                 $this->object->authenticate()->getCode());
+
+        $this->assertContains('Authentication failed',
+                $this->object->authenticate()->getMessages());
     }
 
     public function testAuthenticateSuccessed()
@@ -110,5 +118,17 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(\Zend_Auth_Result::SUCCESS,
                 $this->object->authenticate()->getCode());
+
+        $this->assertTrue(sizeof($this->object->authenticate()->getMessages()) === 0);
+    }
+
+    public function testShouldReturnIdentityIfAuthenticateSuccessed()
+    {
+        $this->object->setEntityName($this->entityName)
+                     ->setIdentityName('email')
+                     ->setIdentity($this->existIdentityCriteria['email'])
+                     ->setCredential('validPass');
+
+        $this->assertNotNull($this->object->authenticate()->getIdentity());
     }
 }

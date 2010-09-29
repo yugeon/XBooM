@@ -35,7 +35,7 @@ use \Xboom\Model\Service\AbstractService,
  \Xboom\Model\Domain\Acl\Role,
  \Xboom\Acl\Acl;
 
-class AclService //extends AbstractService
+class AclService
 {
 
     protected $_em;

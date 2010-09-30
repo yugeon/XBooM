@@ -155,7 +155,8 @@ class User extends AbstractObject implements \Zend_Acl_Role_Interface, \Zend_Acl
     public function getIdentity()
     {
         return array(
-            'name' => $this->getName(),
+            'id'    => $this->getId(),
+            'name'  => $this->getName(),
             'email' => $this->getEmail(),
             'roles' => $this->getAllRolesAsId()
         );

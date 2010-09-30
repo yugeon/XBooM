@@ -152,10 +152,12 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testSuccessedAuthenticateShouldReturnIdentity()
     {
-        $testName = 'Vasya';
+        $testId    = 2;
+        $testName  = 'Vasya';
         $testEmail = 'vasya@mail.com';
-        $password = 'validPassword';
+        $password  = 'validPassword';
 
+        $this->object->setId($testId);
         $this->object->setName($testName);
         $this->object->setEmail($testEmail);
         $this->object->setPassword($this->object->encryptPassword($password));
@@ -175,6 +177,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->object->setGroup($group);
 
         $expectedIdentity = array(
+            'id'    => $testId,
             'name' => $testName,
             'email' => $testEmail,
             'roles' => array('1', '2'),

@@ -97,15 +97,11 @@ class AuthFunctionalTest extends \FunctionalTestCase
         $this->_em->flush();
     }
 
-    public function tearDown()
-    {
-        parent::tearDown();
-    }
-
     public function testShouldReturnGuestIdentityIfUserNotLogin()
     {
         $expectedIdentity = array(
-            'name' => $this->guest->name,
+            'id'    => $this->guest->id,
+            'name'  => $this->guest->name,
             'email' => $this->guest->email,
             'roles' => array($this->guestRole->id)
         );
@@ -144,7 +140,8 @@ class AuthFunctionalTest extends \FunctionalTestCase
     public function testShouldReturnUserIdentityIfUserHasAlreadyLogged()
     {
         $expectedIdentity = array(
-            'name' => $this->user->name,
+            'id'    => $this->user->id,
+            'name'  => $this->user->name,
             'email' => $this->user->email,
             'roles' => array($this->guestRole->id, $this->userRole->id)
         );
@@ -158,6 +155,50 @@ class AuthFunctionalTest extends \FunctionalTestCase
 
         $this->assertEquals($expectedIdentity,
                 $this->authService->getCurrentUserIdentity());
+    }
+
+    public function testShouldReturnGuestIdentityIfUserLogouted()
+    {
+        $expectedIdentity = array(
+            'id'    => $this->guest->id,
+            'name'  => $this->guest->name,
+            'email' => $this->guest->email,
+            'roles' => array($this->guestRole->id)
+        );
+
+        $validData = array(
+            'email' => $this->user->email,
+            'password' => 'p@$$w0rd'
+        );
+
+        $this->authService->authenticate($validData);
+
+        $this->authService->logout();
+
+        $this->assertEquals($expectedIdentity,
+                $this->authService->getCurrentUserIdentity());
+    }
+
+    public function testAuthenticateFiledShouldReturnArrayOfErrors()
+    {
+         $invalidData = array(
+            'email' => $this->user->email,
+            'password' => 'badPassword'
+        );
+        $this->authService->authenticate($invalidData);
+        
+        $this->assertContains('Authentication failed', $this->authService->getMessages());
+    }
+
+    public function testAuthenticateSuccessedShouldReturnEmptyArrayOfErrors()
+    {
+        $validData = array(
+            'email' => $this->user->email,
+            'password' => 'p@$$w0rd'
+        );
+        $this->authService->authenticate($validData);
+
+        $this->assertTrue( \sizeof($this->authService->getMessages()) ==0 );
     }
 
 }

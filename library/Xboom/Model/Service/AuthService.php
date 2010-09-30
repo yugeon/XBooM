@@ -35,12 +35,18 @@ class AuthService extends AbstractService
      *
      * @var Zend_Auth
      */
-    protected $_auth;
+    protected $_auth = null;
     /**
      *
      * @var Zend_Auth_Adapter_Interface
      */
-    protected $_authAdapter;
+    protected $_authAdapter = null;
+
+    /**
+     *
+     * @var Zend_Auth_Result
+     */
+    protected $_result = null;
 
     public function __construct($sc, $auth, $authAdapter)
     {
@@ -54,6 +60,30 @@ class AuthService extends AbstractService
         return $this->_auth;
     }
 
+    public function getCode()
+    {
+        $code = null;
+
+        if (null !== $this->_result)
+        {
+            $code = $this->_result->getCode();
+        }
+        
+        return $code;
+    }
+
+    public function getMessages()
+    {
+        $messages = array();
+
+        if (null !== $this->_result)
+        {
+            $messages = $this->_result->getMessages();
+        }
+
+        return $messages;
+    }
+
     public function authenticate($data)
     {
         // TODO ACL
@@ -62,9 +92,9 @@ class AuthService extends AbstractService
         $this->_authAdapter
                 ->setIdentity($data['email'])
                 ->setCredential($data['password']);
-        $result = $this->_auth->authenticate($this->_authAdapter);
+        $this->_result = $this->_auth->authenticate($this->_authAdapter);
 
-        return $result->isValid();
+        return $this->_result->isValid();
     }
 
     public function getGuestIdentity()

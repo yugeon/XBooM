@@ -43,6 +43,7 @@ class AuthServiceTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->guestIdentity = array(
+            'id'    => '1',
             'name'  => 'guest',
             'email' => 'guest@guest',
             'roles' => array('1'),
@@ -119,6 +120,7 @@ class AuthServiceTest extends \PHPUnit_Framework_TestCase
     public function testGetCurrentUserIdentityShouldReturnGuestIdentityIfUserNotLogin()
     {
         $expectedGuestIdentity = array(
+            'id'    => '1',
             'name'  => 'guest',
             'email' => 'guest@guest',
             'roles' => array('1'),
@@ -132,6 +134,7 @@ class AuthServiceTest extends \PHPUnit_Framework_TestCase
     public function testGetCurrentUserIdentityShouldReturnUserIdentityIfUserIsLogin()
     {
         $userIdentity = array(
+            'id'    => '2',
             'name'  => 'Vasya',
             'email' => 'vasya@mail.com',
             'roles' => array('2', '3'),
@@ -151,5 +154,34 @@ class AuthServiceTest extends \PHPUnit_Framework_TestCase
         $this->object->logout();
 
         $this->assertEquals($this->guestIdentity, $this->object->getCurrentUserIdentity());
+    }
+
+    public function testGetCode()
+    {
+        $this->authResult->shouldReceive('isValid')->andReturn(false);
+        $this->authResult->shouldReceive('getCode')->andReturn(\Zend_Auth_Result::FAILURE_IDENTITY_NOT_FOUND);
+        $this->object->authenticate($this->badData);
+        
+        $this->assertEquals(\Zend_Auth_Result::FAILURE_IDENTITY_NOT_FOUND,
+                $this->object->getCode());
+    }
+
+    public function testIfAuthenticateSuccessedGetMessagesReturnEmptyArray()
+    {
+        $this->authResult->shouldReceive('isValid')->andReturn(true);
+        $this->authResult->shouldReceive('getMessages')->andReturn(array());
+        $this->object->authenticate($this->validData);
+
+        $this->assertTrue(\is_array($this->object->getMessages()));
+        $this->assertTrue(\sizeof($this->object->getMessages()) ==0);
+    }
+
+    public function testFailedAuthenticateShouldReturnMessages()
+    {
+        $this->authResult->shouldReceive('isValid')->andReturn(false);
+        $this->authResult->shouldReceive('getMessages')->andReturn(array('Login or password failed'));
+        $this->object->authenticate($this->badData);
+        
+        $this->assertTrue(\sizeof($this->object->getMessages()) > 0);
     }
 }

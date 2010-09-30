@@ -36,20 +36,6 @@ use \Xboom\Model\Service\AbstractService,
 class UserService extends AbstractService
 {
 
-    public function __construct($sc)
-    {
-        parent::__construct($sc);
-        $this->_initService();
-    }
-
-    protected function _initService()
-    {
-        $this->setModelClassPrefix('\\Core\\Model\\Domain')
-                ->setModelShortName('User')
-                ->setValidatorClassPrefix('\\Core\\Model\\Domain\\Validator')
-                ->setFormClassPrefix('\\Core\\Model\\Form');
-    }
-
     /**
      * Get all users as array of objects.
      *
@@ -82,12 +68,13 @@ class UserService extends AbstractService
      */
     public function registerUser(array $data, $flush = true)
     {
-        // FIXME получение текущего пользователя
-        //$currentUser = $this->_em->getRepository()->getUserWithAllRoles();
-        $currentUser = null;
+        $authService = $this->getServiceContainer()->getService('AuthService');
+        $currentUserIdentity = $authService->getCurrentUserIdentity();
+
         $aclService = $this->getServiceContainer()->getService('AclService');
-        $acl = $aclService->getAcl($currentUser);
-        if (! $acl->isAllowed($currentUser, 'Users', 'register'))
+        $acl = $aclService->getAcl($currentUserIdentity->getRoles());
+
+        if (! $acl->isAllowed($currentUserIdentity->getRoles(), 'Users', 'register'))
         {
             throw new AccessDeniedException('Access denied');
         }

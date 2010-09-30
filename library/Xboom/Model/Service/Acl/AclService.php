@@ -96,18 +96,18 @@ class AclService
      * Normalize the role id.
      *
      * @param Zend_Acl_Role_Interface|int $role
-     * @return string
+     * @return int
      */
     protected function _normalizeSingleRoleId($role = null)
     {
-        $roleId = 'all';
+        $roleId = null;
         if ($role instanceof \Zend_Acl_Role_Interface)
         {
-            $roleId = (string) $role->getRoleId();
+            $roleId = (int) $role->getRoleId();
         }
-        elseif (\is_int($role))
+        elseif (\is_int($role) || \is_string($role))
         {
-            $roleId = (string) $role;
+            $roleId = (int) $role;
         }
 
         return $roleId;
@@ -126,12 +126,20 @@ class AclService
         {
             foreach ($roleId as $value)
             {
-                $result[] = $this->_normalizeSingleRoleId($value);
+                $normValue = $this->_normalizeSingleRoleId($value);
+                if (null !== $normValue)
+                {
+                    $result[] = $normValue;
+                }
             }
         }
         else
         {
-            $result[] = $this->_normalizeSingleRoleId($roleId);
+            $normValue = $this->_normalizeSingleRoleId($roleId);
+            if (null !== $normValue)
+            {
+                $result[] = $normValue;
+            }
         }
 
         return $result;
@@ -256,7 +264,7 @@ class AclService
         }
         else
         {
-            $qb->leftJoin('p.roles', 'r', 'WITH', $qb->expr()->in('res.id', $role));
+            $qb->leftJoin('p.roles', 'r', 'WITH', $qb->expr()->in('r.id', $role));
         }
 
 //        if (\is_int($userId))

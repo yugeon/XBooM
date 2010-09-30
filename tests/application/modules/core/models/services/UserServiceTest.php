@@ -65,6 +65,8 @@ class UserTest extends \PHPUnit_Framework_TestCase
      */
     protected $userData;
 
+    protected $acl;
+
     public function setUp()
     {
         parent::setUp();
@@ -73,22 +75,32 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->em->shouldReceive('persist');
         $this->em->shouldReceive('flush');
 
-        $acl = m::mock('Zend_Acl');
-        $acl->shouldReceive('isAllowed')->andReturn(true);
+        $this->acl = m::mock('Zend_Acl');
+
+        $userIdentity = m::mock('UserIdentity');
+        $userIdentity->shouldReceive('getRoles')->andReturn(array());
+
+        $authService = m::mock('AuthService');
+        $authService->shouldReceive('getCurrentUserIdentity')->andReturn($userIdentity);
 
         $aclService = m::mock('AclService');
-        $aclService->shouldReceive('getAcl')->andReturn($acl);
+        $aclService->shouldReceive('getAcl')->andReturn($this->acl);
 
         $sc = m::mock('ServiceContainer');
         $sc->shouldReceive('getService')->with('doctrine.orm.entitymanager')->andReturn($this->em);
+        $sc->shouldReceive('getService')->with('AuthService')->andReturn($authService);
         $sc->shouldReceive('getService')->with('AclService')->andReturn($aclService);
 
         $this->userMediator = m::mock('\\Xboom\Model\\Form\\Mediator');
         $this->userMediator->shouldReceive('setDomainValidator')->andReturn($this->userMediator);
 
-        $this->userModel = m::mock('\\Xboom\\Model\\Domain\\AbstractObject');
+        $this->userModel = m::mock('\\Xboom\\Model\\Domain\\DomainObject');
 
         $this->object = new UserService($sc);
+        $this->object->setModelClassPrefix('\\Core\\Model\\Domain')
+                ->setModelShortName('User')
+                ->setValidatorClassPrefix('\\Core\\Model\\Domain\\Validator')
+                ->setFormClassPrefix('\\Core\\Model\\Form');
 
         $testUserName = 'TestUserName' . rand(1, 100);
         $testUserPassword = md5($testUserName);
@@ -137,6 +149,8 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testRegisterNewUser()
     {
+        $this->acl->shouldReceive('isAllowed')->andReturn(true);
+
         $this->userMediator->shouldReceive('isValid')->andReturn(true);
         $this->userMediator->shouldReceive('getModel')->andReturn($this->userModel);
 
@@ -148,10 +162,21 @@ class UserTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \Xboom\Model\Service\Acl\AccessDeniedException
+     */
+    public function testShouldRaiseExceptionIfNoPermissions()
+    {
+        $this->acl->shouldReceive('isAllowed')->andReturn(false);
+
+        $user = $this->object->registerUser($this->userData);
+    }
+
+    /**
      * @expectedException \Xboom\Model\Service\Exception
      */
     public function testShouldRaiseExceptionIfCannotRegisterUserBecouseUserDataInvalid()
     {
+        $this->acl->shouldReceive('isAllowed')->andReturn(true);
         // inject mock mediator
         $this->userMediator->shouldReceive('isValid')->andReturn(false);
         $this->object->setFormToModelMediator('RegisterUser', $this->userMediator);

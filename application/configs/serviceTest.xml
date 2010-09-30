@@ -69,6 +69,23 @@
             </call>
         </service>
 
+        <service id="UserService" class="Core\Model\Service\UserService">
+            <argument type="service" id="service_container" />
+
+            <call method="setModelClassPrefix">
+                <argument>\Core\Model\Domain</argument>
+            </call>
+            <call method="setModelShortName">
+                <argument>User</argument>
+            </call>
+            <call method="setValidatorClassPrefix">
+                <argument>\Core\Model\Domain\Validator</argument>
+            </call>
+            <call method="setFormClassPrefix">
+                <argument>\Core\Model\Form</argument>
+            </call>
+        </service>
+
     </services>
 
 </container>

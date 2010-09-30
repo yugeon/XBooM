@@ -38,7 +38,7 @@ class Core_UserController extends Zend_Controller_Action
     public function init()
     {
         $sc = $this->getInvokeArg('bootstrap')->getContainer();
-        $this->userService = new Core\Model\Service\UserService($sc);
+        $this->userService = $sc->getService('UserService');
     }
 
     public function indexAction()

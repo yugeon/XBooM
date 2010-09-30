@@ -26,14 +26,14 @@
  * @author yugeon
  */
 namespace Core\Model\Domain;
-use \Xboom\Model\Domain\AbstractObject,
+use \Xboom\Model\Domain\DomainObject,
     \Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @Entity
  * @Table(name="groups")
  */
-class Group extends AbstractObject implements \Zend_Acl_Role_Interface
+class Group extends DomainObject implements \Zend_Acl_Role_Interface
 {
     /**
      * @Id @Column(type="integer")

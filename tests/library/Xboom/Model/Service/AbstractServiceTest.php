@@ -27,7 +27,7 @@
 
 namespace test\Xboom\Model\Service;
 use \Xboom\Model\Service\AbstractService,
-    \Xboom\Model\Domain\AbstractObject,
+    \Xboom\Model\Domain\DomainObject,
     \Xboom\Model\Validate\AbstractValidator,
     \Mockery as m;
 
@@ -48,7 +48,7 @@ class TestService extends AbstractService
     }
 }
 
-class TestDomainObject extends AbstractObject
+class TestDomainObject extends DomainObject
 {
 
 }
@@ -101,9 +101,9 @@ class AbstractServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue( \strlen($this->object->getModelClassPrefix()) > 0 );
     }
 
-        public function testCanInjectUserObject()
+    public function testCanInjectUserObject()
     {
-        $userModel = m::mock('\\Xboom\\Model\\Domain\\AbstractObject');
+        $userModel = m::mock('\\Xboom\\Model\\Domain\\DomainObject');
         $this->object->setModel($userModel);
         $this->assertEquals($userModel, $this->object->getModel());
     }

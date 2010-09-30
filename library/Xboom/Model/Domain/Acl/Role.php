@@ -27,14 +27,14 @@
  * @author yugeon
  */
 namespace Xboom\Model\Domain\Acl;
-use \Xboom\Model\Domain\AbstractObject,
+use \Xboom\Model\Domain\DomainObject,
     \Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @Entity
  * @Table(name="roles")
  */
-class Role extends AbstractObject implements \Zend_Acl_Role_Interface
+class Role extends DomainObject implements \Zend_Acl_Role_Interface
 {
 
     /**

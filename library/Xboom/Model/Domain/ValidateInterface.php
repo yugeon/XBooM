@@ -51,6 +51,13 @@ interface ValidateInterface
     public function setData(array $data);
 
     /**
+     * Return true if this object clean.
+     *
+     * @return boolean
+     */
+    public function isDirty();
+
+    /**
      * Validate current Domain Object.
      *
      * If fails validation, then this method returns false, and

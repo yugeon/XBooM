@@ -61,7 +61,7 @@ class MediatorTest extends PHPUnit_Framework_TestCase
 
         $this->userForm = m::mock('Zend_Form');
         $this->userValidator = m::mock('\\Xboom\\Model\\Validate\\ValidatorInteface');
-        $this->userModel = m::mock('\\Xboom\\Model\\Domain\\AbstractObject');
+        $this->userModel = m::mock('\\Xboom\\Model\\Domain\\DomainObject');
         $this->userModel->shouldReceive('getValidator')->andReturn($this->userValidator);
         $this->userModel->shouldReceive('setData')->andReturn()->mock();
 
@@ -105,7 +105,7 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     public function testShouldRaiseExceptionIfValidatorIsNull()
     {
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
-        $userModel = m::mock('\\Xboom\\Model\\Domain\\AbstractObject');
+        $userModel = m::mock('\\Xboom\\Model\\Domain\\DomainObject');
         $userModel->shouldReceive('getValidator')->andReturn(null);
         $this->object->setModel($userModel);
         $this->object->isValid($this->userData);

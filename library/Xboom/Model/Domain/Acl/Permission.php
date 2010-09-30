@@ -27,14 +27,14 @@
  * @author yugeon
  */
 namespace Xboom\Model\Domain\Acl;
-use \Xboom\Model\Domain\AbstractObject,
+use \Xboom\Model\Domain\DomainObject,
     \Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @Entity
  * @Table(name="permissions")
  */
-class Permission extends AbstractObject
+class Permission extends DomainObject
 {
     const DENY  = false;
     const ALLOW = true;

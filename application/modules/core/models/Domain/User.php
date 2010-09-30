@@ -23,7 +23,7 @@
 
 namespace Core\Model\Domain;
 
-use \Xboom\Model\Domain\AbstractObject,
+use \Xboom\Model\Domain\DomainObject,
  \Xboom\Model\Domain\Acl\Resource,
  \Doctrine\Common\Collections\ArrayCollection;
 
@@ -31,7 +31,7 @@ use \Xboom\Model\Domain\AbstractObject,
  * @Entity(repositoryClass="Core\Model\Domain\Repository\UserRepository")
  * @Table(name="users")
  */
-class User extends AbstractObject implements \Zend_Acl_Role_Interface, \Zend_Acl_Resource_Interface
+class User extends DomainObject implements \Zend_Acl_Role_Interface, \Zend_Acl_Resource_Interface
 {
 
     /**

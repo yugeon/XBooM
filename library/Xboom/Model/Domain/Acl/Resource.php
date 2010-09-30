@@ -26,14 +26,14 @@
  * @author yugeon
  */
 namespace Xboom\Model\Domain\Acl;
-use \Xboom\Model\Domain\AbstractObject,
+use \Xboom\Model\Domain\DomainObject,
     \Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @Entity
  * @Table(name="resources")
  */
-class Resource extends AbstractObject implements \Zend_Acl_Resource_Interface
+class Resource extends DomainObject implements \Zend_Acl_Resource_Interface
 {
     /**
      * @Id @Column(type="integer")

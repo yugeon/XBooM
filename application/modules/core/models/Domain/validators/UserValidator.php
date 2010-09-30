@@ -41,14 +41,14 @@ class UserValidator extends AbstractValidator
                       ->addValidator(new \Zend_Validate_StringLength(
                               array('min' => 1, 'max' => 50)))
                       ->addFilter(new \Zend_Filter_StringTrim());
-        $this->addPropertyValidator('name', $nameValidator);
+        $this->addPropertyValidator('name', $nameValidator, true);
 
         // email
         $emailValidator = new BaseValidator();
         $emailValidator->addValidator(new \Zend_Validate_NotEmpty(), true)
                        ->addValidator(new \Zend_Validate_EmailAddress())
                        ->addFilter(new \Zend_Filter_StringTrim());
-        $this->addPropertyValidator('email', $emailValidator);
+        $this->addPropertyValidator('email', $emailValidator, true);
 
         // password
         $passwordValidator = new BaseValidator();
@@ -57,7 +57,7 @@ class UserValidator extends AbstractValidator
                               array('min' => 4, 'max' => 32)))
                           ->addFilter(new \Zend_Filter_StringTrim())
                           ->setObscureValue(true);
-        $this->addPropertyValidator('password', $passwordValidator);
+        $this->addPropertyValidator('password', $passwordValidator, true);
 
     }
 }

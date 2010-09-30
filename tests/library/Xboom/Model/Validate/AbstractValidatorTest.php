@@ -1,4 +1,5 @@
 <?php
+
 require_once 'PHPUnit/Framework.php';
 require_once 'Mockery.php';
 
@@ -8,6 +9,7 @@ use \Mockery as m;
 
 class TestModelValidator extends AbstractValidator
 {
+
     protected static $testValidator;
 
     public static function setTestValidator($validator)
@@ -20,6 +22,7 @@ class TestModelValidator extends AbstractValidator
         $propertyName = 'setInInitMethod';
         $this->addPropertyValidator($propertyName, self::$testValidator);
     }
+
 }
 
 /**
@@ -29,17 +32,17 @@ class TestModelValidator extends AbstractValidator
  */
 class Xboom_Model_Validate_AbstractTest extends PHPUnit_Framework_TestCase
 {
+
     /**
      * @var TestModelValidator
      */
     protected $object;
-
     protected $loginValidator;
 
     public function setUp()
     {
         parent::setUp();
-        
+
         $this->loginValidator = m::mock('Xboom\\Model\\Validate\\Element\\ValidatorInterface');
         $this->loginValidator->shouldReceive('isValid')->andReturn(true);
         $this->loginValidator->shouldReceive('getMessages')->andReturn(array());
@@ -53,7 +56,7 @@ class Xboom_Model_Validate_AbstractTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function  testSetAndGetPropertyValidator()
+    public function testSetAndGetPropertyValidator()
     {
         $propertyName = 'login';
         $this->object->addPropertyValidator($propertyName, $this->loginValidator);
@@ -63,6 +66,7 @@ class Xboom_Model_Validate_AbstractTest extends PHPUnit_Framework_TestCase
                 $this->object->getPropertyValidator($propertyName)
         );
     }
+
     public function testMethodInitMustCall()
     {
         $this->assertEquals(
@@ -70,6 +74,7 @@ class Xboom_Model_Validate_AbstractTest extends PHPUnit_Framework_TestCase
                 $this->object->getPropertyValidator('setInInitMethod')
         );
     }
+
     /**
      * @expectedException \Xboom\Model\Validate\NoSuchPropertyException
      */
@@ -77,28 +82,30 @@ class Xboom_Model_Validate_AbstractTest extends PHPUnit_Framework_TestCase
     {
         $this->object->getPropertyValidator('InvalidProperty');
     }
-    public function  testValidDataMustReturnTrue()
+
+    public function testValidDataMustReturnTrue()
     {
         $validData = array(
-            'login'     => 'validLogin',
-            'password'  => 'validPassword',
-            'email'     => 'valid@email.com'
+            'login' => 'validLogin',
+            'password' => 'validPassword',
+            'email' => 'valid@email.com'
         );
         $this->object->addPropertyValidator('login', $this->loginValidator);
-        
+
         $this->assertTrue($this->object->isValid($validData));
     }
+
     public function testInvalidDataMustReturnFalse()
     {
         $invalidData = array(
-            'login'     => 'invalidLogin',
-            'password'  => 'validPassword',
-            'email'     => 'valid@email.com'
+            'login' => 'invalidLogin',
+            'password' => 'validPassword',
+            'email' => 'valid@email.com'
         );
 
         $loginValidator = m::mock('Xboom\\Model\\Validate\\Element\\ValidatorInterface');
         $loginValidator->shouldReceive('isValid')
-                             ->with($invalidData['login'])->andReturn(false);
+                ->with($invalidData['login'])->andReturn(false);
         $this->object->addPropertyValidator('login', $loginValidator);
         $this->assertFalse($this->object->isValid($invalidData));
     }
@@ -106,39 +113,62 @@ class Xboom_Model_Validate_AbstractTest extends PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function  testRaiseExceptionWhenNotArrayValidate()
+    public function testRaiseExceptionWhenNotArrayValidate()
     {
         $dataForValidation = new stdClass();
         $this->object->isValid($dataForValidation);
     }
+
     public function testGetMessageMustBeEmptyIfDataIsValid()
     {
         $validData = array(
-            'login'     => 'validLogin',
-            'password'  => 'validPassword',
-            'email'     => 'valid@email.com'
+            'login' => 'validLogin',
+            'password' => 'validPassword',
+            'email' => 'valid@email.com'
         );
         $this->loginValidator->shouldReceive('getMessages')->andReturn(array());
         $this->object->addPropertyValidator('login', $this->loginValidator);
 
         $this->assertEquals(0, count($this->object->getMessages()));
     }
+
     public function testGetMessageMustReturnArrayOfMessagesIfDataIsNotValid()
     {
         $invalidData = array(
-            'login'     => 'invalidLogin',
-            'password'  => 'validPassword',
-            'email'     => 'valid@email.com'
+            'login' => 'invalidLogin',
+            'password' => 'validPassword',
+            'email' => 'valid@email.com'
         );
         $errorMsg = 'Login must be valid!';
 
         $loginValidator = m::mock('Xboom\\Model\\Validate\\Element\\ValidatorInterface');
         $loginValidator->shouldReceive('isValid')
-                             ->with($invalidData['login'])->andReturn(false);
+                ->with($invalidData['login'])->andReturn(false);
         $loginValidator->shouldReceive('getMessages')->andReturn(array($errorMsg));
         $this->object->addPropertyValidator('login', $loginValidator);
         $this->assertFalse($this->object->isValid($invalidData));
         $messages = $this->object->getMessages();
         $this->assertContains($errorMsg, $messages['login']);
     }
+
+    public function testRequiredElement()
+    {
+        $validDataWithoutRequiredElement = array(
+            //'login'     => 'validLogin',
+            'password'  => 'validPassword',
+            'email'     => 'valid@email.com'
+        );
+        $required = true;
+        $errorMsg = TestModelValidator::REQUIRED_ELEMENT;
+        $loginValidator = m::mock('Xboom\\Model\\Validate\\Element\\ValidatorInterface');
+        $loginValidator->shouldReceive('addErrorMessage');
+        $loginValidator->shouldReceive('getMessages')->andReturn(array($errorMsg));
+        $this->object->addPropertyValidator('login', $loginValidator, $required);
+
+        $this->assertFalse($this->object->isValid($validDataWithoutRequiredElement));
+
+        $messages = $this->object->getMessages();
+        $this->assertContains($errorMsg, $messages['login']);
+    }
+
 }

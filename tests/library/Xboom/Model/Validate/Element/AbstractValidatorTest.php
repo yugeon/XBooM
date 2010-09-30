@@ -215,4 +215,14 @@ class AbstractValidatorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('validValue', $this->object->getValue());
     }
 
+    public function testCanAddErrorMessage()
+    {
+        $message = 'Value required and can\'t be empty';
+        $this->object->addErrorMessage($message);
+
+        $expectedMsg = array($message);
+        $this->assertEquals($expectedMsg, $this->object->getMessages());
+
+    }
+
 }

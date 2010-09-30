@@ -32,6 +32,8 @@ use Xboom\Model\Validate\Element\ValidatorInterface as ElementValidator;
 
 abstract class AbstractValidator implements ValidatorInterface
 {
+
+    const REQUIRED_ELEMENT = 'Value is required and can\'t be empty';
     
     /**
      * Protected property.
@@ -42,6 +44,14 @@ abstract class AbstractValidator implements ValidatorInterface
      * @var array
      */
     protected $_propertiesForValidation = array();
+
+    /**
+     * Required to validation properties
+     *
+     * @var array
+     */
+    protected $_requiredProperties = array();
+
 
     protected $_messages = array();
 
@@ -98,11 +108,19 @@ abstract class AbstractValidator implements ValidatorInterface
      *
      * @param  string $propertyName
      * @param  ElementValidator $validator
+     * @param  boolean $isRequired
      * @return ValidatorInterface Provides a fluent interface
      */
-    public function addPropertyValidator($propertyName, ElementValidator $validator)
+    public function addPropertyValidator($propertyName,
+            ElementValidator $validator, $isRequired = false)
     {
         $this->_propertiesForValidation[$propertyName] = $validator;
+
+        if ($isRequired)
+        {
+            $this->_requiredProperties[$propertyName] = $isRequired;
+        }
+
         return $this;
     }
 
@@ -160,6 +178,11 @@ abstract class AbstractValidator implements ValidatorInterface
             if (\array_key_exists($key, $data))
             {
                 $isValid = $propertyValidator->isValid($data[$key]) && $isValid;
+            }
+            elseif (\array_key_exists($key, $this->_requiredProperties))
+            {
+                $isValid = false;
+                $propertyValidator->addErrorMessage(self::REQUIRED_ELEMENT);
             }
         }
 

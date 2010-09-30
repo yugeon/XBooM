@@ -35,17 +35,17 @@ class RegisterUserForm extends \Zend_Form
 
         $this->addElement('text', 'name', array(
             'label' => 'Username',
-            'required' => true
+            //'required' => true
         ));
 
         $this->addElement('text', 'email', array(
             'label' => 'Email address',
-            'required' => true
+//            'required' => true
         ));
 
         $this->addElement('password', 'password', array(
             'label' => 'Password',
-            'required' => true
+//            'required' => true
         ));
 
         $this->addElement('password', 'confirm_password', array(

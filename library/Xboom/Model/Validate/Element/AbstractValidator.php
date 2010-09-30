@@ -222,4 +222,14 @@ abstract class AbstractValidator implements ValidatorInterface
         return $this->_value;
     }
 
+    /**
+     * @param string $msg
+     * @return AbstractValidator
+     */
+    public function addErrorMessage($msg)
+    {
+        $this->_messages[] = (string)$msg;
+        return $this;
+    }
+
 }

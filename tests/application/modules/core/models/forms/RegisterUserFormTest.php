@@ -36,6 +36,8 @@ class RegisterUserFormTest extends PHPUnit_Framework_TestCase
         $confirmPassword = '123456';
 
         $data = array(
+            'name' => 'ddd',
+            'email' => 'ddd',
             'password' => $password,
             'confirm_password' => $confirmPassword,
         );

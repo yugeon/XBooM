@@ -27,6 +27,7 @@
  */
 
 namespace Xboom\Model\Service;
+use \Xboom\Model\Service\Exception as ServiceException;
 
 class AuthService extends AbstractService
 {
@@ -86,8 +87,14 @@ class AuthService extends AbstractService
 
     public function authenticate($data)
     {
-        // TODO ACL
-        // TODO Validation
+        // FIXME need ACL here ???
+
+        // validation
+        $loginForm = $this->getForm('LoginUser');
+        if (!$loginForm->isValid($data))
+        {
+            throw new ServiceException('Incorrect data in the form');
+        }
 
         $this->_authAdapter
                 ->setIdentity($data['email'])

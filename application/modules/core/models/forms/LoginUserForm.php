@@ -20,26 +20,21 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
-namespace Core\Model\Form;
 /**
- * Description of RegisterNewUserForm
+ * Description of LoginUserForm
  *
  * @author yugeon
  */
-class RegisterUserForm extends \Zend_Form
-{
+namespace Core\Model\Form;
 
+class LoginUserForm extends \Zend_Form
+{
     public function init()
     {
-        $this->setName('registerUser');
-
-        $this->addElement('text', 'name', array(
-            'label' => 'Username',
-            'required' => true
-        ));
+        $this->setName('loginUser');
 
         $this->addElement('text', 'email', array(
-            'label' => 'Email address',
+            'label' => 'Email',
             'required' => true
         ));
 
@@ -48,25 +43,18 @@ class RegisterUserForm extends \Zend_Form
             'required' => true
         ));
 
-        $this->addElement('password', 'confirm_password', array(
-            'label' => 'Confirm password',
-            'required' => true,
-            'validators' => array( array('Identical', false, 'password'))
-        ));
+//        $this->addElement('captcha', 'captcha', array(
+//            'label' => 'Captcha',
+//            'captcha' => array(
+//                'captcha' => 'Image',
+//                'wordLen' => 6,
+//                'timeout' => 300,
+//                'font' => \APPLICATION_PATH . '/configs/fonts/Glasten_Bold.ttf',
+//            ),
+//        ));
 
-        $this->addElement('captcha', 'captcha', array(
-            'label' => 'Captcha',
-            'captcha' => array(
-                'captcha' => 'Image',
-                'wordLen' => 6,
-                'timeout' => 300,
-                'font' => \APPLICATION_PATH . '/configs/fonts/Glasten_Bold.ttf',
-            ),
-        ));
-
-        $this->addElement('submit', 'register', array(
-            'label' => 'Register'
+        $this->addElement('submit', 'login', array(
+            'label' => 'Login'
         ));
     }
-
 }

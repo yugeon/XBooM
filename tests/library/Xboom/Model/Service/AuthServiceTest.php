@@ -88,10 +88,14 @@ class AuthServiceTest extends \PHPUnit_Framework_TestCase
         $this->auth->shouldReceive('getStorage')->andReturn($authStorage);
         $this->auth->shouldReceive('clearIdentity');
 
+        $form = m::mock('Zend_Form');
+        $form->shouldReceive('isValid')->andReturn(true);
+
         $this->object = new AuthService($sc, $this->auth, $authAdapter);
         $this->object
                 ->setModelClassPrefix('\\Model\\Domain')
-                ->setModelShortName('User');
+                ->setModelShortName('User')
+                ->setForm('LoginUser', $form);
     }
 
     public function tearDown()

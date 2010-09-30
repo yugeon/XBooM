@@ -110,6 +110,18 @@ class AuthFunctionalTest extends \FunctionalTestCase
                 $this->authService->getCurrentUserIdentity());
     }
 
+    /**
+     * @expectedException \Xboom\Model\Service\Exception
+     */
+    public function testShouldRaiseExceptionIfFormDataInvalid()
+    {
+        $invalidData = array(
+            'notEmail' => 'bad@email.com',
+            'password' => $this->user->encryptPassword('p@$$w0rd')
+        );
+        $this->assertFalse($this->authService->authenticate($invalidData));
+    }
+
     public function testAuthenticateFailedIfLoginInvalid()
     {
         $invalidData = array(

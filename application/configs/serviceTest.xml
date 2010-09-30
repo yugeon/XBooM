@@ -64,7 +64,9 @@
             <call method="setModelShortName">
                 <argument>User</argument>
             </call>
-
+            <call method="setFormClassPrefix">
+                <argument>\Core\Model\Form</argument>
+            </call>
         </service>
 
     </services>

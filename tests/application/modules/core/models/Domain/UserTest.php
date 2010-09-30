@@ -184,6 +184,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertTrue( (boolean) $this->object->authenticate($password));
-        $this->assertEquals($expectedIdentity, $this->object->authenticate($password));
+        $this->assertEquals($expectedIdentity, $this->object->authenticate($password)->toArray());
     }
 }

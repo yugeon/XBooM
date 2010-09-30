@@ -154,12 +154,13 @@ class User extends DomainObject implements \Zend_Acl_Role_Interface, \Zend_Acl_R
      */
     public function getIdentity()
     {
-        return array(
+        $identity = array(
             'id'    => $this->getId(),
             'name'  => $this->getName(),
             'email' => $this->getEmail(),
             'roles' => $this->getAllRolesAsId()
         );
+        return new UserIdentity($identity);
     }
 
     /**

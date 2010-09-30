@@ -107,7 +107,7 @@ class AuthFunctionalTest extends \FunctionalTestCase
         );
 
         $this->assertEquals($expectedIdentity,
-                $this->authService->getCurrentUserIdentity());
+                $this->authService->getCurrentUserIdentity()->toArray());
     }
 
     /**
@@ -166,7 +166,7 @@ class AuthFunctionalTest extends \FunctionalTestCase
         $this->authService->authenticate($validData);
 
         $this->assertEquals($expectedIdentity,
-                $this->authService->getCurrentUserIdentity());
+                $this->authService->getCurrentUserIdentity()->toArray());
     }
 
     public function testShouldReturnGuestIdentityIfUserLogouted()
@@ -188,7 +188,7 @@ class AuthFunctionalTest extends \FunctionalTestCase
         $this->authService->logout();
 
         $this->assertEquals($expectedIdentity,
-                $this->authService->getCurrentUserIdentity());
+                $this->authService->getCurrentUserIdentity()->toArray());
     }
 
     public function testAuthenticateFiledShouldReturnArrayOfErrors()

@@ -137,4 +137,50 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         $this->object->getResourceId();
     }
+
+    public function testEncryptPassword()
+    {
+        $password = 'meg@SecurePa$$';
+        $this->assertNotEquals($password, $this->object->encryptPassword($password));
+    }
+
+    public function testFailedAuthenticateShouldReturnFalse()
+    {
+        $password = 'badPassword';
+        $this->assertFalse((boolean)$this->object->authenticate($password));
+    }
+
+    public function testSuccessedAuthenticateShouldReturnIdentity()
+    {
+        $testName = 'Vasya';
+        $testEmail = 'vasya@mail.com';
+        $password = 'validPassword';
+
+        $this->object->setName($testName);
+        $this->object->setEmail($testEmail);
+        $this->object->setPassword($this->object->encryptPassword($password));
+
+        $role1 = m::mock('Role');
+        $role1->shouldReceive('getRoleId')->andReturn('1');
+        $role2 = m::mock('Role');
+        $role2->shouldReceive('getRoleId')->andReturn('2');
+
+        $roles = array(
+            $role1,
+            $role2
+        );
+
+        $group = m::mock('Group');
+        $group->shouldReceive('getRoleId')->andReturn($roles);
+        $this->object->setGroup($group);
+
+        $expectedIdentity = array(
+            'name' => $testName,
+            'email' => $testEmail,
+            'roles' => array('1', '2'),
+        );
+
+        $this->assertTrue( (boolean) $this->object->authenticate($password));
+        $this->assertEquals($expectedIdentity, $this->object->authenticate($password));
+    }
 }

@@ -144,7 +144,7 @@ class Doctrine implements \Zend_Auth_Adapter_Interface
 
             $entity = $this->_getEntity();
 
-            if (null === $entity)
+            if (null === $entity || empty($entity))
             {
                 $result = $this->_createAuthResult(
                         \Zend_Auth_Result::FAILURE_IDENTITY_NOT_FOUND, null, array(self::AUTH_FAILED));
@@ -208,7 +208,7 @@ class Doctrine implements \Zend_Auth_Adapter_Interface
         );
 
         return $this->_em->getRepository($this->getEntityName())
-                        ->getForAuth($criteria);
+                        ->getOneForAuthBy($criteria);
     }
 
     protected function _createAuthResult($code, $identity = null, $messages = array())

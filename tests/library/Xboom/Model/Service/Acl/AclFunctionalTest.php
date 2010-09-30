@@ -24,7 +24,6 @@
  * Description of AclFunctionalTestCase
  *
  * @author yugeon
- * @todo Множественные роли
  */
 namespace test\Xboom\Model\Service\Acl;
 use \Core\Model\Domain\User,

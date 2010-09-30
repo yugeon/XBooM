@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  CMF for web applications based on Zend Framework 1 and Doctrine 2
  *  Copyright (C) 2010  Eugene Gruzdev aka yugeon
@@ -21,11 +22,13 @@
  */
 
 namespace Core\Model\Domain;
+
 use \Xboom\Model\Domain\AbstractObject,
-    \Xboom\Model\Domain\Acl\Resource,
-    \Doctrine\Common\Collections\ArrayCollection;
+ \Xboom\Model\Domain\Acl\Resource,
+ \Doctrine\Common\Collections\ArrayCollection;
+
 /**
- * @Entity
+ * @Entity(repositoryClass="Core\Model\Domain\Repository\UserRepository")
  * @Table(name="users")
  */
 class User extends AbstractObject implements \Zend_Acl_Role_Interface, \Zend_Acl_Resource_Interface
@@ -43,7 +46,7 @@ class User extends AbstractObject implements \Zend_Acl_Role_Interface, \Zend_Acl
     /** @Column(type="string", unique=true, length=255) */
     protected $email;
 
-    /** @Column(type="string", length=48) */
+    /** @Column(type="string", nullable=true, length=255) */
     protected $password;
 
     /**
@@ -67,7 +70,7 @@ class User extends AbstractObject implements \Zend_Acl_Role_Interface, \Zend_Acl
      *
      * @return array
      */
-    public function  getRoleId()
+    public function getRoleId()
     {
         if (null !== $this->getId())
         {
@@ -92,12 +95,24 @@ class User extends AbstractObject implements \Zend_Acl_Role_Interface, \Zend_Acl
         return $roles;
     }
 
+    public function getAllRolesAsId()
+    {
+        $rolesId = array();
+        $roles = $this->getAllRoles();
+        foreach ($roles as $role)
+        {
+            $rolesId[] = $role->getRoleId();
+        }
+
+        return $rolesId;
+    }
+
     /**
      * Returns the string identifier of the Resource
      *
      * @return string
      */
-    public function  getResourceId()
+    public function getResourceId()
     {
         if (null !== $this->getResource())
         {
@@ -113,11 +128,53 @@ class User extends AbstractObject implements \Zend_Acl_Role_Interface, \Zend_Acl
      */
     public function setResource($resource)
     {
-        if (! ($resource instanceof \Zend_Acl_Resource_Interface))
+        if (!($resource instanceof \Zend_Acl_Resource_Interface))
         {
             throw new \InvalidArgumentException('Resource must be a object');
         }
 
         $this->resource = $resource;
     }
+
+    /**
+     * Encrypt password
+     * 
+     * @param string $password
+     * @return string Encrupted password
+     */
+    public function encryptPassword($password)
+    {
+        // FIXME: make a more secure algorithm with salt
+        return \md5($password);
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function getIdentity()
+    {
+        return array(
+            'name' => $this->getName(),
+            'email' => $this->getEmail(),
+            'roles' => $this->getAllRolesAsId()
+        );
+    }
+
+    /**
+     *
+     * @param string $password
+     * @return false|array
+     */
+    public function authenticate($password)
+    {
+        $identity = false;
+
+        if ($this->encryptPassword($password) == $this->password)
+        {
+            $identity = $this->getIdentity();
+        }
+        return $identity;
+    }
+
 }

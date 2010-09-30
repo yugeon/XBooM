@@ -53,8 +53,8 @@ class DoctrineTest extends \PHPUnit_Framework_TestCase
 
         $em = m::mock('\\Doctrine\\ORM\\EntityManager');
         $em->shouldReceive('getRepository')->andReturn($em);
-        $em->shouldReceive('getForAuth')->with($this->nonExistIdentityCriteria)->andReturn(null);
-        $em->shouldReceive('getForAuth')->with($this->existIdentityCriteria)->andReturn($user);
+        $em->shouldReceive('getOneForAuthBy')->with($this->nonExistIdentityCriteria)->andReturn(null);
+        $em->shouldReceive('getOneForAuthBy')->with($this->existIdentityCriteria)->andReturn($user);
 
         $this->object = new Doctrine($em);
     }

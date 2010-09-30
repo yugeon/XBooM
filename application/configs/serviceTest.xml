@@ -2,9 +2,9 @@
 
 <container xmlns="http://symfony-project.org/2.0/container">
 
-  <imports>
-    <import resource="entitymanager.xml" />
-  </imports>
+    <imports>
+        <import resource="entitymanager.xml" />
+    </imports>
   
 <!--  <parameters>
       <parameter key="doctrine.connection.options" type="collection">
@@ -16,28 +16,57 @@
       <parameter key="doctrine.orm.proxy_namespace">/dev/null</parameter>
   </parameters>-->
 
-  <services>
-    <service id="mail.transport" class="Zend_Mail_Transport_Smtp" shared="false">
-      <argument>smtp.gmail.com</argument>
-      <argument type="collection">
-        <argument key="auth">login</argument>
-        <argument key="username">%mailer.username%</argument>
-        <argument key="password">%mailer.password%</argument>
-        <argument key="ssl">ssl</argument>
-        <argument key="port">true</argument>
-      </argument>
-    </service>
+    <services>
+        <service id="mail.transport" class="Zend_Mail_Transport_Smtp" shared="false">
+            <argument>smtp.gmail.com</argument>
+            <argument type="collection">
+                <argument key="auth">login</argument>
+                <argument key="username">%mailer.username%</argument>
+                <argument key="password">%mailer.password%</argument>
+                <argument key="ssl">ssl</argument>
+                <argument key="port">true</argument>
+            </argument>
+        </service>
 
-    <service id="mailer" class="%mailer.class%">
-      <call method="setDefaultTransport">
-        <argument type="service" id="mail.transport" />
-      </call>
-    </service>
+        <service id="mailer" class="%mailer.class%">
+            <call method="setDefaultTransport">
+                <argument type="service" id="mail.transport" />
+            </call>
+        </service>
     
-    <service id="AclService" class="Xboom\Model\Service\Acl\AclService">
-        <argument type="service" id="doctrine.orm.entitymanager" />
-    </service>
+        <service id="AclService" class="Xboom\Model\Service\Acl\AclService">
+            <argument type="service" id="doctrine.orm.entitymanager" />
+        </service>
 
-  </services>
+        <service id="auth" class="Zend_Auth" constructor="getInstance" />
+
+        <service id="auth.adapter" class="Xboom\Auth\Adapter\Doctrine">
+            <argument type="service" id="doctrine.orm.entitymanager" />
+            <argument>\Core\Model\Domain\User</argument>
+            <argument>email</argument>
+
+            <call method="setEntityName">
+                <argument>\Core\Model\Domain\User</argument>
+            </call>
+            <call method="setIdentityName">
+                <argument>email</argument>
+            </call>
+        </service>
+
+        <service id="AuthService" class="Xboom\Model\Service\AuthService">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="auth" />
+            <argument type="service" id="auth.adapter" />
+
+            <call method="setModelClassPrefix">
+                <argument>\Core\Model\Domain</argument>
+            </call>
+            <call method="setModelShortName">
+                <argument>User</argument>
+            </call>
+
+        </service>
+
+    </services>
 
 </container>

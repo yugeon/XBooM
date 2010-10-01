@@ -85,6 +85,13 @@ class AuthService extends AbstractService
         return $messages;
     }
 
+    /**
+     * Try authenticate user.
+     *
+     * @param array $data
+     * @return boolean
+     * @throws ServiceException If can't perform authentication
+     */
     public function authenticate($data)
     {
         // FIXME need ACL here ???
@@ -114,13 +121,20 @@ class AuthService extends AbstractService
                         //fixme hardcode guest identity by email
                         ->findOneBy(array('email' => 'guest@guest'));
 
-        if (null !== $guest)
+        if (!empty($guest))
         {
             $result = $guest->getIdentity();
         }
         return $result;
     }
 
+    /**
+     * Get the current user's identity.
+     * If the current user is not logged in,
+     * then returned to the identification of the guest.
+     *
+     * @return object
+     */
     public function getCurrentUserIdentity()
     {
         if ($this->_auth->hasIdentity())

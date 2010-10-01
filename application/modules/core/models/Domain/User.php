@@ -164,6 +164,21 @@ class User extends DomainObject implements \Zend_Acl_Role_Interface, \Zend_Acl_R
     }
 
     /**
+     * Register user.
+     *
+     * @param array $data
+     * @return User
+     */
+    public function register($data)
+    {
+        $this->name     = $data['name'];
+        $this->email    = $data['email'];
+        $this->password = $this->encryptPassword($data['password']);
+        
+        return $this;
+    }
+
+    /**
      *
      * @param string $password
      * @return false|array

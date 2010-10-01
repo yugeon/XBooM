@@ -1,7 +1,7 @@
 <?php
 
 /**
- *
+ * @group functional
  * @author yugeon
  */
 class Core_UserControllerTest extends ControllerTestCase
@@ -11,4 +11,3 @@ class Core_UserControllerTest extends ControllerTestCase
 
     }
 }
-?>

@@ -85,7 +85,7 @@ class UserService extends AbstractService
         if ($formToModelMediator->isValid($data, $breakValidation))
         {
             $user = $formToModelMediator->getModel();
-            //$user->register();
+            $user->register($formToModelMediator->getValues());
 
             $this->_em->persist($user);
 

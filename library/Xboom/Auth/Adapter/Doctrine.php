@@ -144,7 +144,7 @@ class Doctrine implements \Zend_Auth_Adapter_Interface
 
             $entity = $this->_getEntity();
 
-            if (null === $entity || empty($entity))
+            if (empty($entity))
             {
                 $result = $this->_createAuthResult(
                         \Zend_Auth_Result::FAILURE_IDENTITY_NOT_FOUND, null, array(self::AUTH_FAILED));

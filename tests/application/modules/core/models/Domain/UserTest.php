@@ -28,7 +28,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * @var Application_Model_Domain_User
+     * @var User
      */
     protected $object;
 
@@ -69,23 +69,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertType('Zend_Acl_Role_Interface', $this->object);
     }
 
-    public function _testDefaultUserShouldReturnGuestRole()
-    {
-        $this->markTestSkipped();
-        $expected = array(
-            'Guest',
-        );
-        $this->assertEquals($expected, $this->object->getRoleId());
-    }
-
-    public function  _testCanAssignToPersonalRole()
-    {
-        $role = m::mock('Role');
-        $role->shouldReceive('markPersonal');
-        $this->object->setRole($role);
-        $this->assertEquals($role, $this->object->getRole());
-    }
-
     public function testGetRoleIdShouldReturnAllRolesAssignedToUser()
     {
         $groupRoles = array(
@@ -94,26 +77,12 @@ class UserTest extends \PHPUnit_Framework_TestCase
         );
         $userGroup = m::mock('Group');
         $userGroup->shouldReceive('getRoleId')->andReturn($groupRoles);
-//        $userRole = m::mock('Role');
-//        $userRole->shouldReceive('markPersonal');
         $this->object->setId(545);
-//        $this->object->setRole($userRole);
         $this->object->setGroup($userGroup);
 
         $expected = $groupRoles;
-//        $expected[] = $userRole;
         
         $this->assertSame($expected, $this->object->getRoleId());
-    }
-
-    public function _testPersonalRoleShouldBeEspecially()
-    {
-        $userRole = m::mock('Role');
-        $userRole->shouldReceive('markPersonal')->with(true)->once();
-        $userRole->shouldReceive('isPersonal')->andReturn(true);
-        $this->object->setRole($userRole);
-
-        $this->assertTrue($this->object->getRole()->isPersonal());
     }
 
     public function testShouldImplementZendAclResourceInterface()
@@ -142,6 +111,23 @@ class UserTest extends \PHPUnit_Framework_TestCase
     {
         $password = 'meg@SecurePa$$';
         $this->assertNotEquals($password, $this->object->encryptPassword($password));
+    }
+
+    public function testRegister()
+    {
+        $data = array(
+            'name' => 'Vasya',
+            'email' => 'vasya@mail.com',
+            'password' => 'p@$$word'
+        );
+
+        $expected = $data;
+        $expected['password'] = $this->object->encryptPassword($data['password']);
+
+        $this->assertEquals($this->object, $this->object->register($data));
+        $this->assertEquals($expected['name'], $this->object->name);
+        $this->assertEquals($expected['email'], $this->object->email);
+        $this->assertEquals($expected['password'], $this->object->password);
     }
 
     public function testFailedAuthenticateShouldReturnFalse()

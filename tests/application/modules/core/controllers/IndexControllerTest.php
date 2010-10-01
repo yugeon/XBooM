@@ -7,6 +7,7 @@
 /**
  * Description of StatsTest
  *
+ * @group functional
  * @author yugeon
  */
 class Core_IndexControllerTest extends ControllerTestCase

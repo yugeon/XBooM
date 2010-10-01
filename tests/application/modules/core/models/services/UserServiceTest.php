@@ -95,6 +95,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->userMediator->shouldReceive('setDomainValidator')->andReturn($this->userMediator);
 
         $this->userModel = m::mock('\\Xboom\\Model\\Domain\\DomainObject');
+        $this->userModel->shouldReceive('register');
 
         $this->object = new UserService($sc);
         $this->object->setModelClassPrefix('\\Core\\Model\\Domain')
@@ -112,6 +113,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->userData = $userData;
+        $this->userMediator->shouldReceive('getValues')->andReturn($userData);
     }
 
     public function tearDown()

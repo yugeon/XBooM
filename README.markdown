@@ -46,3 +46,13 @@
     ./public/images/captcha
 
 Change config file `./application/configs/application.ini` Set your options for connections to DB.
+
+Run Unit Tests
+
+    cd ./tests
+    phpunit
+
+or without functional tests which need a DB connection
+
+    cd ./tests
+    phpunit --exclude-group=functional

@@ -26,9 +26,9 @@
 
  * PHP version >= 5.3
 
- * Zend Framework 1.10.x http://framework.zend.com/download/latest
+ * [Zend Framework 1.10.x](http://framework.zend.com/download/latest)
 
- * Doctrine 2.x http://www.doctrine-project.org/projects/orm/download
+ * [Doctrine 2.x](http://www.doctrine-project.org/projects/orm/download)
 
 # Install
 
@@ -36,9 +36,9 @@
 
  * Download and put Zend library in `./library`
 
- * Download and put Doctrine-common in `./library/Common`
- * Download and put Doctrine-dbal in `./library/DBAL`
- * Download and put ORM Doctrine 2 in `./library/ORM`
+ * Download and put Doctrine-common library in `./library/Common`
+ * Download and put Doctrine-dbal library in `./library/DBAL`
+ * Download and put ORM Doctrine 2 library in `./library/ORM`
 
  Give write permissions for your web server in the following directory
 
@@ -55,7 +55,7 @@ Change config file `./application/configs/application.ini` Set your options for 
 
 ## Run Unit Tests
 
-Need correct installed PHPUnit http://phpunit.de and Mockery http://github.com/padraic/mockery
+Need correct installed [PHPUnit](http://phpunit.de) and [Mockery](http://github.com/padraic/mockery)
 
 run all tests
 

@@ -47,7 +47,13 @@
 
 Change config file `./application/configs/application.ini` Set your options for connections to DB.
 
-Run Unit Tests
+## Create DB schema
+
+    cd ./tools/doctrine
+    ./doctrine orm:schema-tool:create
+    ./doctrine --testing orm:schema-tool:create
+
+## Run all Unit Tests
 
     cd ./tests
     phpunit

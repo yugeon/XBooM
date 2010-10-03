@@ -29,3 +29,20 @@
  * Zend Framework 1.10.x
 
  * Doctrine 2.x
+
+# Install
+
+    git clone git://github.com/yugeon/XBooM.git
+
+ * Download and put Zend library in `./library`
+
+ * Download and put Doctrine-common in `./library/Common`
+ * Download and put Doctrine-dbal in `./library/DBAL`
+ * Download and put ORM Doctrine 2 in `./library/ORM`
+
+ Give write permissions for the directories
+
+    ./data/*
+    ./public/images/captcha
+
+Change config file `./application/configs/application.ini` Set your options for connections to DB.

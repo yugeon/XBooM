@@ -166,8 +166,10 @@ class Mediator implements MediatorInterface
      */
     public function _pushDataToModel()
     {
-        $values = $this->getValues();
-        $this->_model->setData($values);
+        // potential security violation,
+        // becaouse sets all transfered properties
+//        $values = $this->getValues();
+//        $this->_model->setData($values);
     }
 
     /**

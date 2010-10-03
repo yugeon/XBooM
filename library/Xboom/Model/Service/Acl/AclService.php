@@ -24,7 +24,6 @@
  * Description of AclService
  *
  * @author yugeon
- * @todo refactoring
  */
 
 namespace Xboom\Model\Service\Acl;
@@ -38,14 +37,25 @@ use \Xboom\Model\Service\AbstractService,
 class AclService
 {
 
-    protected $_em;
+    protected $_em = null;
     protected $_acl = array();
     protected $_assertions = array();
-    protected $resourceClass = '\\Xboom\\Model\\Domain\\Acl\\Resource';
+    protected $_resourceClass = '';
 
     public function __construct($em)
     {
         $this->_em = $em;
+    }
+
+    /**
+     *
+     * @param string $resourceClass
+     * @return AclService 
+     */
+    public function setResourceClass($resourceClass)
+    {
+        $this->_resourceClass = $resourceClass;
+        return $this;
     }
 
     public function getAssertion($assertionName)
@@ -243,7 +253,7 @@ class AclService
         $qb = $this->_em->createQueryBuilder();
 
         $qb->select(array('res', 'p', 'r', 'res_own'))
-                ->from($this->resourceClass, 'res')
+                ->from($this->_resourceClass, 'res')
                 ->leftJoin('res.owner', 'res_own');
 
         // constraint by permission
@@ -267,29 +277,6 @@ class AclService
             $qb->leftJoin('p.roles', 'r', 'WITH', $qb->expr()->in('r.id', $role));
         }
 
-//        if (\is_int($userId))
-//        {
-//            $qb->leftJoin('p.roles', 'r', 'WITH',
-//                            'r.id IN (SELECT ur.id FROM \Core\Model\Domain\User u'
-//                            . ' JOIN u.group g JOIN g.roles ur WHERE u.id = :id)')
-//                    ->setParameter('id', $userId);
-//        }
-//        elseif (\is_string($userId))
-//        {
-//            if ('guest' === $userId)
-//            {
-//                $userId = 'guest@guest';
-//            }
-//
-//            $qb->leftJoin('p.roles', 'r', 'WITH',
-//                            'r.id IN (SELECT ur.id FROM \Core\Model\Domain\User u'
-//                            . ' JOIN u.group g JOIN g.roles ur WHERE u.email = :email)')
-//                    ->setParameter('email', $userId);
-//        }
-//        else
-//        {
-//            $qb->leftJoin('p.roles', 'r');
-//        }
         // constraint by resource
         if ('all' !== $resource)
         {
@@ -317,14 +304,14 @@ class AclService
     /**
      * Get all the ids of parents resources by single query without recursion.
      *
-     * @param string $resource
+     * @param string $resourceName
      * @return array
      */
-    protected function _getResourceParentsId($resourceId)
+    protected function _getResourceParentsId($resourceName)
     {
         $result = array();
 
-        $resource = $this->_em->getRepository($this->resourceClass)->findOneByName($resourceId);
+        $resource = $this->_em->getRepository($this->_resourceClass)->findOneByName($resourceName);
 
         if (!\is_object($resource))
         {
@@ -342,7 +329,7 @@ class AclService
         /* @var $qb \Doctrine\ORM\QueryBuilder */
         $qb = $this->_em->createQueryBuilder();
         $qb->select(array('r0.id r0_id', 'r1.id r1_id'))
-                ->from($this->resourceClass, 'r0')
+                ->from($this->_resourceClass, 'r0')
                 ->leftJoin('r0.parent', 'r1')
                 ->where($qb->expr()->eq('r0.id', '?1'))
                 ->setParameter(1, $resourceId);

@@ -9,8 +9,10 @@
 
         <service id="AclService" class="Xboom\Model\Service\Acl\AclService">
             <argument type="service" id="doctrine.orm.entitymanager" />
+            <call method="setResourceClass">
+                <argument>\Xboom\Model\Domain\Acl\Resource</argument>
+            </call>
         </service>
-
 
         <service id="auth" class="Zend_Auth" constructor="getInstance" />
 

@@ -26,9 +26,9 @@
 
  * PHP version >= 5.3
 
- * Zend Framework 1.10.x
+ * Zend Framework 1.10.x http://framework.zend.com/download/latest
 
- * Doctrine 2.x
+ * Doctrine 2.x http://www.doctrine-project.org/projects/orm/download
 
 # Install
 
@@ -40,10 +40,10 @@
  * Download and put Doctrine-dbal in `./library/DBAL`
  * Download and put ORM Doctrine 2 in `./library/ORM`
 
- Give write permissions for the directories
+ Give write permissions for your web server in the following directory
 
-    ./data/*
-    ./public/images/captcha
+    chmod a+w -R ./data
+    chmod a+w ./public/images/captcha
 
 Change config file `./application/configs/application.ini` Set your options for connections to DB.
 
@@ -53,7 +53,11 @@ Change config file `./application/configs/application.ini` Set your options for 
     ./doctrine orm:schema-tool:create
     ./doctrine --testing orm:schema-tool:create
 
-## Run all Unit Tests
+## Run Unit Tests
+
+Need correct installed PHPUnit http://phpunit.de and Mockery http://github.com/padraic/mockery
+
+run all tests
 
     cd ./tests
     phpunit

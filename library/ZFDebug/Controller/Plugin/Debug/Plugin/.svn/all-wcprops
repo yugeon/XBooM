@@ -1,0 +1,83 @@
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/154/trunk/library/ZFDebug/Controller/Plugin/Debug/Plugin
+END
+Exception.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/152/trunk/library/ZFDebug/Controller/Plugin/Debug/Plugin/Exception.php
+END
+Time.php
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/152/trunk/library/ZFDebug/Controller/Plugin/Debug/Plugin/Time.php
+END
+File.php
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/152/trunk/library/ZFDebug/Controller/Plugin/Debug/Plugin/File.php
+END
+Interface.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/109/trunk/library/ZFDebug/Controller/Plugin/Debug/Plugin/Interface.php
+END
+Log.php
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/!svn/ver/152/trunk/library/ZFDebug/Controller/Plugin/Debug/Plugin/Log.php
+END
+Auth.php
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/152/trunk/library/ZFDebug/Controller/Plugin/Debug/Plugin/Auth.php
+END
+Cache.php
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/!svn/ver/152/trunk/library/ZFDebug/Controller/Plugin/Debug/Plugin/Cache.php
+END
+Html.php
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/152/trunk/library/ZFDebug/Controller/Plugin/Debug/Plugin/Html.php
+END
+Text.php
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/!svn/ver/154/trunk/library/ZFDebug/Controller/Plugin/Debug/Plugin/Text.php
+END
+Database.php
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/152/trunk/library/ZFDebug/Controller/Plugin/Debug/Plugin/Database.php
+END
+Variables.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/152/trunk/library/ZFDebug/Controller/Plugin/Debug/Plugin/Variables.php
+END
+Memory.php
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/!svn/ver/152/trunk/library/ZFDebug/Controller/Plugin/Debug/Plugin/Memory.php
+END
+Registry.php
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/!svn/ver/152/trunk/library/ZFDebug/Controller/Plugin/Debug/Plugin/Registry.php
+END

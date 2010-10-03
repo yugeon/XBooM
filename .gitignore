@@ -1,6 +1,5 @@
 /library/Doctrine/*
 /library/Zend/*
-/library/ZFDebug/*
 /data/*
 /public/images/captcha/*
 /tests/log/*

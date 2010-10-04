@@ -17,6 +17,18 @@
 
     <div class="container showgrid">
 
+        <div class="messages">
+            <?php if (!empty($this->messages)) : ?>
+                    <?php foreach ($this->messages as $message) :?>
+            <span><?php echo $this->escape($message); ?></span>
+                    <?php endforeach;?>
+            <?php endif;?>
+        </div>
+
+        <div class="login">
+            <?php echo $this->loginUser(); ?>
+        </div>
+
         <h1>This is Layout</h1>
 <?php echo $this->layout()->content; ?>
 

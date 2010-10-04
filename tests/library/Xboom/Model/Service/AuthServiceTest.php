@@ -188,4 +188,16 @@ class AuthServiceTest extends \PHPUnit_Framework_TestCase
         
         $this->assertTrue(\sizeof($this->object->getMessages()) > 0);
     }
+
+    public function testHasIdentityReturnTrueIfCurrentUserHasIdentity()
+    {
+        $this->auth->shouldReceive('hasIdentity')->andReturn(true);
+        $this->assertTrue($this->object->hasIdentity());
+    }
+
+    public function testHasIdentityReturnFasleIfCurrentUserDontHaveIdentity()
+    {
+        $this->auth->shouldReceive('hasIdentity')->andReturn(false);
+        $this->assertFalse($this->object->hasIdentity());
+    }
 }

@@ -32,7 +32,7 @@ class LoginUserForm extends \Zend_Form
     public function init()
     {
         $this->setName('loginUser');
-
+     
         $this->addElement('text', 'email', array(
             'label' => 'Email',
             'required' => true

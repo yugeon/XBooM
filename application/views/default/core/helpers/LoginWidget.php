@@ -26,7 +26,7 @@
  * @author yugeon
  */
 
-class Core_View_Helper_LoginUser extends Zend_View_Helper_Abstract
+class Core_View_Helper_LoginWidget extends Zend_View_Helper_Abstract
 {
     protected $_scriptPath = 'auth/login.phtml';
 
@@ -47,7 +47,7 @@ class Core_View_Helper_LoginUser extends Zend_View_Helper_Abstract
      *
      * @return string
      */
-    public function loginUser()
+    public function loginWidget()
     {
         if (!isset($this->view->serviceContainer)
                 || !is_object($this->view->serviceContainer))
@@ -67,7 +67,10 @@ class Core_View_Helper_LoginUser extends Zend_View_Helper_Abstract
         else
         {
             $loginForm = $_authService->getForm('LoginUser');
-            $loginForm->setAction('auth/login');
+            $loginForm->setAction(
+                    $this->view->url(
+                            array('controller' => 'auth', 'action' => 'login'))
+            );
             $this->view->loginForm = $loginForm;
         }
 

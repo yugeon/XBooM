@@ -50,12 +50,12 @@ class Core_AuthController extends Zend_Controller_Action
     
     public function loginAction()
     {
+        $this->_helper->viewRenderer->setNoRender();
+
         $this->view->messages = array();
 
         if ($this->_authService->hasIdentity())
         {
-//            $this->view->messages[] = 'вы уже залогины '
-//                    . $this->_authService->getCurrentUserIdentity()->getName();
             return;
         }
 
@@ -83,7 +83,6 @@ class Core_AuthController extends Zend_Controller_Action
             }
         }
 
-    //    $this->view->loginForm = $this->_authService->getForm('LoginUser');
     }
 
     public function logoutAction()

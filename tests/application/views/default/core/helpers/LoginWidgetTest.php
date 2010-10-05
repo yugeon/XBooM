@@ -28,11 +28,11 @@
 
 namespace test\Core\View\Helper;
 
-require_once APPLICATION_PATH . '/views/default/core/helpers/LoginUser.php';
+require_once APPLICATION_PATH . '/views/default/core/helpers/LoginWidget.php';
 
 use \Mockery as m;
 
-class LoginUserTest extends \PHPUnit_Framework_TestCase
+class LoginWidgetTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $object;
@@ -41,7 +41,7 @@ class LoginUserTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->object = new \Core_View_Helper_LoginUser;
+        $this->object = new \Core_View_Helper_LoginWidget;
 
         $userIdentity = m::mock('stdClass');
         //$userIdentity->shouldR
@@ -58,6 +58,7 @@ class LoginUserTest extends \PHPUnit_Framework_TestCase
 
         $this->view = m::mock('Zend_View_Interface');
         $this->view->shouldReceive('__isset')->andReturn(true);
+        $this->view->shouldReceive('url');
         $this->view->serviceContainer = $serviceContainer;
 
         $this->object->setView($this->view);
@@ -83,7 +84,7 @@ class LoginUserTest extends \PHPUnit_Framework_TestCase
     public function testCanSetRenderScriptPath()
     {
         $scriptPath = 'auth/login.phtml';
-        $this->object = new \Core_View_Helper_LoginUser($scriptPath);
+        $this->object = new \Core_View_Helper_LoginWidget($scriptPath);
         $this->assertEquals($scriptPath, $this->object->getScriptPath());
     }
 
@@ -92,7 +93,7 @@ class LoginUserTest extends \PHPUnit_Framework_TestCase
         $expected = 'html text with login form';
         $this->authService->shouldReceive('hasIdentity')->andReturn(false);
         $this->view->shouldReceive('render')->andReturn($expected);
-        $this->assertEquals($expected, $this->object->loginUser());
+        $this->assertEquals($expected, $this->object->loginWidget());
     }
 
     public function testIfCurrentUserHasIdentityReturnIdentity()
@@ -100,6 +101,6 @@ class LoginUserTest extends \PHPUnit_Framework_TestCase
         $expected = 'html text with identity';
         $this->authService->shouldReceive('hasIdentity')->andReturn(true);
         $this->view->shouldReceive('render')->andReturn($expected);
-        $this->assertEquals($expected, $this->object->loginUser());
+        $this->assertEquals($expected, $this->object->loginWidget());
     }
 }

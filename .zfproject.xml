@@ -36,32 +36,35 @@
           </controllersDirectory>
           <layoutsDirectory enabled="false"/>
           <modelsDirectory>
-              <formsDirectory/>
+            <formsDirectory/>
           </modelsDirectory>
         </moduleDirectory>
       </modulesDirectory>
       <viewsDirectory>
+        <layoutsDirectory/>
         <modulesDirectory>
-            <viewScriptsDirectory>
-              <viewControllerScriptsDirectory forControllerName="Index">
-                <viewScriptFile forActionName="index"/>
-              </viewControllerScriptsDirectory>
-              <viewControllerScriptsDirectory forControllerName="Error">
-                <viewScriptFile forActionName="error"/>
-              </viewControllerScriptsDirectory>
-              <viewControllerScriptsDirectory forControllerName="Error">
-                <viewScriptFile forActionName="index"/>
-              </viewControllerScriptsDirectory>
-              <viewControllerScriptsDirectory forControllerName="Auth">
-                <viewScriptFile forActionName="login"/>
-              </viewControllerScriptsDirectory>
-              <viewControllerScriptsDirectory forControllerName="User">
-                <viewScriptFile forActionName="index"/>
-                <viewScriptFile forActionName="add"/>
-              </viewControllerScriptsDirectory>
-            </viewScriptsDirectory>
-            <viewHelpersDirectory/>
-            <viewFiltersDirectory enabled="false"/>
+            <moduleDirectory moduleName="core">
+              <viewScriptsDirectory>
+                <viewControllerScriptsDirectory forControllerName="Index">
+                  <viewScriptFile forActionName="index"/>
+                </viewControllerScriptsDirectory>
+                <viewControllerScriptsDirectory forControllerName="Error">
+                  <viewScriptFile forActionName="error"/>
+                </viewControllerScriptsDirectory>
+                <viewControllerScriptsDirectory forControllerName="Error">
+                  <viewScriptFile forActionName="index"/>
+                </viewControllerScriptsDirectory>
+                <viewControllerScriptsDirectory forControllerName="Auth">
+                  <viewScriptFile forActionName="login"/>
+                </viewControllerScriptsDirectory>
+                <viewControllerScriptsDirectory forControllerName="User">
+                  <viewScriptFile forActionName="index"/>
+                  <viewScriptFile forActionName="add"/>
+                </viewControllerScriptsDirectory>
+              </viewScriptsDirectory>
+              <viewHelpersDirectory/>
+              <viewFiltersDirectory enabled="false"/>
+            </moduleDirectory>
         </modulesDirectory>
       </viewsDirectory>
       <bootstrapFile filesystemName="Bootstrap.php"/>

@@ -38,7 +38,7 @@ class NavigationService
 
     /**
      *
-     * @var Zend_Navigation_Container
+     * @var array of Zend_Navigation_Container
      */
     protected $_navigations = array();
 
@@ -142,12 +142,6 @@ class NavigationService
                         $result[$index]['resource'] = $value->getResourceId();
                         continue;
                     }
-
-//                    if ('permission' == $key)
-//                    {
-//                        $result[$index]['permission'] = $value->getId();
-//                        continue;
-//                    }
 
                     if ('pages' == $key)
                     {

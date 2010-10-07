@@ -37,8 +37,7 @@ use \Xboom\Model\Domain\Navigation\Menu,
 class NavigationFunctionalTest extends \FunctionalTestCase
 {
 
-    protected $newsResource;
-    protected $viewPermission;
+    protected $navigationName = 'default';
     protected $navigationService;
 
     public function setUp()
@@ -54,7 +53,7 @@ class NavigationFunctionalTest extends \FunctionalTestCase
         $viewPermission = 'view';
 
         $page1 = new Page();
-        $page1->label = 'Home';
+        $page1->label = 'Page 1';
         $page1->title = 'Home page';
         $page1->type  = 'mvc';
         $page1->module = 'core';
@@ -65,8 +64,8 @@ class NavigationFunctionalTest extends \FunctionalTestCase
         $this->_em->persist($page1);
 
         $page2 = new Page();
-        $page2->label = 'News';
-        $page2->title = 'Last news';
+        $page2->label = 'Page 1.1';
+        $page2->order = 2;
         $page2->type  = 'mvc';
         $page2->module = 'core';
         $page2->controller = 'news';
@@ -74,26 +73,25 @@ class NavigationFunctionalTest extends \FunctionalTestCase
         $this->_em->persist($page2);
 
         $page3 = new Page();
-        $page3->label = 'Zend';
-        $page3->title = 'Go to Zend Framework off site';
+        $page3->label = 'Page 1.1.1';
         $page3->type  = 'uri';
         $page3->uri = 'http://framework.zend.com';
         $this->_em->persist($page3);
 
         $page4 = new Page();
-        $page4->label = 'Googl';
+        $page4->label = 'Page 2';
         $page4->title = 'Search engine';
         $page4->type  = 'uri';
         $page4->uri = 'http://google.com';
         $this->_em->persist($page4);
 
         $page5 = new Page();
-        $page5->label = 'News';
-        $page5->title = 'Last news';
+        $page5->label = 'Page 1.2';
+        $page5->order = 1;
         $page5->type  = 'mvc';
         $page5->module = 'core';
         $page5->controller = 'news';
-        $page5->action = 'index';
+        $page5->action = 'last';
         $this->_em->persist($page5);
 
         $page1->addChildPage($page2);
@@ -102,7 +100,7 @@ class NavigationFunctionalTest extends \FunctionalTestCase
 
 
         $menu = new Menu();
-        $menu->name = 'default';
+        $menu->name = $this->navigationName;
         $menu->assignToPage($page1);
         $menu->assignToPage($page4);
         $this->_em->persist($menu);
@@ -117,6 +115,21 @@ class NavigationFunctionalTest extends \FunctionalTestCase
 
     public function testGetNavigationByName()
     {
-        $this->navigationService->getNavigation();
+        $actual = array();
+        $expected = array(
+            'Page 1',
+                'Page 1.2',
+                'Page 1.1',
+                    'Page 1.1.1',
+            'Page 2'
+        );
+        $nav = $this->navigationService->getNavigation($this->navigationName);
+
+        $iterator = new \RecursiveIteratorIterator($nav,
+            \RecursiveIteratorIterator::SELF_FIRST);
+        foreach ($iterator as $page) {
+            $actual[] = $page->getLabel();
+        }
+        $this->assertEquals($expected, $actual);
     }
 }

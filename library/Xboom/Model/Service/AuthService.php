@@ -130,7 +130,7 @@ class AuthService extends AbstractService
 
     public function getGuestIdentity()
     {
-        $result = array();
+        $result = null;
         
         // FIXME caching
         $guest = $this->_em

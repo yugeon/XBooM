@@ -31,24 +31,18 @@ class Core_View_Helper_LoginWidget extends Zend_View_Helper_Abstract
     protected $_scriptPath = 'auth/login.phtml';
 
     /**
+     * Set variables for user identity or login form and render view script.
      *
      * @param string $scriptPath
+     * @return string
      */
-    public function __construct($scriptPath = null)
+    public function loginWidget($scriptPath = null)
     {
         if (null !== $scriptPath)
         {
             $this->_scriptPath = $scriptPath;
         }
-    }
 
-    /**
-     * Set variables for user identity or login form and render view script.
-     *
-     * @return string
-     */
-    public function loginWidget()
-    {
         if (!isset($this->view->serviceContainer)
                 || !is_object($this->view->serviceContainer))
         {

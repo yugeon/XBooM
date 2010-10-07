@@ -4,6 +4,7 @@
  * Description of Multilang
  *
  * @author yugeon
+ * @group functional
  */
 class Xboom_Controller_Plugin_MultilangTest extends ControllerTestCase
 {

@@ -1,42 +1,70 @@
-<?php echo $this->doctype() . "\n"; ?>
+<?php echo $this->doctype(); ?>
+
 <html xml:lang="en" xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
     <base href="<?php echo $this->escape($this->ServerUrl() . $this->baseUrl()); ?>" />
 <?php
-    echo $this->headMeta()->setIndent('    ') . "\n";
-    echo $this->headTitle()->setIndent('    ') . "\n";
-    echo $this->headLink()->setIndent('    ')
+    echo $this->headMeta()->setIndent(4) . "\n";
+    echo $this->headTitle()->setIndent(4) . "\n";
+    echo $this->headLink()->setIndent(4)
                      ->appendStylesheet('css/blueprint/screen.css', 'screen, projection')
                      ->appendStylesheet('css/blueprint/print.css', 'print')
                      ->appendStylesheet('css/blueprint/ie.css', 'screen, projection', 'lt IE 8')
                      ->appendStylesheet('css/main.css', 'screen, projection');
-    echo $this->headStyle()->setIndent('    ') . "\n";
+    echo $this->headStyle()->setIndent(4) . "\n";
 ?>
 </head>
 <body>
 
     <div class="container showgrid">
 
-        <div class="messages">
+        <div class="header">
+
+            <div class="topnav">
+                <?php echo $this->navigationWidget()->menu()->setMaxDepth(1)->setIndent(12); ?>
+
+            </div>
+
+            <div class="breadcrumbs">
+                <?php echo $this->navigationWidget()->breadcrumbs()->setMinDepth(1)->setLinkLast(true)->setSeparator(' > '); ?>
+
+            </div>
+            
+        </div>
+
+        <div class="content">
+
+            <div class="messages">
+
             <?php if (!empty($this->messages)) : ?>
                     <?php foreach ($this->messages as $message) :?>
-            <span><?php echo $this->escape($message); ?></span>
+                <span><?php echo $this->escape($message); ?></span>
                     <?php endforeach;?>
             <?php endif;?>
+
+            </div>
+
+            <div class="login">
+
+                <?php echo $this->loginWidget(); ?>
+
+            </div>
+
+            <h1>This is Layout</h1>
+
+            <?php echo $this->layout()->content; ?>
+
         </div>
 
-        <div class="login">
-            <?php echo $this->loginWidget(); ?>
+        <div class="footer">
+            2010 All rights reserved.
         </div>
-
-        <h1>This is Layout</h1>
-<?php echo $this->layout()->content; ?>
 
     </div>
 
 <?php
     // read plz http://webo.in/articles/habrahabr/15-yahoo-best-practices/#javascript
-    echo $this->headScript()->setIndent('    '); ?>
+    echo $this->headScript()->setIndent(4); ?>
     
 </body>
 </html>

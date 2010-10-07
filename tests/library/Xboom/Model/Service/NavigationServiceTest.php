@@ -35,10 +35,38 @@ class NavigationServiceTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $object;
+    /**
+     *
+     * @var EntityManager
+     */
+    protected $em;
 
     public function setUp()
     {
-        $this->object = new NavigationService;
+        $query = m::mock('Query');
+        $query->shouldReceive('setParameter')->andReturn($query);
+
+        $qb = m::mock('QueryBuilder');
+        $qb->shouldReceive('select')->andReturn($qb);
+        $qb->shouldReceive('from')->andReturn($qb);
+        $qb->shouldReceive('leftJoin')->andReturn($qb);
+        $qb->shouldReceive('where')->andReturn($qb);
+        $qb->shouldReceive('andWhere')->andReturn($qb);
+        $qb->shouldReceive('expr')->andReturn($qb);
+        $qb->shouldReceive('eq')->andReturn($qb);
+        $qb->shouldReceive('in')->andReturn($qb);
+        $qb->shouldReceive('orderBy')->andReturn($qb);
+        $qb->shouldReceive('setParameter')->andReturn($qb);
+        $qb->shouldReceive('getQuery')->andReturn($query);
+
+        $result = array();
+        
+        $this->em = m::mock('\\Doctrine\\ORM\\EntityManager');
+        $this->em->shouldReceive('createQueryBuilder')->andReturn($qb);
+        $this->em->shouldReceive('createQuery')->andReturn($query);
+        $query->shouldReceive('getResult')->andReturn($result);
+
+        $this->object = new NavigationService($this->em);
     }
 
     public function tearDown()
@@ -57,4 +85,8 @@ class NavigationServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertType('Zend_Navigation_Container', $this->object->getNavigation());
     }
 
+    public function _testBuildNavigation()
+    {
+        $this->object->buildNavigationByName($name);
+    }
 }

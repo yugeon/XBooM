@@ -29,12 +29,36 @@ namespace Xboom\Model\Service;
 
 class NavigationService
 {
-    
+
+    /**
+     *
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $_em = null;
+
     /**
      *
      * @var Zend_Navigation_Container
      */
     protected $_navigations = array();
+
+    protected $_menuClass = '';
+
+    public function __construct($em)
+    {
+        $this->_em = $em;
+    }
+
+    /**
+     *
+     * @param string $menuClass
+     * @return NavigationService
+     */
+    public function setMenuClass($menuClass)
+    {
+        $this->_menuClass = $menuClass;
+        return $this;
+    }
 
     /**
      * Get navigation
@@ -46,13 +70,96 @@ class NavigationService
     {
         if (!isset($this->_navigations[$name]))
         {
-            $this->setNavigation($name);
+            // TODO caching
+            $navigation = $this->buildNavigationByName($name);
+            $this->setNavigation($navigation, $name);
         }
         return $this->_navigations[$name];
     }
 
-    public function setNavigation($name = 'default')
+    /**
+     *
+     * @param Zend_Navigation_Container $navigation
+     * @param string $name
+     * @return NavigationService
+     */
+    public function setNavigation($navigation, $name = 'default')
     {
-        $this->_navigations[$name] = new \Zend_Navigation();
+        $this->_navigations[$name] = $navigation;
+        return $this;
+    }
+
+    /**
+     *
+     * @param string $name
+     * @return \Zend_Navigation_Container
+     */
+    public function buildNavigationByName($name)
+    {
+        /* @var $qb \Doctrine\ORM\QueryBuilder */
+        $qb = $this->_em->createQueryBuilder();
+
+        $qb->select(array('menu', 'page', 'child', 'res'))
+                ->from($this->_menuClass, 'menu')
+                ->leftJoin('menu.pages', 'page')
+                ->leftJoin('page.pages', 'child')
+                ->leftJoin('page.resource', 'res')
+                ->where('menu.name =?1')
+                ->orderBy('page.order')
+                ->setParameter(1, $name);
+
+        $query = $qb->getQuery();
+        $result = $query->getResult();
+
+        $pages = array();
+        if (!empty($result))
+        {
+            $menu = $result[0];
+            $pages = $this->_extractPages($menu->getPages());
+        }
+
+        return new \Zend_Navigation($pages);
+    }
+
+    /**
+     * Recursive extract pages for navigation container.
+     *
+     * @param Array $pages
+     * @return Array
+     */
+    public function _extractPages($pages)
+    {
+        $result = array();
+
+        foreach ($pages as $index => $page)
+        {
+            foreach ($page->toArray() as $key => $value)
+            {   
+                if (!empty($value))
+                {
+                    if ('resource' == $key)
+                    {
+                        $result[$index]['resource'] = $value->getResourceId();
+                        continue;
+                    }
+
+//                    if ('permission' == $key)
+//                    {
+//                        $result[$index]['permission'] = $value->getId();
+//                        continue;
+//                    }
+
+                    if ('pages' == $key)
+                    {
+                        $result[$index]['pages'] = $this->_extractPages($value->toArray());
+                        continue;
+                    }
+                    
+                    $result[$index][$key] = $value;
+                }
+            }
+        }
+
+        return $result;
     }
 }

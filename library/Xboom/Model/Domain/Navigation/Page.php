@@ -173,7 +173,7 @@ class Page extends DomainObject
      * @Column(length=50, nullable=true)
      * @var string
      */
-    protected $permission = null;
+    protected $privilege = null;
 
     /**
      * Default constructor.

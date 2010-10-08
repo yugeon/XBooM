@@ -29,7 +29,8 @@ namespace test\Xboom\Model\Service;
 use \Xboom\Model\Domain\Navigation\Menu,
     \Xboom\Model\Domain\Navigation\Page,
     \Xboom\Model\Domain\Acl\Resource,
-    \Xboom\Model\Domain\Acl\Permission;
+    \Xboom\Model\Domain\Acl\Permission,
+    \Xboom\Acl\Acl;
 
 /**
  * @group functional
@@ -60,7 +61,7 @@ class NavigationFunctionalTest extends \FunctionalTestCase
         $page1->controller = 'index';
         $page1->action = 'index';
         $page1->resource = $newsResource;
-        $page1->permission = $viewPermission;
+        $page1->privilege = $viewPermission;
         $this->_em->persist($page1);
 
         $page2 = new Page();
@@ -131,5 +132,73 @@ class NavigationFunctionalTest extends \FunctionalTestCase
             $actual[] = $page->getLabel();
         }
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testSuccessfulAccessToSecurePage()
+    {
+        $acl = new Acl();
+        $acl->addRole('guest');
+        $acl->addResource('News');
+        $acl->allow('guest', 'News', 'view');
+
+        $nav = $this->navigationService->getNavigation($this->navigationName);
+
+        $view = \Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->view;
+        $navHelper = $view->navigation($nav);
+        $navHelper->setAcl($acl);
+        $navHelper->setRole('guest');
+
+        $front = \Zend_Controller_Front::getInstance();
+        $router = $front->getRouter();
+        $router->addDefaultRoutes();
+
+//        $expected = array(
+//            'Page 1',
+//                'Page 1.2',
+//                'Page 1.1',
+//                    'Page 1.1.1',
+//            'Page 2'
+//        );
+        $actual = $navHelper->menu()->render();
+
+        $this->assertContains('Page 1', $actual);
+        $this->assertContains('Page 1.2', $actual);
+        $this->assertContains('Page 1.1', $actual);
+        $this->assertContains('Page 1.1.1', $actual);
+        $this->assertContains('Page 2', $actual);
+    }
+
+    public function testDeniedAccessToSecurePage()
+    {
+        $acl = new Acl();
+        $acl->addRole('guest');
+        $acl->addResource('News');
+        $acl->deny('guest', 'News', 'view');
+
+        $nav = $this->navigationService->getNavigation($this->navigationName);
+
+        $view = \Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer')->view;
+        $navHelper = $view->navigation($nav);
+        $navHelper->setAcl($acl);
+        $navHelper->setRole('guest');
+
+        $front = \Zend_Controller_Front::getInstance();
+        $router = $front->getRouter();
+        $router->addDefaultRoutes();
+
+//        $expected = array(
+//            'Page 1',
+//                'Page 1.2',
+//                'Page 1.1',
+//                    'Page 1.1.1',
+//            'Page 2'
+//        );
+        $actual = $navHelper->menu()->render();
+
+        $this->assertNotContains('Page 1', $actual);
+        $this->assertNotContains('Page 1.2', $actual);
+        $this->assertNotContains('Page 1.1', $actual);
+        $this->assertNotContains('Page 1.1.1', $actual);
+        $this->assertContains('Page 2', $actual);
     }
 }

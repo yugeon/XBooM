@@ -75,7 +75,7 @@ class PageTest extends \PHPUnit_Framework_TestCase
             'isActive' => true,
             'isVisible' => true,
             'resource' => $resource,
-            'permission' => $permission,
+            'privilege' => $permission,
             'pages' => array()
         );
 

@@ -36,9 +36,9 @@
 
  * Download and put Zend library in `./library`
 
- * Download and put Doctrine-common library in `./library/Common`
- * Download and put Doctrine-dbal library in `./library/DBAL`
- * Download and put ORM Doctrine 2 library in `./library/ORM`
+ * Download and put Doctrine-common library in `./library/Doctrine/Common`
+ * Download and put Doctrine-dbal library in `./library/Doctrine/DBAL`
+ * Download and put ORM Doctrine 2 library in `./library/Doctrine/ORM`
 
  Give write permissions for your web server in the following directory
 

@@ -1,5 +1,9 @@
+/library/Doctrine
 /library/Doctrine/*
+/library/Zend
 /library/Zend/*
+/library/ZendX
+/library/ZendX/*
 /data/*
 /public/images/captcha/*
 /tests/log/*

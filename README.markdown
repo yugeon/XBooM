@@ -35,6 +35,7 @@
     git clone git://github.com/yugeon/XBooM.git
 
  * Download and put Zend library in `./library`
+ * Download and put ZendX library in `./library`
 
  * Download and put Doctrine-common library in `./library/Doctrine/Common`
  * Download and put Doctrine-dbal library in `./library/Doctrine/DBAL`

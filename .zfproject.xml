@@ -39,32 +39,61 @@
             <formsDirectory/>
           </modelsDirectory>
         </moduleDirectory>
+        <moduleDirectory moduleName="admin">
+          <apisDirectory enabled="false"/>
+          <configsDirectory enabled="false"/>
+          <controllersDirectory>
+            <controllerFile controllerName="Index">
+              <actionMethod actionName="index"/>
+            </controllerFile>
+          </controllersDirectory>
+          <formsDirectory enabled="false"/>
+          <layoutsDirectory enabled="false"/>
+          <modelsDirectory/>
+          <viewsDirectory>
+            <layoutsDirectory enabled="false"/>
+            <viewScriptsDirectory>
+              <viewControllerScriptsDirectory forControllerName="Index">
+                <viewScriptFile forActionName="index"/>
+              </viewControllerScriptsDirectory>
+            </viewScriptsDirectory>
+          </viewsDirectory>
+        </moduleDirectory>
       </modulesDirectory>
       <viewsDirectory>
         <layoutsDirectory/>
         <modulesDirectory>
-            <moduleDirectory moduleName="core">
-              <viewScriptsDirectory>
-                <viewControllerScriptsDirectory forControllerName="Index">
-                  <viewScriptFile forActionName="index"/>
-                </viewControllerScriptsDirectory>
-                <viewControllerScriptsDirectory forControllerName="Error">
-                  <viewScriptFile forActionName="error"/>
-                </viewControllerScriptsDirectory>
-                <viewControllerScriptsDirectory forControllerName="Error">
-                  <viewScriptFile forActionName="index"/>
-                </viewControllerScriptsDirectory>
-                <viewControllerScriptsDirectory forControllerName="Auth">
-                  <viewScriptFile forActionName="login"/>
-                </viewControllerScriptsDirectory>
-                <viewControllerScriptsDirectory forControllerName="User">
-                  <viewScriptFile forActionName="index"/>
-                  <viewScriptFile forActionName="add"/>
-                </viewControllerScriptsDirectory>
-              </viewScriptsDirectory>
-              <viewHelpersDirectory/>
-              <viewFiltersDirectory enabled="false"/>
-            </moduleDirectory>
+          <moduleDirectory moduleName="core">
+            <viewScriptsDirectory>
+              <viewControllerScriptsDirectory forControllerName="Index">
+                <viewScriptFile forActionName="index"/>
+              </viewControllerScriptsDirectory>
+              <viewControllerScriptsDirectory forControllerName="Error">
+                <viewScriptFile forActionName="error"/>
+              </viewControllerScriptsDirectory>
+              <viewControllerScriptsDirectory forControllerName="Error">
+                <viewScriptFile forActionName="index"/>
+              </viewControllerScriptsDirectory>
+              <viewControllerScriptsDirectory forControllerName="Auth">
+                <viewScriptFile forActionName="login"/>
+              </viewControllerScriptsDirectory>
+              <viewControllerScriptsDirectory forControllerName="User">
+                <viewScriptFile forActionName="index"/>
+                <viewScriptFile forActionName="add"/>
+              </viewControllerScriptsDirectory>
+            </viewScriptsDirectory>
+            <viewHelpersDirectory/>
+            <viewFiltersDirectory enabled="false"/>
+          </moduleDirectory>
+          <moduleDirectory moduleName="admin">
+            <viewScriptsDirectory>
+              <viewControllerScriptsDirectory forControllerName="Index">
+                <viewScriptFile forActionName="index"/>
+              </viewControllerScriptsDirectory>
+            </viewScriptsDirectory>
+            <viewHelpersDirectory/>
+            <viewFiltersDirectory enabled="false"/>
+          </moduleDirectory>
         </modulesDirectory>
       </viewsDirectory>
       <bootstrapFile filesystemName="Bootstrap.php"/>
@@ -99,6 +128,7 @@
         <testApplicationControllerDirectory>
           <testApplicationControllerFile filesystemName="ErrorControllerTest.php"/>
           <testApplicationControllerFile filesystemName="ErrorControllerTest.php"/>
+          <testApplicationControllerFile filesystemName="IndexControllerTest.php"/>
           <testApplicationControllerFile filesystemName="IndexControllerTest.php"/>
         </testApplicationControllerDirectory>
       </testApplicationDirectory>

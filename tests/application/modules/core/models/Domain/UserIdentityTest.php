@@ -27,9 +27,9 @@
  */
 
 
-namespace test\Core\Model\Domain;
+namespace test\App\Core\Model\Domain;
 
-use \Core\Model\Domain\UserIdentity,
+use \App\Core\Model\Domain\UserIdentity,
     \Mockery as m;
 
 class UserIdentityTest extends \PHPUnit_Framework_TestCase

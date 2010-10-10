@@ -26,9 +26,9 @@
  * @author yugeon
  */
 
-namespace test\Core\Model\Form;
+namespace test\App\Core\Model\Form;
 
-use \Core\Model\Form\LoginUserForm,
+use \App\Core\Model\Form\LoginUserForm,
     \Mockery as m;
 
 class LoginUserFormTest extends \PHPUnit_Framework_TestCase

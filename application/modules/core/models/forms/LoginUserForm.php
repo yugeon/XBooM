@@ -25,7 +25,7 @@
  *
  * @author yugeon
  */
-namespace Core\Model\Form;
+namespace App\Core\Model\Form;
 
 class LoginUserForm extends \Zend_Form
 {

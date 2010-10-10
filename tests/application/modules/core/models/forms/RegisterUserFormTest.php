@@ -1,9 +1,9 @@
 <?php
 
-use Core\Model\Form\RegisterUserForm;
-require_once 'PHPUnit/Framework.php';
+namespace test\App\Core\Model\Form;
+use \App\Core\Model\Form\RegisterUserForm;
 
-class RegisterUserFormTest extends PHPUnit_Framework_TestCase
+class RegisterUserFormTest extends \PHPUnit_Framework_TestCase
 {
 
     /**

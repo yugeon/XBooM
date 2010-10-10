@@ -25,7 +25,7 @@
  *
  * @author yugeon
  */
-namespace Core\Model\Domain;
+namespace App\Core\Model\Domain;
 use \Xboom\Model\Domain\AbstractObject;
 
 class UserIdentity extends AbstractObject implements \Zend_Acl_Role_Interface

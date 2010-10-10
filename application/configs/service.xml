@@ -25,10 +25,10 @@
 
         <service id="auth.adapter" class="Xboom\Auth\Adapter\Doctrine">
             <argument type="service" id="doctrine.orm.entitymanager" />
-            <argument>\Core\Model\Domain\User</argument>
+            <argument>\App\Core\Model\Domain\User</argument>
             <argument>email</argument>
             <call method="setEntityName">
-                <argument>\Core\Model\Domain\User</argument>
+                <argument>\App\Core\Model\Domain\User</argument>
             </call>
             <call method="setIdentityName">
                 <argument>email</argument>
@@ -41,30 +41,30 @@
             <argument type="service" id="auth.adapter" />
 
             <call method="setModelClassPrefix">
-                <argument>\Core\Model\Domain</argument>
+                <argument>\App\Core\Model\Domain</argument>
             </call>
             <call method="setModelShortName">
                 <argument>User</argument>
             </call>
             <call method="setFormClassPrefix">
-                <argument>\Core\Model\Form</argument>
+                <argument>\App\Core\Model\Form</argument>
             </call>
         </service>
 
-        <service id="UserService" class="Core\Model\Service\UserService">
+        <service id="UserService" class="App\Core\Model\Service\UserService">
             <argument type="service" id="service_container" />
 
             <call method="setModelClassPrefix">
-                <argument>\Core\Model\Domain</argument>
+                <argument>\App\Core\Model\Domain</argument>
             </call>
             <call method="setModelShortName">
                 <argument>User</argument>
             </call>
             <call method="setValidatorClassPrefix">
-                <argument>\Core\Model\Domain\Validator</argument>
+                <argument>\App\Core\Model\Domain\Validator</argument>
             </call>
             <call method="setFormClassPrefix">
-                <argument>\Core\Model\Form</argument>
+                <argument>\App\Core\Model\Form</argument>
             </call>
         </service>
 

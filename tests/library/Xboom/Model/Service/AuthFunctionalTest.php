@@ -28,8 +28,8 @@
 
 namespace test\Xboom\Model\Service;
 
-use \Core\Model\Domain\User,
-    \Core\Model\Domain\Group,
+use \App\Core\Model\Domain\User,
+    \App\Core\Model\Domain\Group,
     \Xboom\Model\Domain\Acl\Resource,
     \Xboom\Model\Domain\Acl\Permission,
     \Xboom\Model\Domain\Acl\Role;

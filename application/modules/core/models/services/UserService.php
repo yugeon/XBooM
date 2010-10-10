@@ -26,10 +26,10 @@
  * @author yugeon
  */
 
-namespace Core\Model\Service;
+namespace App\Core\Model\Service;
 
 use \Xboom\Model\Service\AbstractService,
- \Core\Model\Domain\User,
+ \App\Core\Model\Domain\User,
  \Xboom\Model\Service\Exception as ServiceException,
  \Xboom\Model\Service\Acl\AccessDeniedException;
 

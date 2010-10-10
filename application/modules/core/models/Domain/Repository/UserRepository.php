@@ -26,7 +26,7 @@
  * @author yugeon
  */
 
-namespace Core\Model\Domain\Repository;
+namespace App\Core\Model\Domain\Repository;
 
 use Doctrine\ORM\EntityRepository;
 

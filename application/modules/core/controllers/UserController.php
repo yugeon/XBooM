@@ -20,7 +20,7 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
-use Core\Model\Domain\User as User;
+use App\Core\Model\Domain\User as User;
 class Core_UserController extends Zend_Controller_Action
 {
     /**

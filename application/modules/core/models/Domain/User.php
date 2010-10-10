@@ -21,14 +21,14 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
-namespace Core\Model\Domain;
+namespace App\Core\Model\Domain;
 
 use \Xboom\Model\Domain\DomainObject,
  \Xboom\Model\Domain\Acl\Resource,
  \Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @Entity(repositoryClass="Core\Model\Domain\Repository\UserRepository")
+ * @Entity(repositoryClass="App\Core\Model\Domain\Repository\UserRepository")
  * @Table(name="users")
  */
 class User extends DomainObject implements \Zend_Acl_Role_Interface, \Zend_Acl_Resource_Interface

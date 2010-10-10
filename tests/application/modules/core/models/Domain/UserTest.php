@@ -20,8 +20,8 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
-namespace test\Core\Model\Domain;
-use \Core\Model\Domain\User,
+namespace test\App\Core\Model\Domain;
+use \App\Core\Model\Domain\User,
     \Mockery as m;
 
 class UserTest extends \PHPUnit_Framework_TestCase

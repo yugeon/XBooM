@@ -21,12 +21,12 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
-namespace test\Core\Model\Service;
+namespace test\App\Core\Model\Service;
 
 use \Mockery as m,
- Core\Model\Service\UserService,
- Core\Model\Form\RegisterUserForm,
- Core\Model\Domain\Validator\RegisterUserValidator;
+ \App\Core\Model\Service\UserService,
+ \App\Core\Model\Form\RegisterUserForm,
+ \App\Core\Model\Domain\Validator\RegisterUserValidator;
 
 require_once 'PHPUnit/Framework.php';
 require_once 'Mockery.php';
@@ -98,10 +98,10 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->userModel->shouldReceive('register');
 
         $this->object = new UserService($sc);
-        $this->object->setModelClassPrefix('\\Core\\Model\\Domain')
+        $this->object->setModelClassPrefix('\\App\\Core\\Model\\Domain')
                 ->setModelShortName('User')
-                ->setValidatorClassPrefix('\\Core\\Model\\Domain\\Validator')
-                ->setFormClassPrefix('\\Core\\Model\\Form');
+                ->setValidatorClassPrefix('\\App\\Core\\Model\\Domain\\Validator')
+                ->setFormClassPrefix('\\App\\Core\\Model\\Form');
 
         $testUserName = 'TestUserName' . rand(1, 100);
         $testUserPassword = md5($testUserName);

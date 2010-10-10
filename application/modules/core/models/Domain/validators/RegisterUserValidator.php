@@ -25,7 +25,7 @@
  *
  * @author yugeon
  */
-namespace Core\Model\Domain\Validator;
+namespace App\Core\Model\Domain\Validator;
 use Xboom\Model\Validate\AbstractValidator;
 
 

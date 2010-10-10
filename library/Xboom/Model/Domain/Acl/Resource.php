@@ -70,7 +70,7 @@ class Resource extends DomainObject implements \Zend_Acl_Resource_Interface
     /**
      * Resource owner.
      *
-     * @ManyToOne(targetEntity="\Core\Model\Domain\User")
+     * @ManyToOne(targetEntity="\App\Core\Model\Domain\User")
      * @var User
      */
     protected $owner = null;

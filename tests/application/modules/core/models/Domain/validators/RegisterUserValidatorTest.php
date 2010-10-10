@@ -25,7 +25,7 @@
  *
  * @author yugeon
  */
-use Core\Model\Domain\Validator\RegisterUserValidator;
+use App\Core\Model\Domain\Validator\RegisterUserValidator;
 
 class RegisterUserValidatorTest extends PHPUnit_Framework_TestCase
 {

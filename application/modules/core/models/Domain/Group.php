@@ -25,7 +25,7 @@
  *
  * @author yugeon
  */
-namespace Core\Model\Domain;
+namespace App\Core\Model\Domain;
 use \Xboom\Model\Domain\DomainObject,
     \Doctrine\Common\Collections\ArrayCollection;
 

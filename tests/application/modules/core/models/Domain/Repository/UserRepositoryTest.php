@@ -28,7 +28,7 @@
 
 namespace test\Core\Model\Domain\Repository;
 
-use \Core\Model\Domain\Repository\UserRepository,
+use \App\Core\Model\Domain\Repository\UserRepository,
     \Mockery as m;
 
 class UserRepositoryTest extends \PHPUnit_Framework_TestCase

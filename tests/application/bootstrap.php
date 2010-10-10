@@ -22,13 +22,18 @@ require_once 'Xboom/Loader/Autoloader.php';
 $autoloader = Xboom\Loader\Autoloader::getInstance();
 $autoloader->registerNamespace('Xboom');
 $autoloader->registerNamespace('Doctrine');
+$nsSuffix = 'App';
+if (!empty($nsSuffix))
+{
+    $nsSuffix .= '\\';
+}
 $autoloader->registerNamespace(array(
-    'Core'              => APPLICATION_PATH . '/modules/core',
-    'Core\\Model'       => APPLICATION_PATH . '/modules/core/models',
-    'Core\\Model\\Service'     => APPLICATION_PATH . '/modules/core/models/services',
-    'Core\\Model\\Form' => APPLICATION_PATH . '/modules/core/models/forms',
-    'Core\\Model\\Domain\\Validator'
-                        => APPLICATION_PATH . '/modules/core/models/Domain/validators',
+    $nsSuffix . 'Core' => APPLICATION_PATH . '/modules/core',
+    $nsSuffix . 'Core\\Model' => APPLICATION_PATH . '/modules/core/models',
+    $nsSuffix . 'Core\\Model\\Service' => APPLICATION_PATH . '/modules/core/models/services',
+    $nsSuffix . 'Core\\Model\\Form' => APPLICATION_PATH . '/modules/core/models/forms',
+    $nsSuffix . 'Core\\Model\\Domain\\Validator'
+                => APPLICATION_PATH . '/modules/core/models/Domain/validators',
     )
 );
 

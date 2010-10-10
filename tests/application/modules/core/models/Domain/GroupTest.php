@@ -25,8 +25,8 @@
  *
  * @author yugeon
  */
-namespace test\Core\Model\Domain;
-use \Core\Model\Domain\Group,
+namespace test\App\Core\Model\Domain;
+use \App\Core\Model\Domain\Group,
     \Mockery as m;
 
 class GroupTest extends \PHPUnit_Framework_TestCase

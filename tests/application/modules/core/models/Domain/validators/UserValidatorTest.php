@@ -25,8 +25,8 @@
  *
  * @author yugeon
  */
-namespace test\Core\Model\Domain\Validator;
-use Core\Model\Domain\Validator\UserValidator;
+namespace test\App\Core\Model\Domain\Validator;
+use \App\Core\Model\Domain\Validator\UserValidator;
 
 class UserValidatorTest extends \PHPUnit_Framework_TestCase
 {

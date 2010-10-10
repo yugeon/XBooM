@@ -87,11 +87,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         }
         $autoloader->registerNamespace(array(
             $nsSuffix . 'Core' => APPLICATION_PATH . '/modules/core',
-            $nsSuffix . 'Core\\Model' => APPLICATION_PATH . '/modules/core/models',
-            $nsSuffix . 'Core\\Model\\Service' => APPLICATION_PATH . '/modules/core/models/services',
-            $nsSuffix . 'Core\\Model\\Form' => APPLICATION_PATH . '/modules/core/models/forms',
-            $nsSuffix . 'Core\\Model\\Domain\\Validator'
-                        => APPLICATION_PATH . '/modules/core/models/Domain/validators',
+//            $nsSuffix . 'Core\\Model' => APPLICATION_PATH . '/modules/core/models',
+//            $nsSuffix . 'Core\\Model\\Service' => APPLICATION_PATH . '/modules/core/models/services',
+//            $nsSuffix . 'Core\\Model\\Form' => APPLICATION_PATH . '/modules/core/models/forms',
+//            $nsSuffix . 'Core\\Model\\Domain\\Validator'
+//                        => APPLICATION_PATH . '/modules/core/models/Domain/validators',
             )
         );
     }

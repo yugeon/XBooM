@@ -26,7 +26,7 @@
  * @author yugeon
  */
 
-namespace App\Core\Model\Service\Acl;
+namespace App\Core\Model\Service;
 
 use \Xboom\Model\Service\AbstractService,
  \App\Core\Model\Domain\Acl\Permission,

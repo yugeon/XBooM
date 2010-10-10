@@ -25,7 +25,7 @@
  *
  * @author yugeon
  */
-namespace test\App\Core\Model\Service\Acl;
+namespace test\App\Core\Model\Service;
 use \App\Core\Model\Domain\User,
     \App\Core\Model\Domain\Group,
     \App\Core\Model\Domain\Acl\Resource,

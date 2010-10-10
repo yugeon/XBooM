@@ -7,7 +7,7 @@
 
     <services>
 
-        <service id="AclService" class="App\Core\Model\Service\Acl\AclService">
+        <service id="AclService" class="App\Core\Model\Service\AclService">
             <argument type="service" id="doctrine.orm.entitymanager" />
             <call method="setResourceClass">
                 <argument>\App\Core\Model\Domain\Acl\Resource</argument>

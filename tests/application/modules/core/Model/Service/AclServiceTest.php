@@ -25,9 +25,9 @@
  *
  * @author yugeon
  */
-namespace test\App\Core\Model\Service\Acl;
+namespace test\App\Core\Model\Service;
 
-use App\Core\Model\Service\Acl\AclService,
+use App\Core\Model\Service\AclService,
     \Mockery as m;
 
 class AclServiceTest extends \PHPUnit_Framework_TestCase

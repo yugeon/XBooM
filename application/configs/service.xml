@@ -7,17 +7,17 @@
 
     <services>
 
-        <service id="AclService" class="Xboom\Model\Service\Acl\AclService">
+        <service id="AclService" class="App\Core\Model\Service\Acl\AclService">
             <argument type="service" id="doctrine.orm.entitymanager" />
             <call method="setResourceClass">
-                <argument>\Xboom\Model\Domain\Acl\Resource</argument>
+                <argument>\App\Core\Model\Domain\Acl\Resource</argument>
             </call>
         </service>
 
-        <service id="NavigationService" class="Xboom\Model\Service\NavigationService">
+        <service id="NavigationService" class="App\Core\Model\Service\NavigationService">
             <argument type="service" id="doctrine.orm.entitymanager" />
             <call method="setMenuClass">
-                <argument>\Xboom\Model\Domain\Navigation\Menu</argument>
+                <argument>\App\Core\Model\Domain\Navigation\Menu</argument>
             </call>
         </service>
 
@@ -27,6 +27,7 @@
             <argument type="service" id="doctrine.orm.entitymanager" />
             <argument>\App\Core\Model\Domain\User</argument>
             <argument>email</argument>
+
             <call method="setEntityName">
                 <argument>\App\Core\Model\Domain\User</argument>
             </call>
@@ -35,7 +36,7 @@
             </call>
         </service>
 
-        <service id="AuthService" class="Xboom\Model\Service\AuthService">
+        <service id="AuthService" class="App\Core\Model\Service\AuthService">
             <argument type="service" id="service_container" />
             <argument type="service" id="auth" />
             <argument type="service" id="auth.adapter" />
@@ -69,5 +70,5 @@
         </service>
 
     </services>
-  
+
 </container>

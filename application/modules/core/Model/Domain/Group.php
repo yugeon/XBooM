@@ -60,7 +60,7 @@ class Group extends DomainObject implements \Zend_Acl_Role_Interface
     /**
      * All roles, assigned to this group.
      *
-     * @ManyToMany(targetEntity="\Xboom\Model\Domain\Acl\Role")
+     * @ManyToMany(targetEntity="\App\Core\Model\Domain\Acl\Role")
      * @var ArrayCollection of Role
      */
     protected $roles = null;

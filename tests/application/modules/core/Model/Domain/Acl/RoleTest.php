@@ -25,8 +25,8 @@
  *
  * @author yugeon
  */
-namespace test\Xboom\Model\Domain\Acl;
-use \Xboom\Model\Domain\Acl\Role,
+namespace test\App\Core\Model\Domain\Acl;
+use \App\Core\Model\Domain\Acl\Role,
     \Mockery as m;
 
 class RoleTest extends \PHPUnit_Framework_TestCase

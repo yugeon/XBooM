@@ -26,9 +26,9 @@
  * @author yugeon
  */
 
-namespace test\Xboom\Model\Service;
+namespace test\App\Core\Model\Service;
 
-use \Xboom\Model\Service\AuthService,
+use \App\Core\Model\Service\AuthService,
     \Mockery as m;
 
 class AuthServiceTest extends \PHPUnit_Framework_TestCase

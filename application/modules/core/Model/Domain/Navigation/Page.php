@@ -26,7 +26,7 @@
  * @author yugeon
  */
 
-namespace Xboom\Model\Domain\Navigation;
+namespace App\Core\Model\Domain\Navigation;
 
 use \Xboom\Model\Domain\DomainObject,
     \Doctrine\Common\Collections\ArrayCollection;
@@ -163,7 +163,7 @@ class Page extends DomainObject
     /**
      * ACL resource associated with this page
      *
-     * @OneToOne(targetEntity="\Xboom\Model\Domain\Acl\Resource")
+     * @OneToOne(targetEntity="\App\Core\Model\Domain\Acl\Resource")
      * @var Resource
      */
     protected $resource = null;

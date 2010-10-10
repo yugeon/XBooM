@@ -25,7 +25,7 @@
  *
  * @author yugeon
  */
-namespace Xboom\Model\Domain\Navigation;
+namespace App\Core\Model\Domain\Navigation;
 use \Xboom\Model\Domain\DomainObject,
     \Doctrine\Common\Collections\ArrayCollection;
 

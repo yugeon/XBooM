@@ -21,38 +21,23 @@
  */
 
 /**
- * Test case for Permission
+ * Description of Bootstrap
  *
  * @author yugeon
  */
-namespace test\Xboom\Model\Domain\Acl;
-use \Xboom\Model\Domain\Acl\Permission,
-    \Mockery as m;
-
-class PermissionTest extends \PHPUnit_Framework_TestCase
+class Admin_Bootstrap extends Zend_Application_Module_Bootstrap
 {
-    protected $object;
-
-    public function setUp()
+    protected function _initModuleAutoload()
     {
-        parent::setUp();
-        $this->object = new Permission;
-    }
-
-    public function tearDown()
-    {
-        parent::tearDown();
-        m::close();
-    }
-
-    public function testCanCreatePermission()
-    {
-        $this->assertNotNull($this->object);
-    }
-
-    public function testIsOwnerRestriction()
-    {
-        $this->object->setIsOwnerRestriction(true);
-        $this->assertTrue($this->object->isOwnerRestriction());
+        $autoloader = Xboom\Loader\Autoloader::getInstance();
+        $nsSuffix = $this->getOption('appnamespace');
+        if (!empty($nsSuffix))
+        {
+            $nsSuffix .= '\\';
+        }
+        $autoloader->registerNamespace(array(
+            $nsSuffix . 'Admin' => APPLICATION_PATH . '/modules/admin',
+            )
+        );
     }
 }

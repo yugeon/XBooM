@@ -24,7 +24,7 @@
 namespace App\Core\Model\Domain;
 
 use \Xboom\Model\Domain\DomainObject,
- \Xboom\Model\Domain\Acl\Resource,
+ \App\Core\Model\Domain\Acl\Resource,
  \Doctrine\Common\Collections\ArrayCollection;
 
 /**
@@ -56,13 +56,13 @@ class User extends DomainObject implements \Zend_Acl_Role_Interface, \Zend_Acl_R
      */
     protected $group = null;
 
-    /**
-     * Related resource.
-     *
-     * @OneToOne(targetEntity="\Xboom\Model\Domain\Acl\Resource")
-     * @var Resourse
-     */
-    protected $resource = null;
+//    /**
+//     * Related resource.
+//     *
+//     * @OneToOne(targetEntity="\App\Core\Model\Domain\Acl\Resource")
+//     * @var Resourse
+//     */
+//    protected $resource = null;
 
     /**
      * Retrieve a list of all roles as array.

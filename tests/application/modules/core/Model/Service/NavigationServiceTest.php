@@ -26,9 +26,9 @@
  * @author yugeon
  */
 
-namespace test\Xboom\Model\Service;
+namespace test\App\Core\Model\Service;
 
-use \Xboom\Model\Service\NavigationService,
+use \App\Core\Model\Service\NavigationService,
  \Mockery as m;
 
 class NavigationServiceTest extends \PHPUnit_Framework_TestCase

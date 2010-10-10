@@ -26,8 +26,9 @@
  * @author yugeon
  */
 
-namespace Xboom\Model\Service;
-use \Xboom\Model\Service\Exception as ServiceException;
+namespace App\Core\Model\Service;
+use \Xboom\Model\Service\AbstractService,
+    \Xboom\Model\Service\Exception as ServiceException;
 
 class AuthService extends AbstractService
 {

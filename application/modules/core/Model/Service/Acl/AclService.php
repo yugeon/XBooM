@@ -26,12 +26,12 @@
  * @author yugeon
  */
 
-namespace Xboom\Model\Service\Acl;
+namespace App\Core\Model\Service\Acl;
 
 use \Xboom\Model\Service\AbstractService,
- \Xboom\Model\Domain\Acl\Permission,
- \Xboom\Model\Domain\Acl\Resource,
- \Xboom\Model\Domain\Acl\Role,
+ \App\Core\Model\Domain\Acl\Permission,
+ \App\Core\Model\Domain\Acl\Resource,
+ \App\Core\Model\Domain\Acl\Role,
  \Xboom\Acl\Acl;
 
 class AclService

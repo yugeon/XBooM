@@ -26,13 +26,13 @@
  * @author yugeon
  */
 
-namespace test\Xboom\Model\Service;
+namespace test\App\Core\Model\Service;
 
 use \App\Core\Model\Domain\User,
     \App\Core\Model\Domain\Group,
-    \Xboom\Model\Domain\Acl\Resource,
-    \Xboom\Model\Domain\Acl\Permission,
-    \Xboom\Model\Domain\Acl\Role;
+    \App\Core\Model\Domain\Acl\Resource,
+    \App\Core\Model\Domain\Acl\Permission,
+    \App\Core\Model\Domain\Acl\Role;
 
 /**
  * @group functional

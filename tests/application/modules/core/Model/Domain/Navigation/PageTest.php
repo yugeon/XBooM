@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  CMF for web applications based on Zend Framework 1 and Doctrine 2
  *  Copyright (C) 2010  Eugene Gruzdev aka yugeon
@@ -19,26 +20,25 @@
  * @copyright  Copyright (c) 2010 yugeon <yugeon.ru@gmail.com>
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
-
 /**
- * Description of MenuTest
+ * Description of PageTest
  *
  * @author yugeon
  */
 
-namespace test\Xboom\Model\Domain\Navigation;
+namespace test\App\Core\Model\Domain\Navigation;
 
-use \Xboom\Model\Domain\Navigation\Menu,
+use \App\Core\Model\Domain\Navigation\Page,
  \Mockery as m;
 
-class MenuTest extends \PHPUnit_Framework_TestCase
+class PageTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $object;
 
     public function setUp()
     {
-        $this->object = new Menu;
+        $this->object = new Page;
     }
 
     public function tearDown()
@@ -47,7 +47,6 @@ class MenuTest extends \PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testCanCreateTestObject()
     {
         $this->assertNotNull($this->object);
@@ -55,16 +54,29 @@ class MenuTest extends \PHPUnit_Framework_TestCase
 
     public function testCanGetSetProperties()
     {
-        $pages = array(
-            m::mock('Page'),
-            m::mock('Page'),
-            m::mock('Page'),
-        );
+        $resource = m::mock('Resource');
+        $permission = m::mock('Permission');
 
         $properties = array(
             'id' => 1,
-            'name' => 'default',
-            'pages' => $pages
+            'label' => 'Home',
+            'class' => 'menu-item',
+            'title' => 'Home page',
+            'target' => '_blank',
+            'type' => 'mvc',
+            'order' => 1,
+            'module' => 'core',
+            'controller' => 'index',
+            'action' => 'index',
+            'params' => array('param1' => 'value1', 'param2' => 'value2'),
+            'route' => null,
+            'resetParams' => true,
+            'uri' => 'http://google.com/?a=b',
+            'isActive' => true,
+            'isVisible' => true,
+            'resource' => $resource,
+            'privilege' => $permission,
+            'pages' => array()
         );
 
         foreach ($properties as $key => $value)
@@ -75,13 +87,5 @@ class MenuTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($value, $this->object->{$accessor}());
         }
     }
-
-    public function testCanAssignPage()
-    {
-        $page = m::mock('Page');
-        $this->object->assignToPage($page);
-        $this->assertContains($page, $this->object->getPages());
-    }
-
 
 }

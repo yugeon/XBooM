@@ -25,7 +25,7 @@
  *
  * @author yugeon
  */
-namespace Xboom\Model\Service;
+namespace App\Core\Model\Service;
 
 class NavigationService
 {

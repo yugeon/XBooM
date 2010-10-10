@@ -25,11 +25,11 @@
  *
  * @author yugeon
  */
-namespace test\Xboom\Model\Service;
-use \Xboom\Model\Domain\Navigation\Menu,
-    \Xboom\Model\Domain\Navigation\Page,
-    \Xboom\Model\Domain\Acl\Resource,
-    \Xboom\Model\Domain\Acl\Permission,
+namespace test\App\Core\Model\Service;
+use \App\Core\Model\Domain\Navigation\Menu,
+    \App\Core\Model\Domain\Navigation\Page,
+    \App\Core\Model\Domain\Acl\Resource,
+    \App\Core\Model\Domain\Acl\Permission,
     \Xboom\Acl\Acl;
 
 /**

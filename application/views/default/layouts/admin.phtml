@@ -7,58 +7,93 @@
     echo $this->headMeta()->setIndent(4) . "\n";
     echo $this->headTitle()->setIndent(4) . "\n";
     echo $this->headLink()->setIndent(4)
-                     ->appendStylesheet('css/blueprint/screen.css', 'screen, projection')
-                     ->appendStylesheet('css/blueprint/print.css', 'print')
-                     ->appendStylesheet('css/blueprint/ie.css', 'screen, projection', 'lt IE 8')
-                     ->appendStylesheet('css/main.css', 'screen, projection');
+                     ->appendStylesheet('modules/admin/css/screen.css', 'screen, projection')
+                     ->appendStylesheet('modules/admin/css/ie.css', 'screen, projection', 'lt IE 7');
+                    // ->appendStylesheet('css/blueprint/screen.css', 'screen, projection')
+                    // ->appendStylesheet('css/blueprint/print.css', 'print')
+                    // ->appendStylesheet('css/blueprint/ie.css', 'screen, projection', 'lt IE 8')
+                    // ->appendStylesheet('css/main.css', 'screen, projection');
     echo $this->headStyle()->setIndent(4) . "\n";
 ?>
 </head>
 <body>
 
-    <div class="container showgrid">
+    <div class="page_margins">
+        <div class="page">
 
-        <div class="header">
+            <div id="header">
+                <div id="topnav">
+                    <a>Home</a> | <a>Logout</a>
 
-            <div class="topnav">
-                <?php echo $this->navigationWidget('admin')->menu()->setMaxDepth(1)->setIndent(12); ?>
-
+                </div>
             </div>
 
-            <div class="breadcrumbs">
+<!--            <div id="nav">
+                 skiplink anchor: navigation 
+                <div class="hlist">
+                     main navigation: horizontal list 
+                    <ul>
+                        <li class="active"><strong>Button 1</strong></li>
+                        <li><a href="#">Button 2</a></li>
+                        <li><a href="#">Button 3</a></li>
+                        <li><a href="#">Button 4</a></li>
+                        <li><a href="#">Button 5</a></li>
+                    </ul>
+                </div>
+            </div>-->
+
+            <div id="teaser">
                 <?php echo $this->navigationWidget('admin')->breadcrumbs()->setMinDepth(1)->setLinkLast(true)->setSeparator(' > '); ?>
 
             </div>
+            <!-- end teaser -->
 
-        </div>
+            <div id="main">
+                <div id="col1">
+                    <div id="col1_content" class="clearfix">
 
-        <div class="content">
+                        <!-- add your content here -->
+                        <div class="messages">
 
-            <div class="messages">
+                            <?php if (!empty($this->messages)) : ?>
+                            <?php foreach ($this->messages as $message) : ?>
+                                    <span><?php echo $this->escape($message); ?></span>
+                            <?php endforeach; ?>
+                            <?php endif; ?>
 
-            <?php if (!empty($this->messages)) : ?>
-                    <?php foreach ($this->messages as $message) :?>
-                <span><?php echo $this->escape($message); ?></span>
-                    <?php endforeach;?>
-            <?php endif;?>
+                        </div>
 
+                        <h1>This is admin Layout</h1>
+
+                        <?php echo $this->layout()->content; ?>
+
+                    </div>
+                </div>
+
+                <div id="col3">
+                    <div id="col3_content" class="clearfix">
+
+                        <?php echo $this->navigationWidget()->menu()->setMaxDepth(1)->setIndent(12); ?>
+
+                    </div>
+                    <!-- IE Column Clearing -->
+                    <div id="ie_clearing">   </div>
+                </div>
+            </div>
+            <!-- end main -->
+
+
+            <!-- begin: #footer -->
+            <div id="footer">
+                Layout based on <a href="http://www.yaml.de/">YAML</a>
             </div>
 
-            <h1>This is admin Layout</h1>
-
-            <?php echo $this->layout()->content; ?>
-
         </div>
-
-        <div class="footer">
-            2010 All rights reserved.
-        </div>
-
     </div>
-
 <?php
-    // read plz http://webo.in/articles/habrahabr/15-yahoo-best-practices/#javascript
-    echo $this->headScript()->setIndent(4); ?>
-
+    // read this http://developer.yahoo.com/performance/rules.html#js_bottom
+    // or russian http://webo.in/articles/habrahabr/15-yahoo-best-practices/#javascript
+    echo $this->headScript()->setIndent(4);
+?>
 </body>
 </html>

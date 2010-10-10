@@ -52,7 +52,7 @@ class Menu extends DomainObject
      * @ManyToMany(targetEntity="Page")
      * @JoinTable(name="menus_pages",
      *      joinColumns={@JoinColumn(name="menu_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@JoinColumn(name="page_id", referencedColumnName="id", unique=true)}
+     *      inverseJoinColumns={@JoinColumn(name="page_id", referencedColumnName="id")}
      *      )
      * @var ArrayCollection
      */

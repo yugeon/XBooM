@@ -40,6 +40,7 @@ class NavigationFunctionalTest extends \FunctionalTestCase
 
     protected $navigationName = 'default';
     protected $navigationService;
+    protected $page1;
 
     public function setUp()
     {
@@ -53,16 +54,16 @@ class NavigationFunctionalTest extends \FunctionalTestCase
 
         $viewPermission = 'view';
 
-        $page1 = new Page();
-        $page1->label = 'Page 1';
-        $page1->title = 'Home page';
-        $page1->type  = 'mvc';
-        $page1->module = 'core';
-        $page1->controller = 'index';
-        $page1->action = 'index';
-        $page1->resource = $newsResource;
-        $page1->privilege = $viewPermission;
-        $this->_em->persist($page1);
+        $this->page1 = new Page();
+        $this->page1->label = 'Page 1';
+        $this->page1->title = 'Home page';
+        $this->page1->type  = 'mvc';
+        $this->page1->module = 'core';
+        $this->page1->controller = 'index';
+        $this->page1->action = 'index';
+        $this->page1->resource = $newsResource;
+        $this->page1->privilege = $viewPermission;
+        $this->_em->persist($this->page1);
 
         $page2 = new Page();
         $page2->label = 'Page 1.1';
@@ -95,14 +96,14 @@ class NavigationFunctionalTest extends \FunctionalTestCase
         $page5->action = 'last';
         $this->_em->persist($page5);
 
-        $page1->addChildPage($page2);
-        $page1->addChildPage($page5);
+        $this->page1->addChildPage($page2);
+        $this->page1->addChildPage($page5);
         $page2->addChildPage($page3);
 
 
         $menu = new Menu();
         $menu->name = $this->navigationName;
-        $menu->assignToPage($page1);
+        $menu->assignToPage($this->page1);
         $menu->assignToPage($page4);
         $this->_em->persist($menu);
 
@@ -200,5 +201,16 @@ class NavigationFunctionalTest extends \FunctionalTestCase
         $this->assertNotContains('Page 1.1', $actual);
         $this->assertNotContains('Page 1.1.1', $actual);
         $this->assertContains('Page 2', $actual);
+    }
+
+    public function testCanAddOneAndSamePageToMultipleMenus()
+    {
+        $adminMenu = new Menu();
+        $adminMenu->name = 'admin';
+        $adminMenu->assignToPage($this->page1);
+        $this->_em->persist($adminMenu);
+        $this->_em->flush();
+
+
     }
 }

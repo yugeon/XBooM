@@ -62,4 +62,11 @@ interface ValidatorInterface extends \Zend_Validate_Interface
      */
     public function getPropertiesForValidation();
 
+    /**
+     * Get all filtered values.
+     *
+     * @return array
+     */
+    public function getValues();
+
 }

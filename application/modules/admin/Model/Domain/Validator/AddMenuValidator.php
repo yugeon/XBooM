@@ -21,23 +21,14 @@
  */
 
 /**
- * Description of Bootstrap
+ * Description of AddMenuValidator
  *
  * @author yugeon
  */
-class Admin_Bootstrap extends Zend_Application_Module_Bootstrap
+namespace App\Admin\Model\Domain\Validator;
+use Xboom\Model\Validate\AbstractValidator;
+
+class AddMenuValidator extends AbstractValidator
 {
-    protected function _initModuleAutoload()
-    {
-        $autoloader = Xboom\Loader\Autoloader::getInstance();
-        $nsSuffix = $this->getApplication()->getOption('appnamespace');
-        if (!empty($nsSuffix))
-        {
-            $nsSuffix .= '\\';
-        }
-        $autoloader->registerNamespace(array(
-            $nsSuffix . 'Admin' => APPLICATION_PATH . '/modules/admin',
-            )
-        );
-    }
+    //put your code here
 }

@@ -84,9 +84,4 @@ class NavigationServiceTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertType('Zend_Navigation_Container', $this->object->getNavigation());
     }
-
-    public function _testBuildNavigation()
-    {
-        $this->object->buildNavigationByName($name);
-    }
 }

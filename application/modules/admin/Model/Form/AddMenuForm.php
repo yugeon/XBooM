@@ -21,23 +21,24 @@
  */
 
 /**
- * Description of Bootstrap
+ * Description of AddMenuForm
  *
  * @author yugeon
  */
-class Admin_Bootstrap extends Zend_Application_Module_Bootstrap
+namespace App\Admin\Model\Form;
+
+class AddMenuForm extends \Zend_Form
 {
-    protected function _initModuleAutoload()
+    public function init()
     {
-        $autoloader = Xboom\Loader\Autoloader::getInstance();
-        $nsSuffix = $this->getApplication()->getOption('appnamespace');
-        if (!empty($nsSuffix))
-        {
-            $nsSuffix .= '\\';
-        }
-        $autoloader->registerNamespace(array(
-            $nsSuffix . 'Admin' => APPLICATION_PATH . '/modules/admin',
-            )
-        );
+        $this->setName('addMenu');
+        
+        $this->addElement('text', 'name', array(
+            'label' => 'Name',
+        ));
+
+        $this->addElement('submit', 'add', array(
+            'label' => 'Add'
+        ));
     }
 }

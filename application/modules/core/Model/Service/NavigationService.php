@@ -71,7 +71,7 @@ class NavigationService
         if (!isset($this->_navigations[$name]))
         {
             // TODO caching
-            $navigation = $this->buildNavigationByName($name);
+            $navigation = $this->_buildNavigationByName($name);
             $this->setNavigation($navigation, $name);
         }
         return $this->_navigations[$name];
@@ -94,7 +94,7 @@ class NavigationService
      * @param string $name
      * @return \Zend_Navigation_Container
      */
-    public function buildNavigationByName($name)
+    protected function _buildNavigationByName($name)
     {
         /* @var $qb \Doctrine\ORM\QueryBuilder */
         $qb = $this->_em->createQueryBuilder();

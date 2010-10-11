@@ -69,6 +69,23 @@
             </call>
         </service>
 
+        <service id="MenuService" class="App\Admin\Model\Service\MenuService">
+            <argument type="service" id="service_container" />
+
+            <call method="setModelClassPrefix">
+                <argument>\App\Core\Model\Domain\Navigation</argument>
+            </call>
+            <call method="setModelShortName">
+                <argument>Menu</argument>
+            </call>
+            <call method="setValidatorClassPrefix">
+                <argument>\App\Admin\Model\Domain\Validator</argument>
+            </call>
+            <call method="setFormClassPrefix">
+                <argument>\App\Admin\Model\Form</argument>
+            </call>
+        </service>
+
     </services>
 
 </container>

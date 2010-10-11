@@ -4,8 +4,8 @@
 <head>
     <base href="<?php echo $this->escape($this->ServerUrl() . $this->baseUrl()); ?>" />
 <?php
-    echo $this->headMeta()->setIndent(4) . "\n";
-    echo $this->headTitle()->setIndent(4) . "\n";
+    echo $this->headMeta()->setIndent(4) . PHP_EOL;
+    echo $this->headTitle()->setIndent(4) . PHP_EOL;
     echo $this->headLink()->setIndent(4)
                      ->appendStylesheet('modules/admin/css/screen.css', 'screen, projection')
                      ->appendStylesheet('modules/admin/css/ie.css', 'screen, projection', 'lt IE 7');
@@ -13,7 +13,7 @@
                     // ->appendStylesheet('css/blueprint/print.css', 'print')
                     // ->appendStylesheet('css/blueprint/ie.css', 'screen, projection', 'lt IE 8')
                     // ->appendStylesheet('css/main.css', 'screen, projection');
-    echo $this->headStyle()->setIndent(4) . "\n";
+    echo $this->headStyle()->setIndent(4) . PHP_EOL;
 ?>
 </head>
 <body>
@@ -57,7 +57,7 @@
 
                             <?php if (!empty($this->messages)) : ?>
                             <?php foreach ($this->messages as $message) : ?>
-                                    <span><?php echo $this->escape($message); ?></span>
+                                    <p><?php echo $this->escape($message); ?></p>
                             <?php endforeach; ?>
                             <?php endif; ?>
 
@@ -73,7 +73,7 @@
                 <div id="col3">
                     <div id="col3_content" class="clearfix">
 
-                        <?php echo $this->navigationWidget()->menu()->setMaxDepth(1)->setIndent(12); ?>
+                        <?php echo $this->navigationWidget('admin')->menu()->setMaxDepth(1)->setIndent(12); ?>
 
                     </div>
                     <!-- IE Column Clearing -->

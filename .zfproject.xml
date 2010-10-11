@@ -46,6 +46,10 @@
             <controllerFile controllerName="Index">
               <actionMethod actionName="index"/>
             </controllerFile>
+            <controllerFile controllerName="Navigation">
+              <actionMethod actionName="index"/>
+              <actionMethod actionName="addMenu"/>
+            </controllerFile>
           </controllersDirectory>
           <formsDirectory enabled="false"/>
           <layoutsDirectory enabled="false"/>
@@ -55,6 +59,12 @@
             <viewScriptsDirectory>
               <viewControllerScriptsDirectory forControllerName="Index">
                 <viewScriptFile forActionName="index"/>
+              </viewControllerScriptsDirectory>
+              <viewControllerScriptsDirectory forControllerName="Navigation">
+                <viewScriptFile forActionName="index"/>
+              </viewControllerScriptsDirectory>
+              <viewControllerScriptsDirectory forControllerName="Navigation">
+                <viewScriptFile forActionName="addMenu"/>
               </viewControllerScriptsDirectory>
             </viewScriptsDirectory>
           </viewsDirectory>
@@ -130,6 +140,7 @@
           <testApplicationControllerFile filesystemName="ErrorControllerTest.php"/>
           <testApplicationControllerFile filesystemName="IndexControllerTest.php"/>
           <testApplicationControllerFile filesystemName="IndexControllerTest.php"/>
+          <testApplicationControllerFile filesystemName="NavigationControllerTest.php"/>
         </testApplicationControllerDirectory>
       </testApplicationDirectory>
       <testLibraryDirectory>

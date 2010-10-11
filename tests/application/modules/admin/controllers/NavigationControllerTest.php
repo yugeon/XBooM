@@ -21,23 +21,27 @@
  */
 
 /**
- * Description of Bootstrap
- *
+ * @group functional
  * @author yugeon
  */
-class Admin_Bootstrap extends Zend_Application_Module_Bootstrap
+class Admin_NavigationControllerTest extends ControllerTestCase
 {
-    protected function _initModuleAutoload()
+    public function testCanGetDefaultPage()
     {
-        $autoloader = Xboom\Loader\Autoloader::getInstance();
-        $nsSuffix = $this->getApplication()->getOption('appnamespace');
-        if (!empty($nsSuffix))
-        {
-            $nsSuffix .= '\\';
-        }
-        $autoloader->registerNamespace(array(
-            $nsSuffix . 'Admin' => APPLICATION_PATH . '/modules/admin',
-            )
-        );
+        //$_SERVER['HTTP_HOST'] = 'xboom.local';
+        $this->dispatch('/admin/navigation');
+        $this->assertModule('admin');
+        $this->assertController('navigation');
+        $this->assertAction('index');
+        $this->assertResponseCode(200);
+    }
+
+    public function testCanAddNewMenu()
+    {
+        $this->dispatch('/admin/navigation/add-menu');
+        $this->assertModule('admin');
+        $this->assertController('navigation');
+        $this->assertAction('add-menu');
+        $this->assertResponseCode(200);
     }
 }

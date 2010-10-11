@@ -52,6 +52,7 @@ class Mediator implements MediatorInterface
      */
     protected $_domainValidator = null;
 
+    protected $_values = array();
     /**
      * Create mediator, which connect form and model validator.
      *
@@ -202,8 +203,9 @@ class Mediator implements MediatorInterface
      * @param <type> $form
      * @param <type> $validator
      */
-    protected function _fillFormErrors($form, $validator)
+    protected function _fillFormErrors($validator)
     {
+        $form = $this->getForm();
         if (null === $form || null === $validator)
         {
             return;
@@ -234,50 +236,68 @@ class Mediator implements MediatorInterface
      */
     public function isValid($data, $break1 = true, $break2 = true)
     {
-        $form = $this->getForm();
-        $isFormValid = $form->isValid($data);
-        if (!$isFormValid && $break1)
+        $isDataValid = false;
+
+        $this->_setValues($data);
+
+        $isDataValid = $this->_isFormValid();
+        if ($isDataValid || !$break1)
         {
-            return false;
-        }
-
-        $data = $form->getValues();
-
-        $validator = $this->getValidator();
-        if (null === $validator)
-        {
-            throw new \Xboom\Model\Validate\Exception('Validator is null');
-        }
-        $isDataValid = $validator->isValid($data);
-        $data = $validator->getValues();
-
-        $this->_fillFormValues($form, $validator);
-
-        // Do domain validation if validator is set.
-        $domainValidator = $this->getDomainValidator();
-        if (null !== $domainValidator)
-        {
-            if (!(!$isDataValid && $break2))
+            $isDataValid = $this->_isModelValid() && $isDataValid;
+            if ($isDataValid || !$break2)
             {
-                $isDataValid = $domainValidator->isValid($data) && $isDataValid;
-                $this->_fillFormValues($form, $domainValidator);
+                $isDataValid = $this->_isDomainValid() && $isDataValid;
             }
         }
 
-        if ($isFormValid && $isDataValid)
+        if ($isDataValid)
         {
             $this->_pushDataToModel();
-            return true;
         }
 
-        // Fill form data validation errors.
-        if (!$isDataValid)
+        return $isDataValid;
+    }
+
+    protected function _isFormValid()
+    {
+        $form = $this->getForm();
+        $isFormValid = $form->isValid($this->getValues());
+        $this->_setValues($form->getValues());
+        return (boolean)$isFormValid;
+    }
+
+    protected function _isModelValid()
+    {
+        $isModelValid = true;
+        $validator = $this->getValidator();
+        if (null !== $validator)
         {
-            $this->_fillFormErrors($form, $validator);
-            $this->_fillFormErrors($form, $domainValidator);
-        }
+            $isModelValid = $validator->isValid($this->getValues());
+            if (!$isModelValid)
+            {
+                $this->_fillFormErrors($validator);
+            }
 
-        return false;
+            $this->_setValues($validator->getValues());
+        }
+        return (boolean)$isModelValid;
+    }
+
+    protected function _isDomainValid()
+    {
+        $isDomainValid = true;
+        $domainValidator = $this->getDomainValidator();
+        if (null !== $domainValidator)
+        {
+            $isDomainValid = $domainValidator->isValid($this->getValues());
+            if (!$isDomainValid)
+            {
+                $this->_fillFormErrors($domainValidator);
+            }
+
+            $this->_setValues($domainValidator->getValues());
+        }
+        return (boolean)$isDomainValid;
     }
 
     /**
@@ -287,14 +307,18 @@ class Mediator implements MediatorInterface
      */
     public function getValues()
     {
-        $result = array();
+        return $this->_values;
+    }
 
-        $validator =$this->getValidator();
-        foreach ($validator->getPropertiesForValidation() as $property => $element)
-        {
-            $result[$property] = $element->getValue();
-        }
-
-        return $result;
+        /**
+     * Merge $data with current values.
+     *
+     * @param array $data
+     * @return Mediator
+     */
+    protected function _setValues($data)
+    {
+        $this->_values = \array_merge($this->_values, (array)$data);
+        return $this;
     }
 }

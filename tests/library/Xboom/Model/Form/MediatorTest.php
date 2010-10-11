@@ -99,19 +99,6 @@ class MediatorTest extends PHPUnit_Framework_TestCase
         $this->object = new Mediator(null, null);
     }
 
-    /**
-     * @expectedException \Xboom\Model\Validate\Exception
-     */
-    public function testShouldRaiseExceptionIfValidatorIsNull()
-    {
-        $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
-        $this->userForm->shouldReceive('getValues');
-        $userModel = m::mock('\\Xboom\\Model\\Domain\\DomainObject');
-        $userModel->shouldReceive('getValidator')->andReturn(null);
-        $this->object->setModel($userModel);
-        $this->object->isValid($this->userData);
-    }
-
     public function testGetForm()
     {
         $this->assertNotNull($this->object->getForm());
@@ -139,6 +126,7 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     public function testValidateWhenFormIsNotValidAndDoBreak()
     {
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(false);
+        $this->userForm->shouldReceive('getValues')->andReturn($this->userData);
 
         // not break validation if form is not valid
         $this->assertFalse($this->object->isValid($this->userData));
@@ -203,7 +191,6 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     public function testGetValues()
     {
         $expected = $this->userData;
-        unset($expected['confirm_password']);
 
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
         $this->userForm->shouldReceive('getElements')->andReturn(array());

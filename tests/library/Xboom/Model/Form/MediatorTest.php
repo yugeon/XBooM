@@ -135,7 +135,8 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     public function testValidateWhenFormIsValidAndDataIsValid()
     {
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
-        $this->userForm->shouldReceive('getValues');
+        $this->userForm->shouldReceive('getValues')->andReturn(array());
+        $this->userForm->shouldReceive('getElements')->andReturn(array());
 
         $this->userValidator->shouldReceive('isValid')->andReturn(true);
         $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
@@ -148,7 +149,8 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     public function testValidateWhenFormIsNotValidAndDataIsValid()
     {
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(false);
-        $this->userForm->shouldReceive('getValues');
+        $this->userForm->shouldReceive('getValues')->andReturn(array());
+        $this->userForm->shouldReceive('getElements')->andReturn(array());
 
         $this->userValidator->shouldReceive('isValid')->andReturn(true);
         $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
@@ -243,7 +245,9 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     public function testValidateWhenDomainValidatorExistsAndDataIsValid()
     {
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
-        $this->userForm->shouldReceive('getValues');
+        $this->userForm->shouldReceive('getValues')->andReturn(array());
+        $this->userForm->shouldReceive('getElements')->andReturn(array());
+        
         $this->userValidator->shouldReceive('isValid')->andReturn(true);
         $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
         $this->userValidator->shouldReceive('getValues')->andReturn(array());

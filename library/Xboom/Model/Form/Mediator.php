@@ -179,15 +179,15 @@ class Mediator implements MediatorInterface
      * @param <type> $form
      * @param <type> $validator
      */
-    protected function _fillFormValues($form, $validator)
+    protected function _fillFormValues()
     {
-        $values = $validator->getValues();
+        $values = $this->getValues();
         if (empty($values))
         {
             return;
         }
         
-        $formElements = $form->getElements();
+        $formElements = $this->getForm()->getElements();
         foreach ($formElements as $key => $element)
         {
             if (isset($values[$key]))
@@ -248,8 +248,10 @@ class Mediator implements MediatorInterface
             {
                 $isDataValid = $this->_isDomainValid() && $isDataValid;
             }
-        }
 
+            $this->_fillFormValues();
+        }
+        
         if ($isDataValid)
         {
             $this->_pushDataToModel();

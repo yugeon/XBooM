@@ -21,28 +21,38 @@
  */
 
 /**
- * Description of AddMenuValidator
+ * Description of MenuDomainValidatorTest
  *
  * @author yugeon
  */
-namespace App\Admin\Model\Domain\Validator;
-use \Xboom\Model\Validate\AbstractValidator,
-    \Xboom\Model\Validate\Element\BaseValidator,
-    \Xboom\Validate\UniqueField;
 
-class MenuDomainValidator extends AbstractValidator
+namespace test\App\Admin\Model\Domain\Validator;
+
+use \App\Admin\Model\Domain\Validator\MenuDomainValidator,
+ \Mockery as m;
+
+class MenuDomainValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    public function init()
+
+    protected $object;
+
+    public function setUp()
     {
-        // name
-        $nameValidator = new BaseValidator();
-        $nameValidator->addFilter(new \Zend_Filter_StringTrim)
-                      ->addValidator(new UniqueField(
-                              array(
-                               'em' => $this->getEntityManager(),
-                               'entity' => $this->getEntityClass(),
-                               'field' => 'name')
-                         ));
-        $this->addPropertyValidator('name', $nameValidator);
+        $this->object = new MenuDomainValidator;
     }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+        m::close();
+    }
+
+
+    public function testCanCreateTestObject()
+    {
+        $this->assertNotNull($this->object);
+    }
+
+    
+
 }

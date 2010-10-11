@@ -61,8 +61,10 @@ class MenuService extends AbstractService
         $breakValidation = false;
         if ($formToModelMediator->isValid($data, $breakValidation))
         {
+            $data = $formToModelMediator->getValues();
             $menu = $this->getModel();
             $menu->setName($data['name']);
+            $menu->setDescription($data['description']);
             
             $this->_em->persist($menu);
 

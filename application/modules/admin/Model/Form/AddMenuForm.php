@@ -37,8 +37,13 @@ class AddMenuForm extends \Zend_Form
             'label' => 'Name',
         ));
 
+        $this->addElement('text', 'description', array(
+            'label' => 'Description'
+        ));
+
         $this->addElement('submit', 'add', array(
-            'label' => 'Add'
+            'label' => 'Add',
+            'required' => true,
         ));
     }
 }

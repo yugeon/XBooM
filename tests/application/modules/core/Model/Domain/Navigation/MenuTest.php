@@ -64,6 +64,7 @@ class MenuTest extends \PHPUnit_Framework_TestCase
         $properties = array(
             'id' => 1,
             'name' => 'default',
+            'description' => 'This is default menu',
             'pages' => $pages
         );
 

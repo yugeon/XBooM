@@ -26,9 +26,37 @@
  * @author yugeon
  */
 namespace App\Admin\Model\Domain\Validator;
+<<<<<<< Updated upstream
 use Xboom\Model\Validate\AbstractValidator;
 
 class AddMenuValidator extends AbstractValidator
 {
     //put your code here
+=======
+use \Xboom\Model\Validate\AbstractValidator,
+ \Xboom\Model\Validate\Element\BaseValidator;
+
+class AddMenuValidator extends AbstractValidator
+{
+    public function init()
+    {
+        // name
+        $nameValidator = new BaseValidator();
+        $nameValidator->addValidator(new \Zend_Validate_NotEmpty(), true)
+                      ->addValidator(new \Zend_Validate_StringLength(
+                              array('min' => 1, 'max' => 20)))
+                      ->addFilter(new \Zend_Filter_StringTrim())
+                      ->addFilter(new \Zend_Filter_StripTags());
+        $this->addPropertyValidator('name', $nameValidator, true);
+
+        // description
+        $descrValidator = new BaseValidator();
+        $descrValidator->addValidator(new \Zend_Validate_NotEmpty(), true)
+                      ->addValidator(new \Zend_Validate_StringLength(
+                              array('min' => 1, 'max' => 50)))
+                      ->addFilter(new \Zend_Filter_StringTrim())
+                      ->addFilter(new \Zend_Filter_StripTags());
+        $this->addPropertyValidator('description', $descrValidator);
+    }
+>>>>>>> Stashed changes
 }

@@ -195,12 +195,12 @@ abstract class AbstractValidator implements ValidatorInterface
      */
     public function filter($value)
     {
+        $this->_value = $value;
         foreach ($this->getFilters() as $filter)
         {
-            $value = $filter->filter($value);
+            $this->_value = $filter->filter($this->_value);
         }
-        $this->_value = $value;
-        return $value;
+        return $this->_value;
     }
 
     /**
@@ -217,6 +217,10 @@ abstract class AbstractValidator implements ValidatorInterface
         }
     }
 
+    /**
+     *
+     * @return mixed
+     */
     public function getValue()
     {
         return $this->_value;

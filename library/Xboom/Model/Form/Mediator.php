@@ -180,7 +180,7 @@ class Mediator implements MediatorInterface
      */
     protected function _fillFormValues($form, $validator)
     {
-        $values = $this->getValues();
+        $values = $validator->getValues();
         if (empty($values))
         {
             return;
@@ -241,12 +241,15 @@ class Mediator implements MediatorInterface
             return false;
         }
 
+        $data = $form->getValues();
+
         $validator = $this->getValidator();
         if (null === $validator)
         {
             throw new \Xboom\Model\Validate\Exception('Validator is null');
         }
         $isDataValid = $validator->isValid($data);
+        $data = $validator->getValues();
 
         $this->_fillFormValues($form, $validator);
 
@@ -257,6 +260,7 @@ class Mediator implements MediatorInterface
             if (!(!$isDataValid && $break2))
             {
                 $isDataValid = $domainValidator->isValid($data) && $isDataValid;
+                $this->_fillFormValues($form, $domainValidator);
             }
         }
 

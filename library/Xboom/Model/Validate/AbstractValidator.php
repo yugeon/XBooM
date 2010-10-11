@@ -211,4 +211,20 @@ abstract class AbstractValidator implements ValidatorInterface
         }
         return $this->_messages;
     }
+
+    /**
+     * Get all filtered values.
+     *
+     * @return array
+     */
+    public function getValues()
+    {
+        $values = array();
+        $properties = $this->getPropertiesForValidation();
+        foreach ($properties as $key => $propertyValidator)
+        {
+            $values[$key] = $propertyValidator->getValue();
+        }
+        return $values;
+    }
 }

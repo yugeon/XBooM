@@ -105,6 +105,7 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     public function testShouldRaiseExceptionIfValidatorIsNull()
     {
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
+        $this->userForm->shouldReceive('getValues');
         $userModel = m::mock('\\Xboom\\Model\\Domain\\DomainObject');
         $userModel->shouldReceive('getValidator')->andReturn(null);
         $this->object->setModel($userModel);
@@ -146,9 +147,11 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     public function testValidateWhenFormIsValidAndDataIsValid()
     {
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
+        $this->userForm->shouldReceive('getValues');
 
         $this->userValidator->shouldReceive('isValid')->andReturn(true);
         $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
+        $this->userValidator->shouldReceive('getValues')->andReturn(array());
 
         // not break validation if form is not valid
         $this->assertTrue($this->object->isValid($this->userData, false));
@@ -157,9 +160,11 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     public function testValidateWhenFormIsNotValidAndDataIsValid()
     {
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(false);
+        $this->userForm->shouldReceive('getValues');
 
         $this->userValidator->shouldReceive('isValid')->andReturn(true);
         $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
+        $this->userValidator->shouldReceive('getValues')->andReturn(array());
 
         // not break validation if form is not valid
         $this->assertFalse($this->object->isValid($this->userData, false));
@@ -169,10 +174,12 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     {
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
         $this->userForm->shouldReceive('getElements')->andReturn(array());
+        $this->userForm->shouldReceive('getValues');
 
         $this->userValidator->shouldReceive('isValid')->andReturn(false);
         $this->userValidator->shouldReceive('getMessages')->andReturn(array());
         $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
+        $this->userValidator->shouldReceive('getValues')->andReturn(array());
 
         // not break validation if form is not valid
         $this->assertFalse($this->object->isValid($this->userData, false));
@@ -182,9 +189,11 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     {
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(false);
         $this->userForm->shouldReceive('getElements')->andReturn(array());
+        $this->userForm->shouldReceive('getValues');
 
         $this->userValidator->shouldReceive('isValid')->andReturn(false);
         $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
+        $this->userValidator->shouldReceive('getValues')->andReturn(array());
         $this->userValidator->shouldReceive('getMessages')->andReturn(array());
 
         // not break validation if form is not valid
@@ -198,9 +207,11 @@ class MediatorTest extends PHPUnit_Framework_TestCase
 
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
         $this->userForm->shouldReceive('getElements')->andReturn(array());
+        $this->userForm->shouldReceive('getValues');
 
 
         $this->userValidator->shouldReceive('isValid')->andReturn(true);
+        $this->userValidator->shouldReceive('getValues')->andReturn(array());
 
         $elementValidator1 = m::mock('\\Xboom\\Model\\Validate\\Element\\BaseValidator');
         $elementValidator2 = m::mock('\\Xboom\\Model\\Validate\\Element\\BaseValidator');
@@ -245,11 +256,14 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     public function testValidateWhenDomainValidatorExistsAndDataIsValid()
     {
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
+        $this->userForm->shouldReceive('getValues');
         $this->userValidator->shouldReceive('isValid')->andReturn(true);
         $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
+        $this->userValidator->shouldReceive('getValues')->andReturn(array());
 
         $domainValidator = m::mock('\\Xboom\\Model\\Validate\\ValidatorInterface');
         $domainValidator->shouldReceive('isValid')->andReturn(true);
+        $domainValidator->shouldReceive('getValues')->andReturn(array());
 
         $this->object->setDomainValidator($domainValidator);
 
@@ -260,16 +274,51 @@ class MediatorTest extends PHPUnit_Framework_TestCase
     {
         $this->userForm->shouldReceive('isValid')->with($this->userData)->andReturn(true);
         $this->userForm->shouldReceive('getElements')->andReturn(array());
+        $this->userForm->shouldReceive('getValues');
         $this->userValidator->shouldReceive('isValid')->andReturn(true);
         $this->userValidator->shouldReceive('getMessages')->andReturn(array());
         $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
+        $this->userValidator->shouldReceive('getValues')->andReturn(array());
 
         $domainValidator = m::mock('\\Xboom\\Model\\Validate\\ValidatorInterface');
         $domainValidator->shouldReceive('isValid')->andReturn(false);
+        $domainValidator->shouldReceive('getValues')->andReturn(array());
         $domainValidator->shouldReceive('getMessages')->andReturn(array());
 
         $this->object->setDomainValidator($domainValidator);
 
         $this->assertFalse($this->object->isValid($this->userData, false));
+    }
+
+    public function testDataShouldPassByChainFiltersFromValidatorsVariousLevels()
+    {
+        $data = array(
+            'name' => 'badName <br />',
+            'name2' => ' goodName '
+        );
+        
+        $filteredData = array(
+            'name' => 'badName',
+            'name2' => 'goodName'
+        );
+
+        $this->userForm->shouldReceive('isValid')->with($data)->andReturn(true);
+        $this->userForm->shouldReceive('getElements')->andReturn(array());
+        $this->userForm->shouldReceive('getValues')->andReturn($data);
+        $this->userValidator->shouldReceive('isValid')->andReturn(true);
+        $this->userValidator->shouldReceive('getMessages')->andReturn(array());
+        $this->userValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
+        $this->userValidator->shouldReceive('getValues')->andReturn($filteredData);
+
+
+        $domainValidator = m::mock('\\Xboom\\Model\\Validate\\ValidatorInterface');
+        $domainValidator->shouldReceive('isValid')->with($filteredData)->andReturn(true);
+        $domainValidator->shouldReceive('isValid')->with($data)->andReturn(false);
+        $domainValidator->shouldReceive('getValues')->andReturn($filteredData);
+        $domainValidator->shouldReceive('getMessages')->andReturn(array());
+
+        $this->object->setDomainValidator($domainValidator);
+        
+        $this->assertTrue($this->object->isValid($data, false));
     }
 }

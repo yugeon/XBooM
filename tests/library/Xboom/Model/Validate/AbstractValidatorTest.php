@@ -171,4 +171,32 @@ class Xboom_Model_Validate_AbstractTest extends PHPUnit_Framework_TestCase
         $this->assertContains($errorMsg, $messages['login']);
     }
 
+    public function testShouldReturnFilteredValues()
+    {
+        $unfilteredData = array(
+            'login' => 'invalidLogin<br>',
+            //'password' => '  validPassword  ',
+        );
+
+        $filteredData = array(
+            'login' => 'invalidLogin',
+           // 'password' => 'validPassword',
+        );
+
+        $expectedData = array(
+            'setInInitMethod' => 'invalidLogin',
+            'login' => 'invalidLogin',
+        );
+
+        //$loginValidator = m::mock('Xboom\\Model\\Validate\\Element\\ValidatorInterface');
+        $this->loginValidator->shouldReceive('isValid')->andReturn(true);
+        $this->loginValidator->shouldReceive('getValue')->andReturn($filteredData['login']);
+
+        $this->object->addPropertyValidator('login', $this->loginValidator);
+
+        $this->object->isValid($unfilteredData);
+
+        $this->assertEquals($expectedData, $this->object->getValues());
+    }
+
 }

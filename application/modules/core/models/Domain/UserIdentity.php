@@ -28,10 +28,20 @@
 namespace Core\Model\Domain;
 use \Xboom\Model\Domain\AbstractObject;
 
-class UserIdentity extends AbstractObject
+class UserIdentity extends AbstractObject implements \Zend_Acl_Role_Interface
 {
     protected $id = null;
     protected $name = null;
     protected $email = null;
     protected $roles = array();
+
+    /**
+     * Returns the array of string identifier of the Role
+     *
+     * @return array
+     */
+    public function getRoleId()
+    {
+        return $this->getRoles();
+    }
 }

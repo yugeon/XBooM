@@ -154,6 +154,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $viewRenderer = Zend_Controller_Action_HelperBroker::getStaticHelper('viewRenderer');
         $viewRenderer->setView($view);
 
+        $view->serviceContainer = $this->getContainer();
+        $view->setHelperPath(APPLICATION_PATH . '/views/default/core/helpers', 'Core_View_Helper');
         // Return it, so that it can be stored by the bootstrap
         return $view;
     }

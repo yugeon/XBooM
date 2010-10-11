@@ -1,7 +1,7 @@
-<?php
-foreach ($this->messages as $message)
-{
-    echo $message;
-}
-?>
-<?php echo $this->loginForm; ?>
+
+<?php if ($this->hasIdentity) : ?>
+    Welcome <?php echo $this->escape($this->userIdentity->getName()); ?>,
+    <a href="<?php echo $this->url(array('controller' => 'auth', 'action' => 'logout')); ?>">logout.</a>
+<?php elseif (isset($this->loginForm)): ?>
+    <?php echo $this->loginForm; ?>
+<?php endIf;?>

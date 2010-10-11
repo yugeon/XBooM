@@ -54,11 +54,11 @@ try
 }
 catch (Exception $exception)
 {
-    echo '<html><title>Critical Error</title><body><center>'
+    echo '<html><title>Technical work.</title><body><center>'
        . 'Technical work. Please try again later.';
     if (APPLICATION_ENV == 'development')
     {
-        echo '<br /><br />An exception occured while bootstrapping the application.'
+        echo '<br /><br />An exception occured while processing the application.'
            . '<br />' . $exception->getMessage() . '<br />'
            . '<div align="left">Stack Trace:'
            . '<pre>' . $exception->getTraceAsString() . '</pre></div>';

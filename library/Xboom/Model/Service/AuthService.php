@@ -61,6 +61,23 @@ class AuthService extends AbstractService
         return $this->_auth;
     }
 
+    /**
+     * Return true only if current user has identity
+     * 
+     * @return boolean
+     */
+    public function hasIdentity()
+    {
+        $hasIdentity = false;
+
+        if (null !== $this->_auth)
+        {
+            $hasIdentity = $this->_auth->hasIdentity();
+        }
+
+        return (boolean) $hasIdentity;
+    }
+
     public function getCode()
     {
         $code = null;
@@ -113,7 +130,7 @@ class AuthService extends AbstractService
 
     public function getGuestIdentity()
     {
-        $result = array();
+        $result = null;
         
         // FIXME caching
         $guest = $this->_em

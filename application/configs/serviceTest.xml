@@ -41,6 +41,13 @@
             </call>
         </service>
 
+        <service id="NavigationService" class="Xboom\Model\Service\NavigationService">
+            <argument type="service" id="doctrine.orm.entitymanager" />
+            <call method="setMenuClass">
+                <argument>\Xboom\Model\Domain\Navigation\Menu</argument>
+            </call>
+        </service>
+
         <service id="auth" class="Zend_Auth" constructor="getInstance" />
 
         <service id="auth.adapter" class="Xboom\Auth\Adapter\Doctrine">

@@ -40,6 +40,7 @@ class MenuServiceTest extends \PHPUnit_Framework_TestCase
         $this->em = m::mock('\\Doctrine\\ORM\\EntityManager');
         $this->em->shouldReceive('persist');
         $this->em->shouldReceive('flush');
+        $this->em->shouldReceive('createQuery')->andReturn($this->em);
 
         $this->acl = m::mock('Zend_Acl');
 
@@ -123,4 +124,27 @@ class MenuServiceTest extends \PHPUnit_Framework_TestCase
         $this->object->addMenu($this->data['bad']);
     }
 
+    public function testCanGetMenuList()
+    {
+        $menu = m::mock('Menu');
+        $expectedMenuList = array(
+            $menu,
+            $menu,
+            $menu,
+        );
+
+        $this->acl->shouldReceive('isAllowed')->andReturn(true);
+        $this->em->shouldReceive('getResult')->andReturn($expectedMenuList);
+
+        $this->assertEquals($expectedMenuList, $this->object->getMenuList());
+    }
+
+    /**
+     * @expectedException \Xboom\Model\Service\Acl\AccessDeniedException
+     */
+    public function testGetMenuListShouldRaiseExceptionIfNoPermissions()
+    {
+        $this->acl->shouldReceive('isAllowed')->andReturn(false);
+        $user = $this->object->getMenuList();
+    }
 }

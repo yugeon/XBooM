@@ -143,6 +143,12 @@ class AuthService extends AbstractService
         {
             $result = $guest->getIdentity();
         }
+        else
+        {
+            throw new ServiceException('Can\'t detect current user identity.'
+                    . 'Check what is set default the guest user.');
+        }
+
         return $result;
     }
 

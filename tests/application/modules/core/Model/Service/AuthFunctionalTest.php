@@ -56,7 +56,7 @@ class AuthFunctionalTest extends \FunctionalTestCase
     {
         parent::setUp();
         
-        $this->authService = $this->_sc->getService('AuthService');
+        $this->authService = $this->_sc->getService('RealAuthService');
 
         $this->guestRole = new Role();
         $this->guestRole->name = 'Role 1';

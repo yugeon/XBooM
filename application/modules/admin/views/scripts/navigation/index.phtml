@@ -1,1 +1,4 @@
-<br /><br /><center>View script for controller <b>Navigation</b> and script/action name <b>index</b></center>
+
+<?php foreach ($this->menuList as $menu): ?>
+        <p><?php echo $this->escape($menu->getName()); ?></p>
+<?php endforeach;?>

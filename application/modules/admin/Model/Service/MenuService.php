@@ -50,7 +50,7 @@ class MenuService extends AbstractService
         $aclService = $this->getServiceContainer()->getService('AclService');
         $acl = $aclService->getAcl($curUserIdentity->getRoles());
 
-        if (! $acl->isAllowed($curUserIdentity->getRoles(), 'Users', 'register'))
+        if (! $acl->isAllowed($curUserIdentity->getRoles(), 'admin.menu', 'add'))
         {
             throw new AccessDeniedException('Access denied');
         }
@@ -76,5 +76,23 @@ class MenuService extends AbstractService
         }
         
         throw new ServiceException('Can\'t create new menu.');
+    }
+
+    public function getMenuList()
+    {
+        // acl
+        $authService = $this->getServiceContainer()->getService('AuthService');
+        $curUserIdentity = $authService->getCurrentUserIdentity();
+
+        $aclService = $this->getServiceContainer()->getService('AclService');
+        $acl = $aclService->getAcl($curUserIdentity->getRoles());
+
+        if (! $acl->isAllowed($curUserIdentity->getRoles(), 'admin.menu', 'list'))
+        {
+            throw new AccessDeniedException('Access denied');
+        }
+
+        return $this->_em->createQuery('SELECT m FROM ' . $this->getModelFullName() . ' m')
+                ->getResult();
     }
 }

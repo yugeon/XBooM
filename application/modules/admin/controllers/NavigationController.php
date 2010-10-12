@@ -36,7 +36,15 @@ class Admin_NavigationController extends Zend_Controller_Action
 
     public function indexAction()
     {
-        // action body
+        $this->view->menuList = array();
+        try
+        {
+            $this->view->menuList = $this->_menuService->getMenuList();
+        }
+        catch (\Xboom\Model\Service\Acl\AccessDeniedException $e)
+        {
+            $this->view->messages = (array)$e->getMessage();
+        }
     }
 
     // todo refactoring

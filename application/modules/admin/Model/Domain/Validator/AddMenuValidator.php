@@ -26,13 +26,7 @@
  * @author yugeon
  */
 namespace App\Admin\Model\Domain\Validator;
-<<<<<<< Updated upstream
-use Xboom\Model\Validate\AbstractValidator;
 
-class AddMenuValidator extends AbstractValidator
-{
-    //put your code here
-=======
 use \Xboom\Model\Validate\AbstractValidator,
  \Xboom\Model\Validate\Element\BaseValidator;
 
@@ -58,5 +52,4 @@ class AddMenuValidator extends AbstractValidator
                       ->addFilter(new \Zend_Filter_StripTags());
         $this->addPropertyValidator('description', $descrValidator);
     }
->>>>>>> Stashed changes
 }

@@ -63,8 +63,7 @@ class MenuService extends AbstractService
         {
             $data = $formToModelMediator->getValues();
             $menu = $this->getModel();
-            $menu->setName($data['name']);
-            $menu->setDescription($data['description']);
+            $menu->add($data);
             
             $this->_em->persist($menu);
 

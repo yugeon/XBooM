@@ -47,7 +47,6 @@ class AddMenuValidatorTest extends \PHPUnit_Framework_TestCase
         m::close();
     }
 
-
     public function testCanCreateTestObject()
     {
         $this->assertNotNull($this->object);

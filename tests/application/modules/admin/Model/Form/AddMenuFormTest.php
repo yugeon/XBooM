@@ -56,11 +56,7 @@ class AddMenuFormTest extends \PHPUnit_Framework_TestCase
     public function testInit()
     {
         $this->assertArrayHasKey('name', $this->object->getElements());
-<<<<<<< Updated upstream
-        //$this->assertArrayHasKey('descr', $this->object->getElements());
-=======
         $this->assertArrayHasKey('description', $this->object->getElements());
->>>>>>> Stashed changes
         //$this->assertArrayHasKey('captcha', $this->object->getElements());
     }
 

@@ -84,5 +84,19 @@ class MenuTest extends \PHPUnit_Framework_TestCase
         $this->assertContains($page, $this->object->getPages());
     }
 
+    public function testCanAddMenu()
+    {
+        $menuData1 = array(
+            'name' => 'menu name',
+            'description' => 'ffdf',
+            'noise' => 'laldjf'
+        );
+
+        $menuData2 = $menuData1;
+        unset($menuData2['description']);
+
+        $this->assertEquals($this->object, $this->object->add($menuData1));
+        $this->assertEquals($this->object, $this->object->add($menuData2));
+    }
 
 }

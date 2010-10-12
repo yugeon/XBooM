@@ -33,6 +33,7 @@ class MenuServiceTest extends \PHPUnit_Framework_TestCase
     protected $em;
     protected $acl;
     protected $data;
+    protected $addValidator;
 
     public function setUp()
     {
@@ -70,16 +71,16 @@ class MenuServiceTest extends \PHPUnit_Framework_TestCase
         $addForm = m::mock('Zend_Form');
         $addForm->shouldReceive('isValid')->andReturn(true);
         $addForm->shouldReceive('getElements')->andReturn(array());
+        $addForm->shouldReceive('getValues')->andReturn($this->data['good']);
 
-        $addValidator = m::mock('\\Xboom\\Model\\Validate\\ValidatorInterface');
-        $addValidator->shouldReceive('isValid')->with($this->data['good'])->andReturn(true);
-        $addValidator->shouldReceive('isValid')->with($this->data['bad'])->andReturn(false);
-        $addValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
-        $addValidator->shouldReceive('getMessages')->andReturn(array());
+        $this->addValidator = m::mock('\\Xboom\\Model\\Validate\\ValidatorInterface');
+        $this->addValidator->shouldReceive('getValues')->andReturn($this->data['good']);
+        $this->addValidator->shouldReceive('getPropertiesForValidation')->andReturn(array());
+        $this->addValidator->shouldReceive('getMessages')->andReturn(array());
 
         $this->object->setForm('AddMenu', $addForm);
-        $this->object->setValidator('AddMenu', $addValidator);
-        $this->object->setValidator('MenuDomain', $addValidator);
+        $this->object->setValidator('AddMenu', $this->addValidator);
+        $this->object->setValidator('MenuDomain', $this->addValidator);
     }
 
     public function tearDown()
@@ -97,6 +98,7 @@ class MenuServiceTest extends \PHPUnit_Framework_TestCase
     public function testCanAddNewMenu()
     {
         $this->acl->shouldReceive('isAllowed')->andReturn(true);
+        $this->addValidator->shouldReceive('isValid')->andReturn(true);
         $this->assertType('\\Xboom\\Model\\Domain\\DomainObject',
                 $this->object->addMenu($this->data['good']));
     }
@@ -115,7 +117,9 @@ class MenuServiceTest extends \PHPUnit_Framework_TestCase
      */
     public function testShouldRaiseExceptionsIfValidationFailure()
     {
-        $this->acl->shouldReceive('isAllowed')->andReturn(true);       
+        $this->acl->shouldReceive('isAllowed')->andReturn(true);
+        $this->addValidator->shouldReceive('isValid')->andReturn(false);
+
         $this->object->addMenu($this->data['bad']);
     }
 

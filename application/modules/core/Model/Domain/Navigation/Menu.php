@@ -49,6 +49,7 @@ class Menu extends DomainObject
      */
     protected $name;
     /**
+     *
      * @Column(length=50, nullable=true)
      * @var string
      */
@@ -87,6 +88,16 @@ class Menu extends DomainObject
             $this->pages->add($page);
         }
 
+        return $this;
+    }
+
+    public function add($data)
+    {
+        $this->setName($data['name']);
+        if (!empty($data['description']))
+        {
+            $this->setDescription($data['description']);
+        }
         return $this;
     }
 

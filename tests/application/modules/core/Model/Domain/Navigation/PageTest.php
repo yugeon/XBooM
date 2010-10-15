@@ -35,10 +35,59 @@ class PageTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $object;
+    protected $resource;
+    protected $permission;
+    protected $data;
 
     public function setUp()
     {
         $this->object = new Page;
+
+        $this->resource = m::mock('Resource');
+        $this->permission = m::mock('Permission');
+
+        $this->data = array(
+            'uri' => array(
+                'label' => 'Home',
+                'class' => 'menu-item',
+                'title' => 'Home page',
+                'target' => '_blank',
+                'type' => 'uri',
+                'order' => 1,
+                'module' => 'core',
+                'controller' => 'index',
+                'action' => 'index',
+                'params' => array('param1' => 'value1', 'param2' => 'value2'),
+                'route' => null,
+                'resetParams' => true,
+                'uri' => 'http://google.com/?a=b',
+                'isActive' => true,
+                'isVisible' => true,
+                'resource' => $this->resource,
+                'privilege' => $this->permission,
+                'pages' => array()
+            ),
+            'mvc' => array(
+                'label' => 'Home',
+                'class' => 'menu-item',
+                'title' => 'Home page',
+                'target' => '_blank',
+                'type' => 'mvc',
+                'order' => 1,
+                'module' => 'core',
+                'controller' => 'index',
+                'action' => 'index',
+                'params' => array('param1' => 'value1', 'param2' => 'value2'),
+                'route' => null,
+                'resetParams' => true,
+                'uri' => 'http://google.com/?a=b',
+                'isActive' => true,
+                'isVisible' => true,
+                'resource' => $this->resource,
+                'privilege' => $this->permission,
+                'pages' => array()
+            ),
+        );
     }
 
     public function tearDown()
@@ -54,31 +103,7 @@ class PageTest extends \PHPUnit_Framework_TestCase
 
     public function testCanGetSetProperties()
     {
-        $resource = m::mock('Resource');
-        $permission = m::mock('Permission');
-
-        $properties = array(
-            'id' => 1,
-            'label' => 'Home',
-            'class' => 'menu-item',
-            'title' => 'Home page',
-            'target' => '_blank',
-            'type' => 'mvc',
-            'order' => 1,
-            'module' => 'core',
-            'controller' => 'index',
-            'action' => 'index',
-            'params' => array('param1' => 'value1', 'param2' => 'value2'),
-            'route' => null,
-            'resetParams' => true,
-            'uri' => 'http://google.com/?a=b',
-            'isActive' => true,
-            'isVisible' => true,
-            'resource' => $resource,
-            'privilege' => $permission,
-            'pages' => array()
-        );
-
+        $properties = $this->data['mvc'];
         foreach ($properties as $key => $value)
         {
             $mutator = 'set' . \ucfirst($key);
@@ -86,6 +111,39 @@ class PageTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($this->object, $this->object->{$mutator}($value));
             $this->assertEquals($value, $this->object->{$accessor}());
         }
+    }
+
+    public function testCanAddMvcPage()
+    {
+        $this->object->add($this->data['mvc']);
+        $expected = $this->data['mvc'];
+        $expected['id'] = null;
+        $expected['uri'] = null;
+        unset($expected['pages']);
+
+        $actual = $this->object->toArray();
+        unset($actual['pages']);
+        
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testCanAddUriPage()
+    {
+        $this->object->add($this->data['uri']);
+        $expected = $this->data['uri'];
+        $expected['id'] = null;
+        $expected['action'] = null;
+        $expected['controller'] = null;
+        $expected['module'] = null;
+        $expected['params'] = null;
+        $expected['route'] = null;
+        $expected['resetParams'] = null;
+        unset($expected['pages']);
+
+        $actual = $this->object->toArray();
+        unset($actual['pages']);
+
+        $this->assertEquals($expected, $actual);
     }
 
 }

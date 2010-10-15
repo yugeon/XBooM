@@ -48,7 +48,7 @@ class Page extends DomainObject
     /**
      * Text label of the page.
      *
-     * @Column(length=50, nullable=true)
+     * @Column(length=50)
      * @var string
      */
     protected $label = null;
@@ -125,7 +125,7 @@ class Page extends DomainObject
     /**
      * Whether params should be reset when assembling URL
      *
-     * @Column(type="boolean")
+     * @Column(type="boolean", nullable=true)
      * @var boolean
      */
     protected $resetParams = true;
@@ -194,6 +194,45 @@ class Page extends DomainObject
             $this->pages->add($page);
         }
 
+        return $this;
+    }
+
+    public function add($data)
+    {
+        $this->setLabel($data['label']);
+        $this->setClass($data['class']);
+        $this->setTitle($data['title']);
+        $this->setTarget($data['target']);
+        $this->setOrder($data['order']);
+        if ('mvc' === $data['type'])
+        {
+            $this->setType($data['type']);
+            $this->setUri(null);
+            $this->setAction($data['action']);
+            $this->setController($data['controller']);
+            $this->setModule($data['module']);
+            $this->setParams($data['params']);
+            $this->setRoute($data['route']);
+            $this->setResetParams($data['resetParams']);
+        }
+        else
+        {
+            $this->setType('uri');
+            $this->setUri($data['uri']);
+            $this->setAction(null);
+            $this->setController(null);
+            $this->setModule(null);
+            $this->setParams(null);
+            $this->setRoute(null);
+            $this->setResetParams(null);
+        }
+        if (!empty($data['resource']))
+        {
+            $this->setResource($data['resource']);
+        }
+        $this->setPrivilege($data['privilege']);
+        $this->setIsActive($data['isActive']);
+        $this->setIsVisible($data['isVisible']);
         return $this;
     }
 

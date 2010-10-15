@@ -20,41 +20,36 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
-namespace Xboom\Model\Form;
-interface MediatorInterface
+/**
+ * Description of PageDomainValidatorTest
+ *
+ * @author yugeon
+ */
+namespace test\App\Admin\Model\Domain\Validator;
+
+use \App\Admin\Model\Domain\Validator\PageDomainValidator,
+ \Mockery as m;
+
+class PageDomainValidatorTest extends \PHPUnit_Framework_TestCase
 {
 
-    /**
-     * First check is form valid with this $data.
-     * If form is not valid and $break == true, then return false.
-     * Else check Domain Object use current validator.
-     * Valid data push to model object.
-     * Errors push to form.
-     *
-     * @param array $data
-     * @param boolean $break Break validation if form is not valid.
-     * @return boolean true if $data is valid
-     */
-    public function isValid($data, $break = true, $break2 = true);
+    protected $object;
 
-    /**
-     * Return filtered values from validation.
-     *
-     * @return array
-     */
-    public function getValues();
+    public function setUp()
+    {
+        $this->object = new PageDomainValidator;
+    }
 
-    /**
-     * Return model.
-     *
-     * @return \Xboom\Model\Domain\AbstractObject
-     */
-    public function getModel();
+    public function tearDown()
+    {
+        parent::tearDown();
+        m::close();
+    }
 
-    /**
-     * Return form for this mediator.
-     *
-     * @return object \Zend_Form
-     */
-    public function getForm();
+
+    public function testCanCreateTestObject()
+    {
+        $this->assertNotNull($this->object);
+    }
+
 }

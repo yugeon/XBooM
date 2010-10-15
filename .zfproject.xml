@@ -49,6 +49,7 @@
             <controllerFile controllerName="Navigation">
               <actionMethod actionName="index"/>
               <actionMethod actionName="addMenu"/>
+              <actionMethod actionName="addPage"/>
             </controllerFile>
           </controllersDirectory>
           <formsDirectory enabled="false"/>
@@ -65,6 +66,9 @@
               </viewControllerScriptsDirectory>
               <viewControllerScriptsDirectory forControllerName="Navigation">
                 <viewScriptFile forActionName="addMenu"/>
+              </viewControllerScriptsDirectory>
+              <viewControllerScriptsDirectory forControllerName="Navigation">
+                <viewScriptFile forActionName="addPage"/>
               </viewControllerScriptsDirectory>
             </viewScriptsDirectory>
           </viewsDirectory>

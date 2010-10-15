@@ -175,7 +175,7 @@ abstract class AbstractValidator implements ValidatorInterface
         $properties = $this->getPropertiesForValidation();
         foreach ($properties as $key => $propertyValidator)
         {
-            if (\array_key_exists($key, $data))
+            if (\array_key_exists($key, $data) && !empty($data[$key]))
             {
                 $isValid = $propertyValidator->isValid($data[$key]) && $isValid;
             }

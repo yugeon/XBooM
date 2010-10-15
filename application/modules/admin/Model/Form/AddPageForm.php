@@ -27,6 +27,7 @@
  */
 
 namespace App\Admin\Model\Form;
+use \Xboom\Form\Decorator\JQuery\ConditionalRendering;
 
 class AddPageForm extends \Zend_Form
 {
@@ -103,6 +104,21 @@ class AddPageForm extends \Zend_Form
                 array('uri'),
                 'uri-group'
         );
+
+        // dynamic conditional rendering form elements
+        $group = $this->getDisplayGroup('mvc-group');
+        $group->addDecorator(new ConditionalRendering(array(
+            'actuatorId' => 'type',
+            'actuatorValue' => 'mvc',
+            'id' => 'mvc-group'
+        )));
+
+        $group = $this->getDisplayGroup('uri-group');
+        $group->addDecorator(new ConditionalRendering(array(
+            'actuatorId' => 'type',
+            'actuatorValue' => 'uri',
+            'id' => 'uri-group'
+        )));
 
         $this->addElement('checkbox', 'isActive', array(
             'label' => 'Is active',

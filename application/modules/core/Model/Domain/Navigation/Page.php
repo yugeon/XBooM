@@ -224,15 +224,21 @@ class Page extends DomainObject
             $this->setModule(null);
             $this->setParams(null);
             $this->setRoute(null);
-            $this->setResetParams(null);
         }
         if (!empty($data['resource']))
         {
             $this->setResource($data['resource']);
         }
         $this->setPrivilege($data['privilege']);
-        $this->setIsActive($data['isActive']);
-        $this->setIsVisible($data['isVisible']);
+        if (null !== $data['isActive'])
+        {
+            $this->setIsActive($data['isActive']);
+        }
+        if (null !== $data['isVisible'])
+        {
+            $this->setIsVisible($data['isVisible']);
+        }
+        
         return $this;
     }
 

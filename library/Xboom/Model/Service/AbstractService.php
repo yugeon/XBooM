@@ -368,6 +368,24 @@ abstract class AbstractService implements ServiceInterface
     }
 
     /**
+     * Retrieve form with established validators.
+     *
+     * @param string $formName
+     * @return Zend_Form
+     */
+    public function getFormWithModelValidators($formName)
+    {
+        $mediator = $this->getFormToModelMediator($formName);
+        return $mediator->getFormWithValidators();
+    }
+
+    public function getFormWithValidatorAttribs($formName)
+    {
+        $mediator = $this->getFormToModelMediator($formName);
+        return $mediator->getFormWithAttribs();
+    }
+
+    /**
      * For inject mediator.
      *
      * @param string $mediatorName

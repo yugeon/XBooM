@@ -66,7 +66,7 @@ class Core_UserController extends Zend_Controller_Action
             }
         }
 
-        $form = $this->userService->getForm('RegisterUser');
+        $form = $this->userService->getFormWithValidatorAttribs('RegisterUser');
         echo $form;
 
 //        return $this->_helper->getHelper('Redirector')

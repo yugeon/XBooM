@@ -27,7 +27,8 @@
  */
 namespace Xboom\Model\Form;
 use \Xboom\Model\Validate\ValidatorInterface,
-    \Xboom\Model\Domain\ValidateInterface;
+    \Xboom\Model\Domain\ValidateInterface,
+    \Xboom\Model\Validate\NoSuchPropertyException;
 
 class Mediator implements MediatorInterface
 {
@@ -91,6 +92,56 @@ class Mediator implements MediatorInterface
     public function getForm()
     {
         return $this->_form;
+    }
+
+    public function getFormWithAttribs()
+    {
+        $form = $this->getForm();
+        $validator = $this->getValidator();
+
+        foreach ($form->getElements() as $element)
+        {
+            try
+            {
+                $validators = $validator->getPropertyValidator($element->getName())
+                        ->getValidators();
+                foreach ($validators as $v)
+                {
+                    if ($v instanceof \Zend_Validate_StringLength)
+                    {
+                        if (null !== $v->getMax())
+                        {
+                            $element->setAttrib('maxlength', $v->getMax());
+                        }
+                        break;
+                    }
+                }
+            }
+            catch (NoSuchPropertyException $e)
+            { }
+        }
+
+        return $form;
+    }
+
+    public function getFormWithValidators()
+    {
+        $form = $this->getForm();
+        $validator = $this->getValidator();
+
+        foreach ($form->getElements() as $element)
+        {
+            try
+            {
+                $validators = $validator->getPropertyValidator($element->getName())
+                        ->getValidators();
+                $element->setValidators($validators);
+            }
+            catch (NoSuchPropertyException $e)
+            { }
+        }
+
+        return $form;
     }
 
     /**

@@ -160,4 +160,25 @@ class AbstractServiceTest extends \PHPUnit_Framework_TestCase
                 $this->object->getServiceContainer()->getService('AclService'));
     }
 
+    public function testGetFormWithModelValidators()
+    {
+        $formWithValidators = m::mock('Zend_Form');
+
+        $mediator = m::mock('\\Xboom\\Model\\Form\\MediatorInterface');
+        $mediator->shouldReceive('getFormWithValidators')->andReturn($formWithValidators);
+        $this->object->setFormToModelMediator('My', $mediator);
+
+        $this->assertEquals($formWithValidators, $this->object->getFormWithModelValidators('My'));
+    }
+
+    public function testGetFormWithValidatorAttribs()
+    {
+        $formWithValidatorAttribs = m::mock('Zend_Form');
+
+        $mediator = m::mock('\\Xboom\\Model\\Form\\MediatorInterface');
+        $mediator->shouldReceive('getFormWithAttribs')->andReturn($formWithValidatorAttribs);
+        $this->object->setFormToModelMediator('My', $mediator);
+
+        $this->assertEquals($formWithValidatorAttribs, $this->object->getFormWithValidatorAttribs('My'));
+    }
 }

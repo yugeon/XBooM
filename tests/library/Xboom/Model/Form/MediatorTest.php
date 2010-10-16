@@ -312,4 +312,59 @@ class MediatorTest extends PHPUnit_Framework_TestCase
         
         $this->assertTrue($this->object->isValid($data, false));
     }
+
+    public function testGetFormWithModelValidators()
+    {
+        $propertyName = 'testProperty';
+
+        $elemValidator = m::mock('Zend_Validate_Interface');
+
+        $formElement = m::mock('Zend_Form_Element');
+        $formElement->shouldReceive('getName')->andReturn($propertyName);
+        $formElement->shouldReceive('getValidators')->andReturn(array($elemValidator));
+        $formElement->shouldReceive('setValidators')->andReturn($this->userForm);
+
+        $this->userForm->shouldReceive('getElements')->andReturn(array($formElement));
+
+        $propValidators = m::mock('Zend_Validate_Interface');
+
+        $propValidator = m::mock('\\Xboom\\Model\\Validate\\Element\\ValidatorInterface');
+        $propValidator->shouldReceive('getValidators')->andReturn(array($propValidators));
+
+        $this->userValidator->shouldReceive('getPropertyValidator')->andReturn($propValidator);
+
+        $form = $this->object->getFormWithValidators();
+        foreach ($form->getElements() as $element)
+        {
+            $this->assertTrue( sizeof($element->getValidators()) > 0);
+        }
+    }
+
+    public function testGetFormWithAttribs()
+    {
+        $propertyName = 'testProperty';
+
+        $elemValidator = m::mock('Zend_Validate_Interface');
+
+        $formElement = m::mock('Zend_Form_Element');
+        $formElement->shouldReceive('getName')->andReturn($propertyName);
+        $formElement->shouldReceive('getAttribs')->andReturn(array('maxlength' => 4));
+        $formElement->shouldReceive('setAttrib')->with('maxlength', 4)->andReturn(array('maxlength' => 4));
+
+        $this->userForm->shouldReceive('getElements')->andReturn(array($formElement));
+
+        $propValidators = m::mock('Zend_Validate_StringLength');
+        $propValidators->shouldReceive('getMax')->andReturn(4);
+
+        $propValidator = m::mock('\\Xboom\\Model\\Validate\\Element\\ValidatorInterface');
+        $propValidator->shouldReceive('getValidators')->andReturn(array($propValidators));
+
+        $this->userValidator->shouldReceive('getPropertyValidator')->andReturn($propValidator);
+
+        $form = $this->object->getFormWithAttribs();
+        foreach ($form->getElements() as $element)
+        {
+            $this->assertArrayHasKey('maxlength', $element->getAttribs());
+        }
+    }
 }

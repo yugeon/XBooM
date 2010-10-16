@@ -96,6 +96,6 @@ class Admin_NavigationController extends Zend_Controller_Action
         }
 
         $this->view->messages = (array) $messages;
-        $this->view->form = $pageService->getForm('AddPage');
+        $this->view->form = $pageService->getFormWithValidatorAttribs('AddPage');
     }
 }

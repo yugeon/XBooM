@@ -63,7 +63,7 @@ class AddPageForm extends \Zend_Form
 
         $this->addElement('Select', 'type', array(
             'label' => 'Type',
-            'multiOptions' => array('mvc' => 'mvc', 'uri' => 'uri'),
+            'multiOptions' => array('uri' => 'uri', 'mvc' => 'mvc'),
         ));
 
         $this->addElement('text', 'module', array(

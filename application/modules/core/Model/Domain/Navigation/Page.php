@@ -155,7 +155,7 @@ class Page extends DomainObject
      * @ManyToMany(targetEntity="Page")
      * @JoinTable(name="pages_pages",
      *      joinColumns={@JoinColumn(name="parent_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@JoinColumn(name="child_id", referencedColumnName="id", unique=true)}
+     *      inverseJoinColumns={@JoinColumn(name="child_id", referencedColumnName="id")}
      *      )
      * @var ArrayCollection
      */

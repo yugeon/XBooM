@@ -137,7 +137,7 @@ class PageTest extends \PHPUnit_Framework_TestCase
         $expected['module'] = null;
         $expected['params'] = null;
         $expected['route'] = null;
-        $expected['resetParams'] = null;
+        $expected['resetParams'] = true;
         unset($expected['pages']);
 
         $actual = $this->object->toArray();

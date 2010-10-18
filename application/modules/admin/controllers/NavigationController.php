@@ -98,4 +98,17 @@ class Admin_NavigationController extends Zend_Controller_Action
         $this->view->messages = (array) $messages;
         $this->view->form = $pageService->getFormWithValidatorAttribs('AddPage');
     }
+
+    public function editMenuAction()
+    {
+        $menuName = $this->_getParam('name');
+        $this->view->menuContainer = null;
+        if (null !== $menuName)
+        {
+            $navService = $this->_sc->getService('NavigationService');
+            $menuContainer = $navService->getNavigation($menuName);
+            $this->view->menuContainer = $menuContainer;
+            $this->view->menuName = $menuName;
+        }
+    }
 }

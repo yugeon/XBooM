@@ -1,0 +1,41 @@
+
+<?php
+$this->headStyle()->captureStart();
+?>
+    ul {
+        margin: 0;
+        padding: 0;
+        padding-left: 30px;
+    }
+
+    ul.sortable, ul.sortable ul {
+        margin: 0 0 0 25px;
+        padding: 0;
+        list-style-type: none;
+    }
+
+    ul.sortable {
+        margin: 4em 0;
+        width: 400px;
+    }
+
+    .sortable li {
+        margin: 5px 0 0 0;
+        padding: 0;
+    }
+
+    .sortable li div  {
+        border: 1px solid black;
+        padding: 3px;
+        margin: 0;
+        cursor: move;
+    }
+<?php $this->headStyle()->captureEnd();?>
+
+                        <h2>[<?php echo $this->menuName; ?>]</h2>
+<?php 
+    $this->addHelperPath('Xboom/View/Helper', 'Xboom_View_Helper');
+    echo $this->nestedSortable($this->menuContainer, 'sortable', 'menuList')
+        ->setScriptPath('modules/admin/js/jquery/jquery.ui.nestedSortable.js')
+        ->setIndent(24);
+?>

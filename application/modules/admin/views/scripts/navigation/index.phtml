@@ -3,7 +3,7 @@
     <?php $id = $this->escape($menu->getId()); ?>
         <p>
             <?php echo $this->escape($menu->getName()); ?>
-            | <a href='<?php echo $this->url(array('action' => 'edit', 'id' => $id)); ?>'>Edit</a>
-            | <a href='<?php echo $this->url(array('action' => 'delete', 'id' => $id)); ?>'>Delete</a>
+            | <a href='<?php echo $this->url(array('action' => 'edit-menu', 'name' => $this->escape($menu->getName()))); ?>'>Edit</a>
+            | <a href='<?php echo $this->url(array('action' => 'delete', 'name' => $this->escape($menu->getName()))); ?>'>Delete</a>
         </p>
 <?php endforeach;?>

@@ -25,7 +25,6 @@
  *
  * @author yugeon
  */
-require_once 'PHPUnit/Framework.php';
 
 use Xboom\Model\Validate\Element\ValidatorInterface;
 use Xboom\Model\Validate\Element\AbstractValidator;

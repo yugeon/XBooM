@@ -28,9 +28,6 @@ use \Mockery as m,
  \App\Core\Model\Form\RegisterUserForm,
  \App\Core\Model\Domain\Validator\RegisterUserValidator;
 
-require_once 'PHPUnit/Framework.php';
-require_once 'Mockery.php';
-
 /**
  * Description of User
  *

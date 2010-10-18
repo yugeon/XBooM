@@ -27,8 +27,6 @@ use Xboom\Model\Validate\ValidatorInterface,
     Xboom\Model\Domain\DomainObject,
    \Mockery as m;
 
-require_once 'PHPUnit/Framework.php';
-
 class TestDomainObject extends DomainObject
 {
 

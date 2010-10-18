@@ -20,7 +20,6 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
-require_once 'PHPUnit/Framework.php';
 /**
  * Description of MediatorTest
  *

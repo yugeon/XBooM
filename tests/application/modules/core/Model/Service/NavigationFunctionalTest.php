@@ -27,10 +27,10 @@
  */
 namespace test\App\Core\Model\Service;
 use \App\Core\Model\Domain\Navigation\Menu,
-    \App\Core\Model\Domain\Navigation\Page,
-    \App\Core\Model\Domain\Acl\Resource,
-    \App\Core\Model\Domain\Acl\Permission,
-    \Xboom\Acl\Acl;
+ \App\Core\Model\Domain\Navigation\Page,
+ \App\Core\Model\Domain\Acl\Resource,
+ \App\Core\Model\Domain\Acl\Permission,
+ \Xboom\Acl\Acl;
 
 /**
  * @group functional
@@ -96,9 +96,13 @@ class NavigationFunctionalTest extends \FunctionalTestCase
         $page5->action = 'last';
         $this->_em->persist($page5);
 
-        $this->page1->addChildPage($page2);
-        $this->page1->addChildPage($page5);
-        $page2->addChildPage($page3);
+        $page2->assignToParent($this->page1);
+        $page5->assignToParent($this->page1);
+        $page3->assignToParent($page2);
+
+//        $this->page1->addChildPage($page2);
+//        $this->page1->addChildPage($page5);
+//        $page2->addChildPage($page3);
 
 
         $menu = new Menu();
@@ -120,15 +124,15 @@ class NavigationFunctionalTest extends \FunctionalTestCase
         $actual = array();
         $expected = array(
             'Page 1',
-                'Page 1.2',
-                'Page 1.1',
-                    'Page 1.1.1',
+            'Page 1.2',
+            'Page 1.1',
+            'Page 1.1.1',
             'Page 2'
         );
         $nav = $this->navigationService->getNavigation($this->navigationName);
 
         $iterator = new \RecursiveIteratorIterator($nav,
-            \RecursiveIteratorIterator::SELF_FIRST);
+                        \RecursiveIteratorIterator::SELF_FIRST);
         foreach ($iterator as $page) {
             $actual[] = $page->getLabel();
         }
@@ -210,7 +214,77 @@ class NavigationFunctionalTest extends \FunctionalTestCase
         $adminMenu->assignToPage($this->page1);
         $this->_em->persist($adminMenu);
         $this->_em->flush();
-
-
     }
+
+    /**
+     *
+     * @param RecursiveIterator $iterator
+     * @param int $parentId
+     * @param int $depth
+     * @return array
+     */
+    function getMenuHierarchy($iterator, $parentId = null, $depth = 0)
+    {
+        $result = array();
+        while ($iterator->valid())
+        {
+            $page = $iterator->current();
+            $actual = array(
+                'id' => $page->getId(),
+                'parent' => $parentId,
+                'level' => $depth,
+                //'label' => $page->getLabel()
+            );
+            $result[] = $actual;
+            
+            if ($iterator->hasChildren())
+            {
+                $childs = $this->getMenuHierarchy(
+                        $iterator->getChildren(), $page->getId(), $depth+1);
+                $result = \array_merge($result, $childs);
+            }
+                
+            $iterator->next();
+        }
+        return $result;
+    }
+
+    public function testCanSaveMenuHierarchy()
+    {
+//        $before = array(
+//            'Page 1',
+//                'Page 1.2',
+//                'Page 1.1',
+//                    'Page 1.1.1',
+//            'Page 2'
+//        );
+//        $after = array(
+//            'Page 1',
+//                'Page 1.2',
+//                'Page 1.1',
+//            'Page 2'
+//                'Page 1.1.1',
+//        );
+        $nav = $this->navigationService->getNavigation($this->navigationName);
+        $expected = $this->getMenuHierarchy($nav);
+
+        $expected[3]['parent'] = $expected[4]['parent'];
+        $expected[3]['level'] = 1;
+
+        $this->navigationService->saveMenuHierarchy($expected);
+
+        $this->navigationService->unsetNavigation($this->navigationName);
+        $nav = $this->navigationService->getNavigation($this->navigationName);
+        $actual = $this->getMenuHierarchy($nav);
+
+//        $menu = array(
+//            array('id' => 1, 'parent' => 0, 'level' => 0 ),
+//                array('id' => 2, 'parent' => 1, 'level' => 1),
+//                array('id' => 3, 'parent' => 1, 'level' => 1),
+//            array('id' => 4, 'parent' => 0, 'level' => 0),
+//                array('id' => 5, 'parent' => 4, 'level' => 1),
+//        );
+        $this->assertEquals($expected, $actual);
+    }
+
 }

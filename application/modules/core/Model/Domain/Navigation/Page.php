@@ -161,6 +161,12 @@ class Page extends DomainObject
      */
     protected $pages = null;
     /**
+     *
+     * @ManyToOne(targetEntity="Page")
+     * @var Page
+     */
+    protected $parent = null;
+    /**
      * ACL resource associated with this page
      *
      * @OneToOne(targetEntity="\App\Core\Model\Domain\Acl\Resource")
@@ -187,6 +193,13 @@ class Page extends DomainObject
         parent::__construct($data);
     }
 
+    public function assignToParent($parentPage)
+    {
+        $this->parent = $parentPage;
+        $parentPage->addChildPage($this);
+        return $this;
+    }
+    
     public function addChildPage($page)
     {
         if (!$this->pages->contains($page))

@@ -30,6 +30,20 @@ $this->headStyle()->captureStart();
         margin: 0;
         cursor: move;
     }
+
+    .jquery-ajax-loader {
+        background: #BBBBBB url(images/ajax-loader.gif) no-repeat 50% 50%;
+    }
+    .jquery-ajax-loader-mini {
+        background: #BBBBBB url(images/ajax-loader-mini.gif) no-repeat 50% 50%;
+    }
+
+    .ajax-loader-ok {
+        background: #BBB url(images/ajax-loader-ok32.png) no-repeat 50% 50%;
+    }
+    .ajax-loader-error {
+        background: #BBB url(images/ajax-loader-error32.png) no-repeat 50% 50%;
+    }
 <?php $this->headStyle()->captureEnd();?>
 
                         <h2>[<?php echo $this->menuName; ?>]</h2>
@@ -39,3 +53,162 @@ $this->headStyle()->captureStart();
         ->setScriptPath('modules/admin/js/jquery/jquery.ui.nestedSortable.js')
         ->setIndent(24);
 ?>
+
+    <p>
+		<input type="submit" name="serialize" id="serialize" value="Serialize" />
+    </p>
+	<p id="serializeOutput"></p>
+
+	<p>
+		<input type="submit" name="toArray" id="toArray" value="To array" />
+	<pre id="toArrayOutput"></pre>
+
+		<input type="submit" name="save" id="save" value="Save" />
+
+    <script  src="modules/admin/js/jquery/jquery.ajaxLoader.js"></script>
+    <script>
+
+	$(document).ready(function(){
+        $('#serialize').click(function(){
+            $('div.jquery-ajax-loader1').fadeOut(1200);
+			serialized = $('ul.sortable').nestedSortable('serialize');
+			$('#serializeOutput').text(serialized);
+		});
+
+		$('#toArray').click(function(e){
+			arraied = $('ul.sortable').nestedSortable('toArray', {startDepthCount: 0});
+			arraied = dump(arraied);
+			(typeof($('#toArrayOutput')[0].textContent) != 'undefined') ?
+			$('#toArrayOutput')[0].textContent = arraied : $('#toArrayOutput')[0].innerText = arraied;
+		});
+
+        $('#save').click(function(){
+
+            var data = getOrder($('ul.sortable'));
+
+            $.ajax({
+                url: '/admin/navigation/save-menu/format/json',
+                dataType: 'json',
+                type: 'post',
+                data: { data: data },
+                beforeSend: function(){
+                    $('ul.sortable').ajaxLoader();
+                    $('#save').attr('disabled','disabled');
+                },
+                timeout: 1000,
+                complete: function(){
+                    $('#save').removeAttr('disabled');
+                },
+                error: function(){
+                    $('ul.sortable').ajaxLoader('showClass', 'ajax-loader-error');
+                    alert('An error occurred while saving');
+                },
+                success: function(r, status){
+                    $('ul.sortable').ajaxLoader('showClass', 'ajax-loader-ok');
+//                    console.log(r);
+//                    console.log(status);
+                }
+            })
+        });
+
+    });
+
+    
+
+    function getOrder($ul){
+
+        var $li = $ul.find('li');
+
+        var isFirst = function($element){
+            return $element.prev().length === 0;
+        };
+
+        var isLast = function($element){
+            return $element.next().length === 0;
+        };
+
+        var hasChildren = function($element){
+            return $element.find('> ul > li:first').length === 1;
+        };
+
+        var checkDepth = function($start, selector){
+            var level = 0;
+
+            while (true) {
+                $start = $start.find(selector);
+
+                if ($start.length !== 0) {
+                    level++;
+                } else {
+                    break;
+                }
+            }
+
+            return level;
+        };
+
+        var getItemIdFromElement = function($element)
+        {
+            var res = $element.attr('id').match($element.expression || (/(.+)[-=_](.+)/));
+            return ($element.key && $element.expression ? res[1] : res[2]);
+        }
+
+        var level = -1,
+            parents = [0],	// parents[level] = parent_id
+            prevWasLastSibling = false,
+            data = [];
+
+        $li.each(function(){
+
+            var $self = $(this);
+
+            if (prevWasLastSibling) {
+                level -= checkDepth($self.prev(), '> ul > li:last');
+                prevWasLastSibling = false;
+
+            } else if (isFirst($self)) {
+                level++;
+            }
+
+            data.push({
+                level: level,
+                parent: parents[level],
+                id: getItemIdFromElement($self)
+            });
+
+            if (hasChildren($self)) {
+                parents[level + 1] = getItemIdFromElement($self);
+
+            } else if (isLast($self)) {		// Don't evaluate if hasChildren
+                prevWasLastSibling = true;
+            }
+        });
+
+        return data;
+    };
+
+    function dump(arr,level) {
+		var dumped_text = "";
+		if(!level) level = 0;
+
+		//The padding given at the beginning of the line.
+		var level_padding = "";
+		for(var j=0;j<level+1;j++) level_padding += "    ";
+
+		if(typeof(arr) == 'object') { //Array/Hashes/Objects
+			for(var item in arr) {
+				var value = arr[item];
+
+				if(typeof(value) == 'object') { //If it is an array,
+					dumped_text += level_padding + "'" + item + "' ...\n";
+					dumped_text += dump(value,level+1);
+				} else {
+					dumped_text += level_padding + "'" + item + "' => \"" + value + "\"\n";
+				}
+			}
+		} else { //Stings/Chars/Numbers etc.
+			dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
+		}
+		return dumped_text;
+	}
+    </script>

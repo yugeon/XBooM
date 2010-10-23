@@ -84,4 +84,21 @@ class NavigationServiceTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertType('Zend_Navigation_Container', $this->object->getNavigation());
     }
+
+    public function testCanGetNavigationAsArray()
+    {
+        $this->assertTrue(is_array($this->object->getNavigationAsArray()));
+    }
+
+    public function testCanSaveMenuHierarchy()
+    {
+        $menu = array(
+            array('level' => 0, 'parent' => 0, 'id' => 1),
+                array('level' => 1, 'parent' => 1, 'id' => 2),
+                array('level' => 1, 'parent' => 1, 'id' => 3),
+            array('level' => 0, 'parent' => 0, 'id' => 4),
+                array('level' => 1, 'parent' => 4, 'id' => 5),
+        );
+        $this->assertEquals($this->object, $this->object->saveMenuHierarchy($menu));
+    }
 }

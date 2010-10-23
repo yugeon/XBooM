@@ -74,7 +74,7 @@ class NavigationService
             $navigation = $this->_buildNavigationByName($name);
             $this->setNavigation($navigation, $name);
         }
-        return $this->_navigations[$name];
+        return new \Zend_Navigation($this->_navigations[$name]);
     }
 
     /**
@@ -89,10 +89,35 @@ class NavigationService
         return $this;
     }
 
+    public function unsetNavigation($name)
+    {
+        if (isset($this->_navigations[$name]))
+        {
+            unset($this->_navigations[$name]);
+        }
+        return $this;
+    }
+
     /**
      *
      * @param string $name
-     * @return \Zend_Navigation_Container
+     * @return array
+     */
+    public function getNavigationAsArray($name = 'default')
+    {
+        if (!isset($this->_navigations[$name]))
+        {
+            // TODO caching
+            $navigation = $this->_buildNavigationByName($name);
+            $this->setNavigation($navigation, $name);
+        }
+        return $this->_navigations[$name];
+    }
+
+    /**
+     *
+     * @param string $name
+     * @return array
      */
     protected function _buildNavigationByName($name)
     {
@@ -118,7 +143,7 @@ class NavigationService
             $pages = $this->_extractPages($menu->getPages());
         }
 
-        return new \Zend_Navigation($pages);
+        return $pages;
     }
 
     /**
@@ -137,6 +162,11 @@ class NavigationService
             {   
                 if (!empty($value))
                 {
+                    if ('parent' == $key)
+                    {
+                        continue;
+                    }
+
                     if ('resource' == $key)
                     {
                         $result[$index]['resource'] = $value->getResourceId();
@@ -155,5 +185,14 @@ class NavigationService
         }
 
         return $result;
+    }
+    
+    public function saveMenuHierarchy($menuHierarchy)
+    {
+        //$menuHierarchy = $this->_normalizeMenuHierarchy($menuHierarchy);
+        // 1. Выбрать всю ветку
+        // 2. Изменить коллекции
+        // 3. Сохранить
+        return $this;
     }
 }

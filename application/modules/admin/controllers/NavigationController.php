@@ -111,4 +111,21 @@ class Admin_NavigationController extends Zend_Controller_Action
             $this->view->menuName = $menuName;
         }
     }
+
+    public function saveMenuAction()
+    {
+        //sleep(2.7);
+//        $menuName = $this->_getParam('name', 'admin');
+//        
+//            $menuContainer = $navService->getNavigation($menuName);
+//            $this->_helper->json->sendJson($menuContainer->toArray());
+
+        if ($this->getRequest()->isPost())
+        {
+            $navService = $this->_sc->getService('NavigationService');
+            $navService->saveMenu($this->getRequest()->getPost());
+        }
+        $this->_helper->json->sendJson($this->_getParam('data'));
+        //var_dump($this->_getParam('data'));
+    }
 }

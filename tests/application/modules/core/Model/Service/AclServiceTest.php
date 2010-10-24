@@ -62,7 +62,7 @@ class AclServiceTest extends \PHPUnit_Framework_TestCase
         $this->permission->shouldReceive('getName')->andReturn('test-permission-name');
         $this->permission->shouldReceive('getType')->andReturn(true);
 
-        $this->permission1 = m::mock('\\Xboom\\Model\\Domain\\Acl\\Permission');
+        $this->permission1 = m::mock('\\App\\Core\\Model\\Domain\\Acl\\Permission');
         $this->permission1->shouldReceive('getResource')->andReturn($this->resource);
         $this->permission1->shouldReceive('isOwnerRestriction')->andReturn(false);
         $this->permission1->shouldReceive('getName')->andReturn('test-permission-name1');

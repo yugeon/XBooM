@@ -59,7 +59,7 @@ class MediatorTest extends PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->userForm = m::mock('Zend_Form');
-        $this->userValidator = m::mock('\\Xboom\\Model\\Validate\\ValidatorInteface');
+        $this->userValidator = m::mock('\\Xboom\\Model\\Validate\\ValidatorInterface');
         $this->userModel = m::mock('\\Xboom\\Model\\Domain\\DomainObject');
         $this->userModel->shouldReceive('getValidator')->andReturn($this->userValidator);
         $this->userModel->shouldReceive('setData')->andReturn()->mock();

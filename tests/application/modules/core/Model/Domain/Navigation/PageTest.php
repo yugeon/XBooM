@@ -123,6 +123,7 @@ class PageTest extends \PHPUnit_Framework_TestCase
 
         $actual = $this->object->toArray();
         unset($actual['pages']);
+        unset($actual['parent']);
         
         $this->assertEquals($expected, $actual);
     }
@@ -142,6 +143,7 @@ class PageTest extends \PHPUnit_Framework_TestCase
 
         $actual = $this->object->toArray();
         unset($actual['pages']);
+        unset($actual['parent']);
 
         $this->assertEquals($expected, $actual);
     }

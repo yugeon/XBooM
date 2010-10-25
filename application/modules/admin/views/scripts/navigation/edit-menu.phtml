@@ -90,7 +90,7 @@ $this->headStyle()->captureStart();
                 url: '/admin/navigation/save-menu/format/json',
                 dataType: 'json',
                 type: 'post',
-                data: { data: data },
+                data: { menuName: '<?php echo $this->menuName; ?>', data: data },
                 beforeSend: function(){
                     $('ul.sortable').ajaxLoader();
                     $('#save').attr('disabled','disabled');
@@ -99,14 +99,16 @@ $this->headStyle()->captureStart();
                 complete: function(){
                     $('#save').removeAttr('disabled');
                 },
-                error: function(){
+                error: function(r){
                     $('ul.sortable').ajaxLoader('showClass', 'ajax-loader-error');
-                    alert('An error occurred while saving');
+                    alert(r.message || 'An error occurred while saving');
                 },
-                success: function(r, status){
+                success: function(r){
+                    if ('error' == r.result) {
+                        this.error(r);
+                        return;
+                    }
                     $('ul.sortable').ajaxLoader('showClass', 'ajax-loader-ok');
-//                    console.log(r);
-//                    console.log(status);
                 }
             })
         });
@@ -173,6 +175,7 @@ $this->headStyle()->captureStart();
             data.push({
                 level: level,
                 parent: parents[level],
+                order: $self.index(),
                 id: getItemIdFromElement($self)
             });
 

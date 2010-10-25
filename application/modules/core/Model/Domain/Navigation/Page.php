@@ -196,7 +196,31 @@ class Page extends DomainObject
     public function assignToParent($parentPage)
     {
         $this->parent = $parentPage;
-        $parentPage->addChildPage($this);
+        if (!\is_null($parentPage))
+        {
+            $parentPage->addChildPage($this);
+        }
+        return $this;
+    }
+
+    public function removeParent()
+    {
+        if (!\is_null($this->getParent()))
+        {
+            $this->getParent()->removeChild($this);
+            $this->setParent(null);
+        }
+        return $this;
+    }
+
+    public function changeParent($newParent)
+    {
+        if ($this->getParent() != $newParent)
+        {
+            $this->removeParent();
+            $this->assignToParent($newParent);
+        }
+        
         return $this;
     }
     
@@ -207,6 +231,12 @@ class Page extends DomainObject
             $this->pages->add($page);
         }
 
+        return $this;
+    }
+
+    public function removeChild($childPage)
+    {
+        $this->getPages()->removeElement($childPage);
         return $this;
     }
 
@@ -238,6 +268,7 @@ class Page extends DomainObject
             $this->setParams(null);
             $this->setRoute(null);
         }
+        // Fixme resource
         if (!empty($data['resource']))
         {
             $this->setResource($data['resource']);

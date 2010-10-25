@@ -60,10 +60,15 @@ class NavigationServiceTest extends \PHPUnit_Framework_TestCase
         $qb->shouldReceive('getQuery')->andReturn($query);
 
         $result = array();
+
+        $menu = m::mock('Menu');
         
         $this->em = m::mock('\\Doctrine\\ORM\\EntityManager');
         $this->em->shouldReceive('createQueryBuilder')->andReturn($qb);
+        $this->em->shouldReceive('getRepository')->andReturn($this->em);
+        $this->em->shouldReceive('findOneByName')->andReturn($menu);
         $this->em->shouldReceive('createQuery')->andReturn($query);
+        $this->em->shouldReceive('flush');
         $query->shouldReceive('getResult')->andReturn($result);
 
         $this->object = new NavigationService($this->em);
@@ -93,12 +98,17 @@ class NavigationServiceTest extends \PHPUnit_Framework_TestCase
     public function testCanSaveMenuHierarchy()
     {
         $menu = array(
-            array('level' => 0, 'parent' => 0, 'id' => 1),
-                array('level' => 1, 'parent' => 1, 'id' => 2),
-                array('level' => 1, 'parent' => 1, 'id' => 3),
-            array('level' => 0, 'parent' => 0, 'id' => 4),
-                array('level' => 1, 'parent' => 4, 'id' => 5),
+            array('order' => 0, 'parent' => 0, 'id' => 1),
+                array('order' => 1, 'parent' => 1, 'id' => 2),
+                array('order' => 1, 'parent' => 1, 'id' => 3),
+            array('order' => 0, 'parent' => 0, 'id' => 4),
+                array('order' => 1, 'parent' => 4, 'id' => 5),
         );
-        $this->assertEquals($this->object, $this->object->saveMenuHierarchy($menu));
+        $data = array(
+            'menuName' => 'testMenu',
+            'data' => $menu
+        );
+
+        $this->assertEquals($this->object, $this->object->saveMenuHierarchy($data));
     }
 }

@@ -99,4 +99,11 @@ class MenuTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->object, $this->object->add($menuData2));
     }
 
+    public function testCanRemoveChildPage()
+    {
+        $page = m::mock('Page');
+        $this->object->assignToPage($page);
+        $this->assertEquals($this->object, $this->object->removePage($page));
+        $this->assertNotContains($page, $this->object->getPages());
+    }
 }

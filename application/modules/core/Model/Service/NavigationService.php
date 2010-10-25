@@ -27,6 +27,8 @@
  */
 namespace App\Core\Model\Service;
 
+use \Xboom\Model\Service\Exception as ServiceException;
+
 class NavigationService
 {
 
@@ -38,11 +40,12 @@ class NavigationService
 
     /**
      *
-     * @var array of Zend_Navigation_Container
+     * @var array of Menu
      */
-    protected $_navigations = array();
+    protected $_menus = array();
 
     protected $_menuClass = '';
+    protected $_pageClass = '';
 
     public function __construct($em)
     {
@@ -61,6 +64,17 @@ class NavigationService
     }
 
     /**
+     *
+     * @param string $pageClass
+     * @return NavigationService
+     */
+    public function setPageClass($pageClass)
+    {
+        $this->_pageClass = $pageClass;
+        return $this;
+    }
+
+    /**
      * Get navigation
      *
      * @param string $name
@@ -68,58 +82,79 @@ class NavigationService
      */
     public function getNavigation($name = 'default')
     {
-        if (!isset($this->_navigations[$name]))
-        {
-            // TODO caching
-            $navigation = $this->_buildNavigationByName($name);
-            $this->setNavigation($navigation, $name);
-        }
-        return new \Zend_Navigation($this->_navigations[$name]);
+        $navigation = $this->getNavigationAsArray($name);
+        return new \Zend_Navigation($navigation);
     }
 
     /**
      *
-     * @param Zend_Navigation_Container $navigation
+     * @param string $name
+     * @return Menu|null
+     */
+    public function getMenu($name)
+    {
+        if (!isset ($this->_menus[$name]))
+        {
+            // TODO caching
+            $menu = $this->_buildMenuByName($name);
+            $this->setMenu($menu, $name);
+        }
+
+        return $this->_menus[$name];
+    }
+    /**
+     * Save the menu object in internal cache.
+     *
+     * @param Menu $menu
      * @param string $name
      * @return NavigationService
      */
-    public function setNavigation($navigation, $name = 'default')
+    public function setMenu($menu, $name = 'default')
     {
-        $this->_navigations[$name] = $navigation;
+        $this->_menus[$name] = $menu;
         return $this;
     }
 
-    public function unsetNavigation($name)
+    /**
+     * Reset menu object from internal cache.
+     *
+     * @param string $name Menu name.
+     * @return NavigationService
+     */
+    public function unsetMenu($name)
     {
-        if (isset($this->_navigations[$name]))
+        if (isset($this->_menus[$name]))
         {
-            unset($this->_navigations[$name]);
+            unset($this->_menus[$name]);
         }
         return $this;
     }
 
     /**
+     * Transform menu domain object to navigation array.
      *
      * @param string $name
      * @return array
      */
     public function getNavigationAsArray($name = 'default')
     {
-        if (!isset($this->_navigations[$name]))
+        $navigation = array();
+        $menu = $this->getMenu($name);
+        if (!\is_null($menu))
         {
-            // TODO caching
-            $navigation = $this->_buildNavigationByName($name);
-            $this->setNavigation($navigation, $name);
+            $navigation = $this->_extractPages($menu->getPages());
         }
-        return $this->_navigations[$name];
+        
+        return $navigation;
     }
 
     /**
+     * Build a menu object with all its pages.
      *
      * @param string $name
-     * @return array
+     * @return Menu|null
      */
-    protected function _buildNavigationByName($name)
+    protected function _buildMenuByName($name)
     {
         /* @var $qb \Doctrine\ORM\QueryBuilder */
         $qb = $this->_em->createQueryBuilder();
@@ -136,14 +171,12 @@ class NavigationService
         $query = $qb->getQuery();
         $result = $query->getResult();
 
-        $pages = array();
+        $menu = null;
         if (!empty($result))
         {
             $menu = $result[0];
-            $pages = $this->_extractPages($menu->getPages());
         }
-
-        return $pages;
+        return $menu;
     }
 
     /**
@@ -186,13 +219,120 @@ class NavigationService
 
         return $result;
     }
-    
-    public function saveMenuHierarchy($menuHierarchy)
+
+    /**
+     * Returns the unique identifiers of those pages
+     * that are involved in a save operation
+     *
+     * @param array $menuHierarchy
+     * @return array
+     */
+    protected function _normalizeMenuHierarchyIds($menuHierarchy)
     {
-        //$menuHierarchy = $this->_normalizeMenuHierarchy($menuHierarchy);
-        // 1. Выбрать всю ветку
-        // 2. Изменить коллекции
-        // 3. Сохранить
-        return $this;
+        $ids = array();
+        foreach ($menuHierarchy as $pageItem)
+        {
+            $ids[] = $pageItem['id'];
+            $ids[] = $pageItem['parent'];
+        }
+        return \array_unique($ids);
+    }
+
+    /**
+     * Retrieve all pages with relevant ids.
+     *
+     * @param array $ids Page idnetificators.
+     * @return array
+     */
+    protected function _getPagesByIds(array $ids)
+    {
+        /* @var $qb \Doctrine\ORM\QueryBuilder */
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select(array('page'))
+                ->from($this->_pageClass, 'page')
+                ->leftJoin('page.parent', 'p')
+                ->where($qb->expr()->in('page.id', $ids));
+        $query = $qb->getQuery();
+        $result = $query->getResult();
+        return $result;
+    }
+
+    /**
+     * Retrieve page object from selection.
+     *
+     * @param array $pages
+     * @param int $id
+     * @return Page|null
+     */
+    protected function _getPageById($pages, $id)
+    {
+        foreach ($pages as $page)
+        {
+            if ($id == $page->getId())
+            {
+                return $page;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Save menu hierarchy.
+     *
+     * @param array $data
+     * @return NavigationService
+     * @throws ServiceException
+     */
+    public function saveMenuHierarchy($data)
+    {
+        // TODO ACL
+        // TODO Validation
+        try
+        {
+            $menuName = $data['menuName'];
+            $menuHierarchy = $data['data'];
+
+            $menu = $this->_em->getRepository($this->_menuClass)->findOneByName($menuName);
+
+            $ids = $this->_normalizeMenuHierarchyIds($menuHierarchy);
+            $pages = $this->_getPagesByIds($ids, $menuName);
+
+            foreach ($menuHierarchy as $menuItem)
+            {
+                $id = $menuItem['id'];
+                $parentId = $menuItem['parent'];
+                $order = $menuItem['order'];
+
+                $page = $this->_getPageById($pages, $id);
+                if (!\is_null($page))
+                {
+                    $page->setOrder($order);
+                    $newParent = $this->_getPageById($pages, $parentId);
+                    if (\is_null($newParent))
+                    {
+                        // assign page to menu
+                        $page->removeParent();
+                        $menu->assignToPage($page);
+                    }
+                    else
+                    {
+                        // change parent
+                        if (\is_null($page->getParent()))
+                        {
+                            // remove from the menu, as this page is now a subordinate
+                            $menu->removePage($page);
+                        }
+                        $page->changeParent($newParent);
+                    }
+                }
+            }
+
+            $this->_em->flush();
+            return $this;
+        }
+        catch(\Exception $e)
+        {
+            throw new ServiceException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 }

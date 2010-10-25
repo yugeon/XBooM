@@ -20,6 +20,8 @@
  * @license    http://www.gnu.org/licenses/gpl-3.0.html  GNU GPLv3
  */
 
+use \Xboom\Model\Service\Exception as ServiceException;
+
 class Admin_NavigationController extends Zend_Controller_Action
 {
 
@@ -63,7 +65,7 @@ class Admin_NavigationController extends Zend_Controller_Action
             {
                 $messages = $e->getMessage();
             }
-            catch (\Xboom\Model\Service\Exception $e)
+            catch (ServiceException $e)
             {
                 $messages = 'Add Failed, try again';
             }
@@ -89,7 +91,7 @@ class Admin_NavigationController extends Zend_Controller_Action
             {
                 $messages = $e->getMessage();
             }
-            catch (\Xboom\Model\Service\Exception $e)
+            catch (ServiceException $e)
             {
                 $messages = 'Add Failed, try again';
             }
@@ -114,18 +116,19 @@ class Admin_NavigationController extends Zend_Controller_Action
 
     public function saveMenuAction()
     {
-        //sleep(2.7);
-//        $menuName = $this->_getParam('name', 'admin');
-//        
-//            $menuContainer = $navService->getNavigation($menuName);
-//            $this->_helper->json->sendJson($menuContainer->toArray());
-
         if ($this->getRequest()->isPost())
         {
             $navService = $this->_sc->getService('NavigationService');
-            $navService->saveMenu($this->getRequest()->getPost());
+            try
+            {
+                $navService->saveMenuHierarchy($this->getRequest()->getPost());
+                $this->_helper->json->sendJson(array('result' => 'ok'));
+            }
+            catch (ServiceException $e)
+            {
+                $this->_helper->json->sendJson(array('result' => 'error', 'message' => $e->getMessage()));
+            }
         }
-        $this->_helper->json->sendJson($this->_getParam('data'));
-        //var_dump($this->_getParam('data'));
+        $this->_redirect('/');
     }
 }

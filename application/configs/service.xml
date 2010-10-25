@@ -19,6 +19,9 @@
             <call method="setMenuClass">
                 <argument>\App\Core\Model\Domain\Navigation\Menu</argument>
             </call>
+            <call method="setPageClass">
+                <argument>\App\Core\Model\Domain\Navigation\Page</argument>
+            </call>
         </service>
 
         <service id="auth" class="Zend_Auth" constructor="getInstance" />

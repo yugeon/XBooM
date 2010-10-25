@@ -148,4 +148,47 @@ class PageTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testCanAddChildPage()
+    {
+        $page = m::mock('Page');
+        $this->assertEquals($this->object, $this->object->addChildPage($page));
+        $this->assertContains($page, $this->object->getPages());
+
+    }
+
+    public function testCanRemoveChildPage()
+    {
+        $page = m::mock('Page');
+        $this->object->addChildPage($page);
+        $this->assertEquals($this->object, $this->object->removeChild($page));
+        $this->assertNotContains($page, $this->object->getPages());
+    }
+
+    public function testCanAssignToParent()
+    {
+        $parentPage = m::mock('Page');
+        $parentPage->shouldReceive('addChildPage')->with($this->object)->andReturn($parentPage);
+        $this->assertEquals($this->object, $this->object->assignToParent($parentPage));
+    }
+
+    public function testCanRemoveParentAssociation()
+    {
+        $parentPage = m::mock('Page');
+        $parentPage->shouldReceive('addChildPage')->with($this->object)->andReturn($parentPage);
+        $parentPage->shouldReceive('removeChild')->with($this->object)->andReturn($parentPage);
+        $this->object->assignToParent($parentPage);
+
+        $this->assertEquals($this->object, $this->object->removeParent());
+        $this->assertNull($this->object->getParent());
+    }
+
+    public function testCanChangeParentPage()
+    {
+        $newParent = m::mock('Page');
+        $newParent->shouldReceive('addChildPage')->with($this->object)->andReturn($newParent);
+
+        $this->assertEquals($this->object, $this->object->changeParent($newParent));
+        $this->assertEquals($newParent, $this->object->getParent());
+    }
+
 }

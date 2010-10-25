@@ -91,6 +91,12 @@ class Menu extends DomainObject
         return $this;
     }
 
+    public function removePage($page)
+    {
+        $this->getPages()->removeElement($page);
+        return $this;
+    }
+
     public function add($data)
     {
         $this->setName($data['name']);

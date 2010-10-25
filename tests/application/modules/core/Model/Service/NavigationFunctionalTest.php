@@ -111,6 +111,18 @@ class NavigationFunctionalTest extends \FunctionalTestCase
         $menu->assignToPage($page4);
         $this->_em->persist($menu);
 
+        $page6 = new Page();
+        $page6->label = 'Page from other menu';
+        $page6->title = 'Search engine';
+        $page6->type  = 'uri';
+        $page6->uri = 'http://google.com';
+        $this->_em->persist($page6);
+
+        $menu2 = new Menu();
+        $menu2->name = 'OtherMenu';
+        $menu2->assignToPage($page6);
+        $this->_em->persist($menu2);
+
         $this->_em->flush();
     }
 
@@ -232,8 +244,9 @@ class NavigationFunctionalTest extends \FunctionalTestCase
             $actual = array(
                 'id' => $page->getId(),
                 'parent' => $parentId,
-                'level' => $depth,
-                //'label' => $page->getLabel()
+    //            'level' => $depth,
+                'order' => $page->getOrder(),
+                'label' => $page->getLabel()
             );
             $result[] = $actual;
             
@@ -251,39 +264,41 @@ class NavigationFunctionalTest extends \FunctionalTestCase
 
     public function testCanSaveMenuHierarchy()
     {
-//        $before = array(
-//            'Page 1',
-//                'Page 1.2',
-//                'Page 1.1',
-//                    'Page 1.1.1',
-//            'Page 2'
-//        );
-//        $after = array(
-//            'Page 1',
-//                'Page 1.2',
-//                'Page 1.1',
-//            'Page 2'
-//                'Page 1.1.1',
-//        );
         $nav = $this->navigationService->getNavigation($this->navigationName);
         $expected = $this->getMenuHierarchy($nav);
 
-        $expected[3]['parent'] = $expected[4]['parent'];
-        $expected[3]['level'] = 1;
+        // simulate user drag&drop operation
+        // Before:
+        //     'Page 1',
+        //         'Page 1.2',
+        //         'Page 1.1',
+        //             'Page 1.1.1',
+        //     'Page 2'
+        //
+        // After:
+        //     'Page 1',
+        //         'Page 1.2',
+        //         'Page 2'
+        //             'Page 1.1.1',
+        //     'Page 1.1',
+        $expected[2]['parent'] = null;
+        $expected[2]['order'] = 1;
+        $expected[3]['parent'] = $expected[4]['id'];
+        $expected[3]['order'] = 1;
+        $expected[4]['parent'] = $expected[1]['id'];
+        $expected[4]['order'] = 1;
+        list($expected[2], $expected[4]) = array($expected[4], $expected[2]);
 
-        $this->navigationService->saveMenuHierarchy($expected);
+        $data = array(
+            'data' => $expected,
+            'menuName' => $this->navigationName,
+        );
+        $this->navigationService->saveMenuHierarchy($data);
 
-        $this->navigationService->unsetNavigation($this->navigationName);
+        $this->navigationService->unsetMenu($this->navigationName);
         $nav = $this->navigationService->getNavigation($this->navigationName);
         $actual = $this->getMenuHierarchy($nav);
 
-//        $menu = array(
-//            array('id' => 1, 'parent' => 0, 'level' => 0 ),
-//                array('id' => 2, 'parent' => 1, 'level' => 1),
-//                array('id' => 3, 'parent' => 1, 'level' => 1),
-//            array('id' => 4, 'parent' => 0, 'level' => 0),
-//                array('id' => 5, 'parent' => 4, 'level' => 1),
-//        );
         $this->assertEquals($expected, $actual);
     }
 

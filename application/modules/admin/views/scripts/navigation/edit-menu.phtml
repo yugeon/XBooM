@@ -1,7 +1,5 @@
 
-<?php
-$this->headStyle()->captureStart();
-?>
+<?php $this->headStyle()->captureStart();?>
     ul {
         margin: 0;
         padding: 0;
@@ -54,33 +52,12 @@ $this->headStyle()->captureStart();
         ->setIndent(24);
 ?>
 
-    <p>
-		<input type="submit" name="serialize" id="serialize" value="Serialize" />
-    </p>
-	<p id="serializeOutput"></p>
+    <input type="submit" name="save" id="save" value="Save" />
 
-	<p>
-		<input type="submit" name="toArray" id="toArray" value="To array" />
-	<pre id="toArrayOutput"></pre>
-
-		<input type="submit" name="save" id="save" value="Save" />
-
-    <script  src="modules/admin/js/jquery/jquery.ajaxLoader.js"></script>
-    <script>
+    <script type="text/javascript" src="modules/admin/js/jquery/jquery.ajaxLoader.js"></script>
+    <script type="text/javascript">
 
 	$(document).ready(function(){
-        $('#serialize').click(function(){
-            $('div.jquery-ajax-loader1').fadeOut(1200);
-			serialized = $('ul.sortable').nestedSortable('serialize');
-			$('#serializeOutput').text(serialized);
-		});
-
-		$('#toArray').click(function(e){
-			arraied = $('ul.sortable').nestedSortable('toArray', {startDepthCount: 0});
-			arraied = dump(arraied);
-			(typeof($('#toArrayOutput')[0].textContent) != 'undefined') ?
-			$('#toArrayOutput')[0].textContent = arraied : $('#toArrayOutput')[0].innerText = arraied;
-		});
 
         $('#save').click(function(){
 
@@ -99,18 +76,24 @@ $this->headStyle()->captureStart();
                 complete: function(){
                     $('#save').removeAttr('disabled');
                 },
-                error: function(r){
+                error: function(){
                     $('ul.sortable').ajaxLoader('showClass', 'ajax-loader-error');
-                    alert(r.message || 'An error occurred while saving');
+                    alert('An error occurred while saving');
                 },
                 success: function(r){
                     if ('error' == r.result) {
-                        this.error(r);
+                        this.error();
                         return;
                     }
                     $('ul.sortable').ajaxLoader('showClass', 'ajax-loader-ok');
                 }
-            })
+            });
+        });
+
+        $('ul.sortable').nestedSortable({
+            update: function(event, ui) {
+                ui.item.find('> div:first').addClass('ui-state-highlight');
+            }
         });
 
     });
@@ -189,29 +172,4 @@ $this->headStyle()->captureStart();
 
         return data;
     };
-
-    function dump(arr,level) {
-		var dumped_text = "";
-		if(!level) level = 0;
-
-		//The padding given at the beginning of the line.
-		var level_padding = "";
-		for(var j=0;j<level+1;j++) level_padding += "    ";
-
-		if(typeof(arr) == 'object') { //Array/Hashes/Objects
-			for(var item in arr) {
-				var value = arr[item];
-
-				if(typeof(value) == 'object') { //If it is an array,
-					dumped_text += level_padding + "'" + item + "' ...\n";
-					dumped_text += dump(value,level+1);
-				} else {
-					dumped_text += level_padding + "'" + item + "' => \"" + value + "\"\n";
-				}
-			}
-		} else { //Stings/Chars/Numbers etc.
-			dumped_text = "===>"+arr+"<===("+typeof(arr)+")";
-		}
-		return dumped_text;
-	}
     </script>

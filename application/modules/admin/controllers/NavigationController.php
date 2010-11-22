@@ -126,7 +126,7 @@ class Admin_NavigationController extends Zend_Controller_Action
             }
             catch (ServiceException $e)
             {
-                $this->_helper->json->sendJson(array('result' => 'error', 'message' => $e->getMessage()));
+                $this->_helper->json->sendJson(array('result' => 'error'));
             }
         }
         $this->_redirect('/');

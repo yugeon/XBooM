@@ -52,14 +52,17 @@
         ->setIndent(24);
 ?>
 
-    <input type="submit" name="save" id="save" value="Save" />
+    <!-->TODO: add translate support</!-->
+    <button id="save">Save</button>
 
     <script type="text/javascript" src="modules/admin/js/jquery/jquery.ajaxLoader.js"></script>
     <script type="text/javascript">
 
 	$(document).ready(function(){
 
-        $('#save').click(function(){
+        $('#save')
+        .button()
+        .click(function(){
 
             var data = getOrder($('ul.sortable'));
 
@@ -72,7 +75,7 @@
                     $('ul.sortable').ajaxLoader();
                     $('#save').attr('disabled','disabled');
                 },
-                timeout: 1000,
+                timeout: 3000,
                 complete: function(){
                     $('#save').removeAttr('disabled');
                 },
@@ -92,13 +95,11 @@
 
         $('ul.sortable').nestedSortable({
             update: function(event, ui) {
-                ui.item.find('> div:first').addClass('ui-state-highlight');
+                ui.item.find('> div:first').addClass('ui-state-hover');
             }
-        });
+        })
 
     });
-
-    
 
     function getOrder($ul){
 

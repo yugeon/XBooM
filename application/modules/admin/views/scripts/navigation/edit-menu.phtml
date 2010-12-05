@@ -1,5 +1,6 @@
 
 <?php $this->headStyle()->captureStart();?>
+
     ul {
         margin: 0;
         padding: 0;
@@ -31,16 +32,19 @@
 
     .jquery-ajax-loader {
         background: #BBBBBB url(images/ajax-loader.gif) no-repeat 50% 50%;
+        z-index: 9999;
     }
     .jquery-ajax-loader-mini {
         background: #BBBBBB url(images/ajax-loader-mini.gif) no-repeat 50% 50%;
+        z-index: 9999;
     }
-
     .ajax-loader-ok {
         background: #BBB url(images/ajax-loader-ok32.png) no-repeat 50% 50%;
+        z-index: 9999;
     }
     .ajax-loader-error {
         background: #BBB url(images/ajax-loader-error32.png) no-repeat 50% 50%;
+        z-index: 9999;
     }
 <?php $this->headStyle()->captureEnd();?>
 
@@ -52,8 +56,14 @@
         ->setIndent(24);
 ?>
 
-    <!-->TODO: add translate support</!-->
+    <div id="add-page-form" title="Add new page">
+        
+    </div>
+
+    <!TODO: add translate support-->
+    <hr />
     <button id="save">Save</button>
+    <button id="add-page-button">Add new page</button>
 
     <script type="text/javascript" src="modules/admin/js/jquery/jquery.ajaxLoader.js"></script>
     <script type="text/javascript">
@@ -75,13 +85,13 @@
                     $('ul.sortable').ajaxLoader();
                     $('#save').attr('disabled','disabled');
                 },
-                timeout: 3000,
+                timeout: 10000,
                 complete: function(){
                     $('#save').removeAttr('disabled');
                 },
                 error: function(){
                     $('ul.sortable').ajaxLoader('showClass', 'ajax-loader-error');
-                    alert('An error occurred while saving');
+                    alert('An error occurred while saving. Try again later.');
                 },
                 success: function(r){
                     if ('error' == r.result) {
@@ -97,7 +107,55 @@
             update: function(event, ui) {
                 ui.item.find('> div:first').addClass('ui-state-hover');
             }
-        })
+        });
+
+        var height = $(window).height() * 0.8;
+        var width = $(window).width() * 0.7;
+
+        $( "#add-page-form" ).dialog({
+			autoOpen: false,
+			modal: true,
+            height: height,
+            width: width,
+            buttons: {
+                Cancel: function() {
+					$(this).dialog('close');
+				},
+                'Add': function() {
+                    $(this).find('> form:first').submit();
+                }
+            }
+        });
+
+        $('#add-page-button')
+        .button()
+        .click(function() {
+            $('#add-page-form').dialog('open');
+            $.ajax({
+                url: '/admin/navigation/add-page/format/html',
+                dataType: 'html',
+                type: 'get',
+                beforeSend: function(){
+                    $('#add-page-form').ajaxLoader();
+                    $('#add-page-button').attr('disabled','disabled');
+                },
+                timeout: 10000,
+                complete: function(){
+                    $('#add-page-button').removeAttr('disabled');
+                },
+                error: function(){
+                    $('#add-page-form').ajaxLoader('showClass', 'ajax-loader-error');
+                    alert('An error occurred while create new page. Try again later.');
+                },
+                success: function(r){
+                    if ('error' == r.result) {
+                        this.error();
+                        return;
+                    }
+                    $('#add-page-form').html(r).ajaxLoader('showClass', 'ajax-loader-ok', 1);
+                }
+            });
+        });
 
     });
 

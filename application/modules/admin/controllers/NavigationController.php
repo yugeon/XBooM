@@ -33,6 +33,10 @@ class Admin_NavigationController extends Zend_Controller_Action
         $this->_helper->layout->setLayout('admin');
 
         $this->_sc = $this->getInvokeArg('bootstrap')->getContainer();
+
+        $ajaxContext = $this->_helper->getHelper('AjaxContext');
+        $ajaxContext->addActionContext('add-page', 'html')
+                    ->initContext();
     }
 
     public function indexAction()
@@ -98,7 +102,8 @@ class Admin_NavigationController extends Zend_Controller_Action
         }
 
         $this->view->messages = (array) $messages;
-        $this->view->form = $pageService->getFormWithValidatorAttribs('AddPage');
+        $this->view->form = $pageService->getFormWithValidatorAttribs('AddPage')
+                          ->setAction($this->_helper->url('add-page'));
     }
 
     public function editMenuAction()

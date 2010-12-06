@@ -77,8 +77,8 @@
             var data = getOrder($('ul.sortable'));
 
             $.ajax({
-                url: '/admin/navigation/save-menu/format/json',
-                dataType: 'json',
+                url: '/admin/navigation/save-menu/format/html',
+                dataType: 'html',
                 type: 'post',
                 data: { menuName: '<?php echo $this->escape($this->menuName); ?>', data: data },
                 beforeSend: function(){
@@ -94,11 +94,16 @@
                     alert('An error occurred while saving. Try again later.');
                 },
                 success: function(r){
-                    if ('error' == r.result) {
-                        this.error();
-                        return;
-                    }
                     $('ul.sortable').ajaxLoader('showClass', 'ajax-loader-ok');
+                    if (r.replace(/\s/g, '') == '') {
+                        $('ul.sortable').empty();
+                    } else {
+                        if ('error' == $(r).html()) {
+                            this.error();
+                            return;
+                        }
+                        $('ul.sortable').html($(r).html());
+                    }
                 }
             });
         });

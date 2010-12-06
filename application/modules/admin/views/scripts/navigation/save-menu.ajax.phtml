@@ -1,0 +1,13 @@
+
+<?php
+
+    if ((isset($this->result) && $this->result == 'error'))
+    {
+        echo '<result>error</result>';
+    }
+    else
+    {
+        $this->addHelperPath('Xboom/View/Helper', 'Xboom_View_Helper');
+        echo $this->nestedSortable($this->menuContainer, 'sortable', 'menuList');
+    }
+?>

@@ -49,10 +49,17 @@ class PageServiceTest extends \PHPUnit_Framework_TestCase
         $aclService = m::mock('AclService');
         $aclService->shouldReceive('getAcl')->andReturn($this->acl);
 
+        $menuEntity = m::mock('Menu');
+        $menuEntity->shouldReceive('assignToPage')->andReturn(true);
+
+        $menuService = m::mock('MenuService');
+        $menuService->shouldReceive('getMenuByName')->andReturn($menuEntity);
+
         $sc = m::mock('ServiceContainer');
         $sc->shouldReceive('getService')->with('doctrine.orm.entitymanager')->andReturn($this->em);
         $sc->shouldReceive('getService')->with('AuthService')->andReturn($authService);
         $sc->shouldReceive('getService')->with('AclService')->andReturn($aclService);
+        $sc->shouldReceive('getService')->with('MenuService')->andReturn($menuService);
 
         $this->object = new PageService($sc);
 
@@ -66,6 +73,7 @@ class PageServiceTest extends \PHPUnit_Framework_TestCase
         
         $this->data = array(
             'uri' => array(
+                'menuName' => 'Test menu',
                 'label' => 'Home',
                 'class' => 'menu-item',
                 'title' => 'Home page',
@@ -86,6 +94,7 @@ class PageServiceTest extends \PHPUnit_Framework_TestCase
                 'pages' => array()
             ),
             'mvc' => array(
+                'menuName' => 'Test menu',
                 'label' => 'Home',
                 'class' => 'menu-item',
                 'title' => 'Home page',
@@ -106,6 +115,7 @@ class PageServiceTest extends \PHPUnit_Framework_TestCase
                 'pages' => array()
             ),
             'bad' => array(
+                'menuName' => 'Test menu',
                 'label' => 'Home',
                 'class' => 'menu-item',
                 'title' => 'Home page',

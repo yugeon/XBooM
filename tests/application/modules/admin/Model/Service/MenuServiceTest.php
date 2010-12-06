@@ -147,4 +147,22 @@ class MenuServiceTest extends \PHPUnit_Framework_TestCase
         $this->acl->shouldReceive('isAllowed')->andReturn(false);
         $user = $this->object->getMenuList();
     }
+
+    public function testShouldReturnTrueIfMenuIsExists()
+    {
+        $menuName = 'Home';
+        $menuValidator = m::mock('Zend_Validate_Interface');
+        $menuValidator->shouldReceive('isValid')->andReturn(true);
+
+        $this->assertTrue($this->object->menuIsExists($menuName, $menuValidator));
+    }
+
+    public function testShouldReturnFalseIfMenuIsNotExists()
+    {
+        $menuName = 'Not exists menu name';
+        $menuValidator = m::mock('Zend_Validate_Interface');
+        $menuValidator->shouldReceive('isValid')->andReturn(false);
+
+        $this->assertFalse($this->object->menuIsExists($menuName, $menuValidator));
+    }
 }

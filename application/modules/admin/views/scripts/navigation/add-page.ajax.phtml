@@ -22,13 +22,15 @@
  */
 ?>
 
+
+
+    <?php if (is_array($this->messages)) : ?>
+        <?php foreach ($this->messages as $message) : ?>
+            <p><?php echo $this->escape($message); ?></p>
+        <?php endforeach;?>
+    <?php endif; ?>
+
 <?php
-
-    if (!empty($this->messages))
-    {
-        echo implode('<br>', $this->messages);
-    }
-
     if (!empty($this->form))
     {
         // hide control elements becouse they present in the dialog box
@@ -47,7 +49,7 @@
     $this->JQuery()->onLoadCaptureStart();
 ?>
 
-    $('#<?php echo $this->form->getName(); ?>').submit(function(){
+    $('#<?php echo $this->escape($this->form->getName()); ?>').submit(function(){
         var thisForm = this;
         $.ajax({
             url: '/admin/navigation/add-page/format/html',

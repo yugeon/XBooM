@@ -28,10 +28,41 @@
 namespace App\Admin\Model\Service;
 use \Xboom\Model\Service\AbstractService,
  \Xboom\Model\Service\Exception as ServiceException,
- \Xboom\Model\Service\Acl\AccessDeniedException;
+ \Xboom\Model\Service\Acl\AccessDeniedException,
+ \Xboom\Validate\EntityIsExists;
 
 class MenuService extends AbstractService
 {
+
+    /**
+     * Check if menu is exists.
+     * 
+     * @param type $menuName
+     * @return boolean
+     */
+    public function menuIsExists($menuName, $menuValidator = null)
+    {
+        $options = array(
+            'em' => $this->_em,
+            'entity' => $this->getModelFullName(),
+            'field' => 'name'
+        );
+
+        if (is_null($menuValidator))
+        {
+            $menuValidator = new EntityIsExists($options);
+        }
+
+        return $menuValidator->isValid($menuName);
+    }
+
+    public function getMenuByName($name)
+    {
+        $criteria = array(
+            'name' => $name
+        );
+        return $this->_em->getRepository($this->getModelFullName())->findOneBy($criteria);
+    }
 
     /**
      * Add new menu.

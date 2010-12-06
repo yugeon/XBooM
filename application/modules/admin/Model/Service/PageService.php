@@ -53,9 +53,23 @@ class PageService extends AbstractService
         $breakValidation = false;
         if ($formToModelMediator->isValid($data, $breakValidation))
         {
+            if (!\array_key_exists('menuName', $data))
+            {
+                throw new ServiceException('Menu name is not presented');
+            }
+            
+            $menuName = $data['menuName'];
+            
+            $menuService = $this->getServiceContainer()->getService('MenuService');
+            if (!($menu = $menuService->getMenuByName($menuName)))
+            {
+                throw new ServiceException("Menu with name '$menuName' dos't exists");
+            }
+
             $data = $formToModelMediator->getValues();
             $page = $this->getModel();
             $page->add($data);
+            $menu->assignToPage($page);
 
             $this->_em->persist($page);
 

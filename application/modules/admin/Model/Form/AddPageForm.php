@@ -35,6 +35,8 @@ class AddPageForm extends \Zend_Form
     {
         $this->setName('addPage');
 
+        $this->addElement('hidden', 'menuName');
+
         $this->addElement('text', 'label', array(
             'label' => 'Label',
         ));

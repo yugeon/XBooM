@@ -48,7 +48,7 @@
     }
 <?php $this->headStyle()->captureEnd();?>
 
-                        <h2>[<?php echo $this->menuName; ?>]</h2>
+                        <h2>[<?php echo $this->escape($this->menuName); ?>]</h2>
 <?php 
     $this->addHelperPath('Xboom/View/Helper', 'Xboom_View_Helper');
     echo $this->nestedSortable($this->menuContainer, 'sortable', 'menuList')
@@ -80,7 +80,7 @@
                 url: '/admin/navigation/save-menu/format/json',
                 dataType: 'json',
                 type: 'post',
-                data: { menuName: '<?php echo $this->menuName; ?>', data: data },
+                data: { menuName: '<?php echo $this->escape($this->menuName); ?>', data: data },
                 beforeSend: function(){
                     $('ul.sortable').ajaxLoader();
                     $('#save').attr('disabled','disabled');
@@ -135,6 +135,7 @@
                 url: '/admin/navigation/add-page/format/html',
                 dataType: 'html',
                 type: 'get',
+                data: { menuName: '<?php echo $this->escape($this->menuName); ?>'},
                 beforeSend: function(){
                     $('#add-page-form').ajaxLoader();
                     $('#add-page-button').attr('disabled','disabled');

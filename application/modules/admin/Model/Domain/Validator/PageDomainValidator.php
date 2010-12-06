@@ -28,21 +28,22 @@
 namespace App\Admin\Model\Domain\Validator;
 use \Xboom\Model\Validate\AbstractValidator,
     \Xboom\Model\Validate\Element\BaseValidator,
-    \Xboom\Validate\UniqueField;
+    \Xboom\Validate\UniqueField,
+    \Xboom\Validate\EntityIsExists;
 
 class PageDomainValidator extends AbstractValidator
 {
     public function init()
     {
         // label
-        $labelValidator = new BaseValidator();
-        $labelValidator->addFilter(new \Zend_Filter_StringTrim)
-                      ->addValidator(new UniqueField(
-                              array(
-                               'em' => $this->getEntityManager(),
-                               'entity' => $this->getEntityClass(),
-                               'field' => 'label')
-                         ));
-        $this->addPropertyValidator('label', $labelValidator);
+//        $labelValidator = new BaseValidator();
+//        $labelValidator->addFilter(new \Zend_Filter_StringTrim)
+//                      ->addValidator(new UniqueField(
+//                              array(
+//                               'em' => $this->getEntityManager(),
+//                               'entity' => $this->getEntityClass(),
+//                               'field' => 'label')
+//                         ));
+//        $this->addPropertyValidator('label', $labelValidator);
     }
 }

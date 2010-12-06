@@ -89,21 +89,25 @@ class Admin_NavigationController extends Zend_Controller_Action
             try
             {
                 $result = $pageService->addPage($this->getRequest()->getPost());
-                $messages = 'Add ok! Id: ' . $result->id;
+                $messages[] = 'Add ok! Id: ' . $result->id;
             }
             catch (\Xboom\Model\Service\Acl\AccessDeniedException $e)
             {
-                $messages = $e->getMessage();
+                $messages[] = $e->getMessage();
             }
             catch (ServiceException $e)
             {
-                $messages = 'Add Failed, try again';
+                $messages[] = 'Add Failed, try again';
+                $messages[] = $e->getMessage();
             }
         }
 
         $this->view->messages = (array) $messages;
-        $this->view->form = $pageService->getFormWithValidatorAttribs('AddPage')
-                          ->setAction($this->_helper->url('add-page'));
+
+        $form = $pageService->getFormWithValidatorAttribs('AddPage');
+        $form->getElement('menuName')->setValue($this->getRequest()->getParam('menuName'));
+        $form->setAction($this->_helper->url('add-page'));
+        $this->view->form = $form;
     }
 
     public function editMenuAction()

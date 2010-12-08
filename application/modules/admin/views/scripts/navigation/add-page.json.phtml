@@ -67,13 +67,12 @@
                 this.showError('An error occurred while add new page. Try again later.');
             },
             success: function(data){
-                if (!data || data.error) {
-                    this.showError(data.error.message);
-                    return;
-                } else {
-                    var html = data.result.html;
-                    $(thisForm).parent().html(html).ajaxLoader('showClass', 'ajax-loader-ok', 1);
+                if (!data.error) {
+                    $(thisForm).trigger('refresh.menu');
                 }
+                
+                var html = data.result.html;
+                $(thisForm).parent().html(html).ajaxLoader('showClass', 'ajax-loader-ok', 1);
             },
             showError: function(msg){
                 $('#add-page-form').ajaxLoader('showClass', 'ajax-loader-error');
@@ -92,6 +91,12 @@
 ?>
 
 {
+<?php if ((isset($this->resultStatus) && $this->resultStatus == 'error')): ?>
+    "error":
+    {
+        "message": <?php echo $this->json($this->escape($this->resultMsg)); ?>
+    },
+<?php endif; ?>
     "result":
     {
         "html": <?php echo $this->json($outputHtml); ?>

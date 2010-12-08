@@ -62,6 +62,7 @@
 
     <!TODO: add translate support-->
     <hr />
+    <button id="refresh-menu">Refresh</button>
     <button id="save">Save</button>
     <button id="add-page-button">Add new page</button>
 
@@ -70,6 +71,12 @@
 
 	$(document).ready(function(){
 
+        $('#refresh-menu')
+        .button()
+        .click(function(){
+            $(this).trigger('refresh.menu');
+        });
+        
         $('#save')
         .button()
         .click(function(){
@@ -167,6 +174,38 @@
                 },
                 showError: function(msg){
                     $('#add-page-form').ajaxLoader('showClass', 'ajax-loader-error');
+                    if (msg) {
+                        alert(msg);
+                    }
+                }
+            });
+        });
+
+        $('body').bind('refresh.menu', function() {
+            $.ajax({
+                url: '/admin/navigation/edit-menu/format/json',
+                dataType: 'json',
+                type: 'post',
+                data: { name: '<?php echo $this->escape($this->menuName); ?>' },
+                beforeSend: function(){
+                    $('ul.sortable').ajaxLoader();
+                },
+                timeout: 10000,
+                error: function(){
+                    this.showError('An error occurred while refreshing menu. Please reload page.');
+                },
+                success: function(data){
+                    if (!data || data.error) {
+                        this.showError(data.error.message);
+                        return;
+                    } else {
+                        $('ul.sortable').ajaxLoader('showClass', 'ajax-loader-ok');
+                        var html = $(data.result.html).html();
+                        $('ul.sortable').html(html);
+                    }
+                },
+                showError: function(msg){
+                    $('ul.sortable').ajaxLoader('showClass', 'ajax-loader-error');
                     if (msg) {
                         alert(msg);
                     }

@@ -35,7 +35,8 @@ class Admin_NavigationController extends Zend_Controller_Action
         $this->_sc = $this->getInvokeArg('bootstrap')->getContainer();
 
         $ajaxContext = $this->_helper->getHelper('AjaxContext');
-        $ajaxContext->addActionContext('add-page', 'json')
+        $ajaxContext->addActionContext('edit-menu', 'json')
+                    ->addActionContext('add-page', 'json')
                     ->addActionContext('save-menu', 'json')
                     ->setAutoJsonSerialization(false)
                     ->initContext();
@@ -93,14 +94,12 @@ class Admin_NavigationController extends Zend_Controller_Action
                 $result = $pageService->addPage($this->getRequest()->getPost());
                 $messages[] = 'Add ok! Id: ' . $result->id;
             }
-            catch (\Xboom\Model\Service\Acl\AccessDeniedException $e)
-            {
-                $messages[] = $e->getMessage();
-            }
             catch (ServiceException $e)
             {
                 $messages[] = 'Add Failed, try again';
                 $messages[] = $e->getMessage();
+                $this->view->resultStatus = 'error';
+                $this->view->resultMsg = $e->getMessage();
             }
         }
 
@@ -118,10 +117,18 @@ class Admin_NavigationController extends Zend_Controller_Action
         $this->view->menuContainer = null;
         if (null !== $menuName)
         {
-            $navService = $this->_sc->getService('NavigationService');
-            $menuContainer = $navService->getNavigation($menuName);
-            $this->view->menuContainer = $menuContainer;
-            $this->view->menuName = $menuName;
+            try
+            {
+                $navService = $this->_sc->getService('NavigationService');
+                $menuContainer = $navService->getNavigation($menuName);
+                $this->view->menuContainer = $menuContainer;
+                $this->view->menuName = $menuName;
+            }
+            catch (ServiceException $e)
+            {
+                $this->view->resultStatus = 'error';
+                $this->view->resultMsg = $e->getMessage();
+            }
         }
     }
 

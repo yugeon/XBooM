@@ -77,8 +77,8 @@
             var data = getOrder($('ul.sortable'));
 
             $.ajax({
-                url: '/admin/navigation/save-menu/format/html',
-                dataType: 'html',
+                url: '/admin/navigation/save-menu/format/json',
+                dataType: 'json',
                 type: 'post',
                 data: { menuName: '<?php echo $this->escape($this->menuName); ?>', data: data },
                 beforeSend: function(){
@@ -90,19 +90,22 @@
                     $('#save').removeAttr('disabled');
                 },
                 error: function(){
-                    $('ul.sortable').ajaxLoader('showClass', 'ajax-loader-error');
-                    alert('An error occurred while saving. Try again later.');
+                    this.showError('An error occurred while saving. Try again later.');
                 },
-                success: function(r){
-                    $('ul.sortable').ajaxLoader('showClass', 'ajax-loader-ok');
-                    if (r.replace(/\s/g, '') == '') {
-                        $('ul.sortable').empty();
+                success: function(data){
+                    if (!data || data.error) {
+                        this.showError(data.error.message);
+                        return;
                     } else {
-                        if ('error' == $(r).html()) {
-                            this.error();
-                            return;
-                        }
-                        $('ul.sortable').html($(r).html());
+                        $('ul.sortable').ajaxLoader('showClass', 'ajax-loader-ok');
+                        var html = $(data.result.html).html();
+                        $('ul.sortable').html(html);
+                    }
+                },
+                showError: function(msg){
+                    $('ul.sortable').ajaxLoader('showClass', 'ajax-loader-error');
+                    if (msg) {
+                        alert(msg);
                     }
                 }
             });
@@ -137,8 +140,8 @@
         .click(function() {
             $('#add-page-form').dialog('open');
             $.ajax({
-                url: '/admin/navigation/add-page/format/html',
-                dataType: 'html',
+                url: '/admin/navigation/add-page/format/json',
+                dataType: 'json',
                 type: 'get',
                 data: { menuName: '<?php echo $this->escape($this->menuName); ?>'},
                 beforeSend: function(){
@@ -150,15 +153,23 @@
                     $('#add-page-button').removeAttr('disabled');
                 },
                 error: function(){
-                    $('#add-page-form').ajaxLoader('showClass', 'ajax-loader-error');
-                    alert('An error occurred while create new page. Try again later.');
+                    this.showError('An error occurred while create new page. Try again later.');
                 },
-                success: function(r){
-                    if ('error' == r.result) {
-                        this.error();
+                success: function(data){
+                    if (!data || data.error) {
+                        this.showError(data.error.message);
                         return;
+                    } else {
+                        $('#add-page-form').ajaxLoader('showClass', 'ajax-loader-ok', 1);
+                        var html = data.result.html;
+                        $('#add-page-form').html(html);
                     }
-                    $('#add-page-form').html(r).ajaxLoader('showClass', 'ajax-loader-ok', 1);
+                },
+                showError: function(msg){
+                    $('#add-page-form').ajaxLoader('showClass', 'ajax-loader-error');
+                    if (msg) {
+                        alert(msg);
+                    }
                 }
             });
         });

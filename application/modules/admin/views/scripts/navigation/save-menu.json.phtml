@@ -22,9 +22,20 @@
  */
 ?>
 
-<?php
-    if (!empty($this->form))
+{
+<?php if ((isset($this->resultStatus) && $this->resultStatus == 'error')): ?>
+    "error":
     {
-        echo $this->form;
+        "message": <?php echo $this->json($this->escape($this->resultMsg)); ?>
     }
-?>
+<?php else :?>
+    "result":
+    {
+        "html":
+        <?php
+             $this->addHelperPath('Xboom/View/Helper', 'Xboom_View_Helper');
+             echo $this->json((string)$this->nestedSortable($this->menuContainer, 'sortable', 'menuList'));
+        ?>
+    }
+<?php endif; ?>
+}

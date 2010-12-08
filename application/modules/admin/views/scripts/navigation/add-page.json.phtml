@@ -22,15 +22,18 @@
  */
 ?>
 
-
-
-    <?php if (is_array($this->messages)) : ?>
-        <?php foreach ($this->messages as $message) : ?>
-            <p><?php echo $this->escape($message); ?></p>
-        <?php endforeach;?>
-    <?php endif; ?>
-
 <?php
+
+    $outputHtml = '';
+
+    if (is_array($this->messages))
+    {
+        foreach ($this->messages as $message)
+        {
+            $outputHtml .= '<p>' . $this->escape($message) . '</p>';
+        }
+    }
+
     if (!empty($this->form))
     {
         // hide control elements becouse they present in the dialog box
@@ -40,7 +43,7 @@
         $this->form->getElement('reset')
                    ->setDecorators(array('ViewHelper'))
                    ->setAttrib('style', 'display:none;');
-        echo $this->form;
+        $outputHtml .= (string) $this->form;
     }
 ?>
 
@@ -52,8 +55,8 @@
     $('#<?php echo $this->escape($this->form->getName()); ?>').submit(function(){
         var thisForm = this;
         $.ajax({
-            url: '/admin/navigation/add-page/format/html',
-            dataType: 'html',
+            url: '/admin/navigation/add-page/format/json',
+            dataType: 'json',
             type: 'post',
             data: $(this).serialize().concat('&submit=1'),
             beforeSend: function(){
@@ -61,15 +64,22 @@
             },
             timeout: 10000,
             error: function(){
-                $(thisForm).parent().ajaxLoader('showClass', 'ajax-loader-error');
-                alert('An error occurred while create new page. Try again later.');
+                this.showError('An error occurred while add new page. Try again later.');
             },
-            success: function(r){
-                if ('error' == r.result) {
-                    this.error();
+            success: function(data){
+                if (!data || data.error) {
+                    this.showError(data.error.message);
                     return;
+                } else {
+                    var html = data.result.html;
+                    $(thisForm).parent().html(html).ajaxLoader('showClass', 'ajax-loader-ok', 1);
                 }
-                $(thisForm).parent().html(r).ajaxLoader('showClass', 'ajax-loader-ok', 1);
+            },
+            showError: function(msg){
+                $('#add-page-form').ajaxLoader('showClass', 'ajax-loader-error');
+                if (msg) {
+                    alert(msg);
+                }
             }
         });
         
@@ -78,5 +88,12 @@
 
 <?php
     $this->JQuery()->onLoadCaptureEnd();
-    echo $this->JQuery()->setRenderMode(ZendX_JQuery::RENDER_JQUERY_ON_LOAD);
+    $outputHtml .= (string) $this->JQuery()->setRenderMode(ZendX_JQuery::RENDER_JQUERY_ON_LOAD);
 ?>
+
+{
+    "result":
+    {
+        "html": <?php echo $this->json($outputHtml); ?>
+    }
+}

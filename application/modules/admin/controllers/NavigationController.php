@@ -35,8 +35,9 @@ class Admin_NavigationController extends Zend_Controller_Action
         $this->_sc = $this->getInvokeArg('bootstrap')->getContainer();
 
         $ajaxContext = $this->_helper->getHelper('AjaxContext');
-        $ajaxContext->addActionContext('add-page', 'html')
-                    ->addActionContext('save-menu', 'html')
+        $ajaxContext->addActionContext('add-page', 'json')
+                    ->addActionContext('save-menu', 'json')
+                    ->setAutoJsonSerialization(false)
                     ->initContext();
     }
 
@@ -132,14 +133,15 @@ class Admin_NavigationController extends Zend_Controller_Action
             try
             {
                 $navService->saveMenuHierarchy($this->getRequest()->getPost());
-                
+
                 $menuName = $this->_getParam('menuName');
                 $menuContainer = $navService->getNavigation($menuName);
                 $this->view->menuContainer = $menuContainer;
             }
             catch (ServiceException $e)
             {
-                $this->view->result = 'error';
+                $this->view->resultStatus = 'error';
+                $this->view->resultMsg = $e->getMessage();
             }
         }
         else
